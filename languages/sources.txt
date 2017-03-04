@@ -1,0 +1,12 @@
+de
+ from: http://wortschatz.uni-leipzig.de/html/wliste.html
+
+
+it, nl, fr
+ from: https://invokeit.wordpress.com/frequency-word-lists/
+
+    
+
+
+
+
