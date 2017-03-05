@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 import zeeguu
-from zeeguu.tests.model_tests.model_test_mixin import ModelTestMixIn
+from zeeguu.tests.model_test_mixin import ModelTestMixIn
 
 db = zeeguu.db
 from zeeguu.model.domain_name import DomainName

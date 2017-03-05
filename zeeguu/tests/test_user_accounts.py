@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import zeeguu
 from zeeguu import util
-from zeeguu.tests.model_tests.model_test_mixin import ModelTestMixIn
+from zeeguu.tests.model_test_mixin import ModelTestMixIn
 from zeeguu.model import Session, User
 
 
