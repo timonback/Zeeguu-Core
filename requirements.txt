@@ -28,5 +28,3 @@ regex==2017.02.08
 six==1.10.0
 webassets==0.12.1
 wsgiref==0.1.2
--e git+git@github.com:mircealungu/zee-core.git@51b016ae09fde912343e26ea317c164c89d201df#egg=zeeguu-master
--e git+git@github.com:mircealungu/zee-api.git@8acae14e501b7e429348d2336b546d948d78d5ca#egg=zeeguu_api-master
