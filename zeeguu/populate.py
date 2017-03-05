@@ -152,7 +152,7 @@ def path_of_language_resources():
     """
     import os
     path = os.path.dirname(__file__)
-    return path+"/../languages/"
+    return path+"/language_data/"
 
 
 def test_word_list(lang_code):

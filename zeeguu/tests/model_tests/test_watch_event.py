@@ -17,7 +17,7 @@ class WatchEventTest(ModelTestMixIn, TestCase):
             db.session.commit()
 
         retrieved = WatchEventType.find_by_name("glance")
-        assert (retrieved.name == "glance")
+        assert retrieved.name == "glance"   
         return retrieved
 
     def test_watch_event(self):

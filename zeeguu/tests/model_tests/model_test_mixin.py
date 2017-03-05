@@ -8,9 +8,12 @@ from flask import Flask
 # We initialize here the zeeguu.app because in several places
 # in the zeeguu code it is expected especially for its config
 
-zeeguu.app = Flask(__name__)
-zeeguu.app.config.from_pyfile("testing.cfg", silent=True) #config.cfg is in the instance folder
+zeeguu.app = Flask("Zeeguu-Core-Test")
+print (str(zeeguu.app))
+print ("running from: "+ zeeguu.app.instance_path)
+zeeguu.app.config.from_pyfile("testing.cfg", silent=False) #config.cfg is in the instance folder
 zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
+print ("running with DB: "+zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI")) 
 
 # CRITICAL IMPORT: Load all the model classes so they all get initialized with the zeeguu.db object
 import zeeguu.model
