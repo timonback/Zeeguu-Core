@@ -80,7 +80,7 @@ class KnownWordProbability(db.Model):
 
     @classmethod
     def find_for_userword(cls, user, user_word):
-        from zeeguu import RankedWord
+        from zeeguu.model import RankedWord
         ranked_word = RankedWord.find(user_word.word, user_word.language)
         return cls.find(user,user_word, ranked_word)
 

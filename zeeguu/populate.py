@@ -3,8 +3,6 @@ import re
 
 import zeeguu
 import datetime
-
-from sqlalchemy import MetaData
 from zeeguu.model.ranked_word import RankedWord
 from zeeguu.model.url import Url
 from zeeguu.model.text import Text

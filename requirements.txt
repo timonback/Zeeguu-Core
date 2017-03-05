@@ -1,0 +1,32 @@
+BeautifulSoup==3.2.1
+Flask==0.12
+Flask-Assets==0.12
+Flask-SQLAlchemy==2.2
+Flask-WTF==0.14.2
+Jinja2==2.9.5
+MarkupSafe==0.23
+MySQL-python==1.2.5
+Pillow==4.0.0
+SQLAlchemy==1.1.6
+WTForms==2.1
+Werkzeug==0.11.15
+beautifulsoup4==4.5.3
+click==6.7
+cssmin==0.2.0
+cssselect==1.0.1
+feedparser==5.2.1
+futures==3.0.5
+goose-extractor==1.0.25
+goslate==1.5.1
+itsdangerous==0.24
+jieba==0.38
+jsmin==2.2.1
+lxml==3.7.3
+nltk==3.2.2
+olefile==0.44
+regex==2017.02.08
+six==1.10.0
+webassets==0.12.1
+wsgiref==0.1.2
+-e git+git@github.com:mircealungu/zee-core.git@51b016ae09fde912343e26ea317c164c89d201df#egg=zeeguu-master
+-e git+git@github.com:mircealungu/zee-api.git@8acae14e501b7e429348d2336b546d948d78d5ca#egg=zeeguu_api-master

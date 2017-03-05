@@ -1,4 +1,6 @@
 from unittest import TestCase
+
+import zeeguu
 from zeeguu import util
 from zeeguu.tests.model_tests.model_test_mixin import ModelTestMixIn
 from zeeguu.model import Session, User
@@ -19,6 +21,10 @@ class UserPreferenceTest(ModelTestMixIn, TestCase):
     def test_user_session(self):
         user = User.find("i@mir.lu")
         s = Session.find_for_user(user)
+        print s.id
+        zeeguu.db.session.add(s)
+        zeeguu.db.session.commit()
+
         # print s.id
         # #
         # s2 = Session.find_for_id(s.id)
