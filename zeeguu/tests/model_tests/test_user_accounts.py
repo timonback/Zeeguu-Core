@@ -21,7 +21,7 @@ class UserPreferenceTest(ModelTestMixIn, TestCase):
     def test_user_session(self):
         user = User.find("i@mir.lu")
         s = Session.find_for_user(user)
-        print s.id
+        # print s.id
         zeeguu.db.session.add(s)
         zeeguu.db.session.commit()
 
