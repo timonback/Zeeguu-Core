@@ -10,7 +10,7 @@
 #
 # __author__ = 'mircea'
 #
-
+from zeeguu.model import KnownWordProbability
 from zeeguu.the_librarian.text import split_words_from_text
 from zeeguu.model.ranked_word import RankedWord
 
@@ -31,6 +31,20 @@ def discrete_text_difficulty(median_difficulty, average_difficulty):
         return "MEDIUM"
     return "HARD"
 
+
+def text_difficulty_for_user(user, text, language, difficulty_computer = 'default', rank_boundary = REFERENCE_VOCABULARY_SIZE):
+    """
+    given a user, computes the known_probabilities, and then delegates to the
+    other text_difficulty
+    :param user:
+    :param text:
+    :param language:
+    :param difficulty_computer:
+    :param rank_boundary:
+    :return:
+    """
+    known_probabilities = KnownWordProbability.find_all_by_user_cached(user)
+    return text_difficulty(text, language, known_probabilities, difficulty_computer, rank_boundary)
 
 def text_difficulty(text, language, known_probabilities, difficulty_computer = 'default', rank_boundary = REFERENCE_VOCABULARY_SIZE):
     """
@@ -72,10 +86,18 @@ def text_difficulty(text, language, known_probabilities, difficulty_computer = '
     center = int(round(len(word_difficulties) / 2, 0))
     difficulty_median = word_difficulties[center]
 
+    normalized_estimate = difficulty_median
+
     difficulty_scores = dict(
         score_median=difficulty_median,
         score_average=difficulty_average,
-        estimated_difficulty=discrete_text_difficulty(difficulty_average, difficulty_median))
+        estimated_difficulty=discrete_text_difficulty(difficulty_average, difficulty_median),
+        # previous are for backwards compatibility reasonons
+        # TODO: must be removed
+
+        normalized=normalized_estimate,
+        discrete=discrete_text_difficulty(difficulty_average, difficulty_median),
+    )
 
     return difficulty_scores
 

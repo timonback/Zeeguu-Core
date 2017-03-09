@@ -12,4 +12,3 @@ class FeedTest(ModelTestMixIn, TestCase):
 
         first_item_date = items[0]["published"]
         assert first_item_date
-

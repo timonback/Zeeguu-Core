@@ -66,6 +66,11 @@ class User(db.Model):
             native_language=self.native_language_id
         )
 
+    def text_difficulty(self, text, language):
+        from zeeguu.language.text_difficulty import text_difficulty_for_user
+        return text_difficulty_for_user(self, text, language)
+
+
     def set_learned_language(self, code):
         self.learned_language = Language.find(code)
 

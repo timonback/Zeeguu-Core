@@ -1,3 +1,4 @@
+import os
 from unittest import TestCase
 
 import flask_sqlalchemy
@@ -9,9 +10,12 @@ from flask import Flask
 # in the zeeguu code it is expected especially for its config
 
 zeeguu.app = Flask("Zeeguu-Core-Test")
-print (str(zeeguu.app))
-print ("running from: "+ zeeguu.app.instance_path)
-zeeguu.app.config.from_pyfile("testing.cfg", silent=False) #config.cfg is in the instance folder
+
+config_file = os.path.expanduser('~/.zeeguu/model_test.cfg')
+if os.environ.has_key("CONFIG_FILE"):
+    config_file = os.environ["CONFIG_FILE"]
+zeeguu.app.config.from_pyfile(config_file, silent=False) #config.cfg is in the instance folder
+
 zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
 print ("running with DB: "+zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI")) 
 

@@ -71,6 +71,7 @@ class RSSFeed(db.Model):
             print e
             return None
 
+
     @classmethod
     def find_by_url(cls, url):
         try:
@@ -79,6 +80,29 @@ class RSSFeed(db.Model):
             return result
         except sqlalchemy.orm.exc.NoResultFound:
             return None
+
+    def feed_items_with_metrics(self, user, timeout=10):
+        """
+        Retrieves the feed items for this feed together with their metrics (difficulty,
+        learnability, etc.).
+
+        Assumes that the language of the feed is correctly set
+
+        :return: dictionary with keys being urls and values being the corresponding metrics
+        """
+        from zeeguu.language.retrieve_and_compute import retrieve_urls_and_compute_metrics
+
+        feed_items = self.feed_items()
+        urls = [each['url'] for each in feed_items]
+        urls_and_metrics = retrieve_urls_and_compute_metrics(urls,
+                                                             self.language,
+                                                             user,
+                                                             timeout)
+        filtered_feed_items = [dict(each.items() + {"metrics":urls_and_metrics.get(each['url'])}.items())
+                               for each in feed_items
+                               if each["url"] in urls_and_metrics.keys()]
+
+        return filtered_feed_items
 
     @classmethod
     def find_or_create(cls, url, title, description, image_url, language):

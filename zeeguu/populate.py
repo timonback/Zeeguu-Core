@@ -19,6 +19,7 @@ TEST_PASS='test'
 TEST_EMAIL='i@mir.lu'
 
 TEST_BOOKMARKS_COUNT = 2
+RANKED_WORDS_IN_DB = 0
 
 
 def drop_current_tables(db):
@@ -166,13 +167,15 @@ def add_ranked_word_to_db(db, lang_code):
     # zeeguu.app.test_request_context().push()
     db.session.commit()
     from_lang = Language.find(lang_code)
-    initial_line_number = 1
+    line_number = 1
 
     for word in filter_word_list(test_word_list(lang_code)):
-        r = RankedWord(word.lower(), from_lang,initial_line_number)
+        r = RankedWord(word.lower(), from_lang,line_number)
         db.session.add(r)
-        initial_line_number+=1
+        line_number+=1
         # print "added " + str(r.word)
+    global RANKED_WORDS_IN_DB
+    RANKED_WORDS_IN_DB = line_number
     db.session.commit()
 
 
