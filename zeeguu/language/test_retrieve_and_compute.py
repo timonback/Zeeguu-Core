@@ -47,9 +47,7 @@ class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
         assert items_with_metrics[0]["title"]
         assert items_with_metrics[0]["summary"]
         assert items_with_metrics[0]["published"]
-
-        print items_with_metrics[0]["title"]
-        print items_with_metrics[0]["metrics"]
+        assert items_with_metrics[0]["metrics"]
 
 
 

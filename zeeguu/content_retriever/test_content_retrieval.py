@@ -23,4 +23,4 @@ class TestContentRetrieval(ModelTestMixIn, TestCase):
 
     def test_with_redirect(self):
         content_and_urls = get_content_for_urls([URL_WITH_REDIRECT])
-        print content_and_urls
+        assert content_and_urls
