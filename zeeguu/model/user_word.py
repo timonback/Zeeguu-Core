@@ -64,7 +64,7 @@ class UserWord(db.Model, util.JSONSerializable):
             return (cls.query.filter(cls.word == word)
                              .filter(cls.language == language)
                              .one())
-        except sqlalchemy.orm.exc.NoResultFound:
+        except sqlalchemy.orm.exc.NoResultFound as e:
             rank = UserWord.find_rank(word.lower(),language)
             return cls(word, language,rank)
 

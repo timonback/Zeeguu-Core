@@ -161,7 +161,7 @@ class Bookmark(db.Model):
         for word in self.context_words_with_rank():
             enc_prob = EncounterBasedProbability.find_or_create(word, user, language)
             zeeguu.db.session.add(enc_prob)
-            zeeguu.db.session.commit()
+            # zeeguu.db.session.commit()
             user_word = None
             ranked_word = enc_prob.ranked_word
             if UserWord.exists(word,language):
@@ -196,14 +196,16 @@ class Bookmark(db.Model):
                 enc_prob = EncounterBasedProbability.find(user, ranked_word)
                 enc_prob.word_has_just_beek_bookmarked()
                 db.session.add(enc_prob)
-                db.session.commit()
+                # db.session.commit()
 
             # 2.c) update known word probability if it exists
             if KnownWordProbability.exists(user, self.origin,ranked_word):
                 known_word_prob = KnownWordProbability.find(user,self.origin,ranked_word)
                 known_word_prob.word_has_just_beek_bookmarked()
                 db.session.add(known_word_prob)
-                db.session.commit()
+                # db.session.commit()
+
+        db.session.commit()
 
     @classmethod
     def find_by_specific_user(cls, user):
