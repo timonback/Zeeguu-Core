@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-
 from zeeguu.tests.model_test_mixin import ModelTestMixIn
 
 from zeeguu.model import Url, RSSFeed
@@ -42,7 +41,7 @@ class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
         url = Url(DE_SAMPLE_FEED_1_URL, DE_SAMPLE_FEED_1_URL)
         feed = RSSFeed(url, DE_SAMPLE_FEED_1_TITLE, "blabla", image_url = None, language = self.de)
 
-        items_with_metrics = feed.feed_items_with_metrics(self.mir, 5)
+        items_with_metrics = feed.feed_items_with_metrics(self.mir, 10)
 
         assert len(items_with_metrics) > 0
         assert items_with_metrics[0]["title"]
