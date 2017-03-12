@@ -35,16 +35,20 @@ class ModelTestMixIn(TestCase):
 
         self.ctx = zeeguu.app.test_request_context().push()
 
-        # if maximal populate is set to True by the subclass, before
-        # invoking super.setUp() we populate the DB with the extended
-        # version of the test data. otherwise, only a minimal test
-        # data is created.
-        if hasattr(self, 'maximal_populate'):
-            create_test_db(zeeguu.db)
-        else:
-            create_minimal_test_db(zeeguu.db)
+        # if no_need_for_db is set to True, the DB is not recreated
+        # this speeds up the tests a little
 
-        self.session = zeeguu.db.session
+        if not hasattr(self, 'no_need_for_db'):
+            # if maximal populate is set to True by the subclass, before
+            # invoking super.setUp() we populate the DB with the extended
+            # version of the test data. otherwise, only a minimal test
+            # data is created.
+            if hasattr(self, 'maximal_populate'):
+                create_test_db(zeeguu.db)
+            else:
+                create_minimal_test_db(zeeguu.db)
+
+            self.session = zeeguu.db.session
 
         # Some common test fixtures
         self.mir = zeeguu.model.User.find("i@mir.lu")

@@ -17,7 +17,7 @@ setuptools.setup(
     package_data={'': ['language_data/*']},
     install_requires=("flask>=0.10.1", 
                       "Flask-SQLAlchemy",
-                      "goose-extractor",
+                      "redability",
                       "cssmin",
                       "jsmin",
                       "flask-wtf",

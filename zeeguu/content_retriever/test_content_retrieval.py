@@ -7,6 +7,10 @@ from zeeguu.tests.testing_data import *
 
 class TestContentRetrieval(ModelTestMixIn, TestCase):
 
+    def setUp(self):
+        self.no_need_for_db = True
+        super(TestContentRetrieval, self).setUp()
+
     def test_simple_parallel_retrieval(self):
         urls = [EASIEST_STORY_URL,
                 VERY_EASY_STORY_URL]
@@ -16,3 +20,7 @@ class TestContentRetrieval(ModelTestMixIn, TestCase):
         for each in content_and_urls:
             assert each['url']
             assert each['content']
+
+    def test_with_redirect(self):
+        content_and_urls = get_content_for_urls([URL_WITH_REDIRECT])
+        print content_and_urls

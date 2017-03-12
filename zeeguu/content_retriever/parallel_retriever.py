@@ -2,7 +2,7 @@ import Queue
 import threading
 
 import time
-from zeeguu.content_retriever.goose_extractor import ContentExtractorFromUrl
+from zeeguu.content_retriever.content_extractor import ContentExtractorFromUrl
 
 
 def get_content_for_urls(urls, timeout = 10):
