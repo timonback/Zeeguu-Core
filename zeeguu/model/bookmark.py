@@ -1,6 +1,5 @@
 import re
 
-import datetime
 from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
@@ -13,6 +12,7 @@ from zeeguu.model.exercise import Exercise
 from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.user_word import UserWord
 from zeeguu.model.ranked_word import RankedWord
+from datetime import datetime
 
 
 bookmark_translation_mapping = Table('bookmark_translation_mapping', db.Model.metadata,
@@ -95,7 +95,7 @@ class Bookmark(db.Model):
         new_outcome=ExerciseOutcome.query.filter_by(
         outcome=exercise_outcome
     ).first()
-        exercise = Exercise(new_outcome,new_source,exercise_solving_speed,datetime.datetime.now())
+        exercise = Exercise(new_outcome,new_source,exercise_solving_speed, datetime.now())
         self.add_new_exercise(exercise)
         db.session.add(exercise)
 
@@ -130,6 +130,8 @@ class Bookmark(db.Model):
         return result
 
     def calculate_probabilities_after_adding_a_bookmark(self, user,language):
+        a = datetime.now()
+
         from zeeguu.model.known_word_probability import KnownWordProbability
         from zeeguu.model.exercise_based_probability import ExerciseBasedProbability
         from zeeguu.model.encounter_based_probability import EncounterBasedProbability
@@ -206,6 +208,14 @@ class Bookmark(db.Model):
                 # db.session.commit()
 
         db.session.commit()
+
+        b = datetime.now()
+        delta = b - a
+        print ("calculating proabilities for user {1} and bookmark {2} took {0}ms".
+               format(int(delta.total_seconds() * 1000),
+                      user.id,
+                      self.id))
+
 
     @classmethod
     def find_by_specific_user(cls, user):
@@ -309,7 +319,12 @@ class Bookmark(db.Model):
 
         return False, None
 
+
     def has_been_learned(self, also_return_time=False):
+        # TODO: This must be stored in the DB together with the
+        # bookmark... once a bookmark has been learned, we shoud
+        # not ever doubt it ...
+
         """
         :param also_return_time: should the function return also the time when
         the bookmark has been learned?

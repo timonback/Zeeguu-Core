@@ -53,6 +53,8 @@ class ModelTestMixIn(TestCase):
         # Some common test fixtures
         self.mir = zeeguu.model.User.find("i@mir.lu")
         self.de = zeeguu.model.Language.find("de")
+        self.en = zeeguu.model.Language.find("en")
+
 
     def tearDown(self):
         super(ModelTestMixIn, self).tearDown()
