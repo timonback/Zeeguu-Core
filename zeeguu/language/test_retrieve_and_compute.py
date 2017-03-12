@@ -27,13 +27,12 @@ class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
                                                          self.de,
                                                          self.mir)
 
-        difficulty_for_easiest = difficulties[EASIEST_STORY_URL]
-        difficulty_for_very_easy = difficulties[VERY_EASY_STORY_URL]
-        difficulty_for_easy = difficulties[EASY_STORY_URL]
+        difficulty_for_easiest = difficulties[EASIEST_STORY_URL]['difficulty']
+        difficulty_for_very_easy = difficulties[VERY_EASY_STORY_URL]['difficulty']
+        difficulty_for_easy = difficulties[EASY_STORY_URL]['difficulty']
 
         assert \
             difficulty_for_easiest['normalized'] < \
-            difficulty_for_very_easy['normalized'] < \
             difficulty_for_easy['normalized']
 
         # on the other hand, they're all EASY
