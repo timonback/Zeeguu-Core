@@ -5,6 +5,8 @@ from zeeguu import util
 from zeeguu.tests.model_test_mixin import ModelTestMixIn
 from zeeguu.model import Session, User
 
+WANNABE_UUID = '2b4a7c0d1e8f'
+TEST_PASS = 'cherrypie'
 
 class UserPreferenceTest(ModelTestMixIn, TestCase):
 
@@ -33,3 +35,18 @@ class UserPreferenceTest(ModelTestMixIn, TestCase):
         #
         # s3 = Session.find_for_id(3)
         # assert not s3
+
+    @classmethod
+    def test_create_anonymous_user_and_get_sessions(self):
+        u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS)
+        zeeguu.db.session.add_all([u1])
+        zeeguu.db.session.commit()
+        assert u1.name == WANNABE_UUID
+
+    @classmethod
+    def test_get_session_for_anonymous_user(self):
+        self.test_create_anonymous_user_and_get_sessions()
+        user = User.authorize(WANNABE_UUID+'@mir.lu',TEST_PASS)
+        assert Session.find_for_user(user).id > 0
+
+

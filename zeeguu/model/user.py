@@ -16,6 +16,8 @@ db = zeeguu.db
 
 from zeeguu.model.user_word import UserWord
 
+ANONYMOUS_EMAIL_DOMAIN = '@anon.zeeguu'
+
 starred_words_association_table = Table('starred_words_association', db.Model.metadata,
     Column('user_id', Integer, ForeignKey('user.id')),
     Column('starred_word_id', Integer, ForeignKey('user_word.id'))
@@ -42,12 +44,21 @@ class User(db.Model):
     )
     native_language = sqlalchemy.orm.relationship("Language", foreign_keys=[native_language_id])
 
-    def __init__(self, email, username, password, learned_language=None, native_language = None):
+    def __init__(self, email, name, password, learned_language=None, native_language = None):
         self.email = email
-        self.name = username
+        self.name = name
         self.update_password(password)
         self.learned_language = learned_language or Language.default_learned()
         self.native_language = native_language or Language.default_native_language()
+
+    @classmethod
+    def create_anonymous(cls, uuid, password, learned_language = None, native_language = None):
+
+        # since the DB must have an email we generate a fake one
+        fake_email = uuid+ANONYMOUS_EMAIL_DOMAIN
+
+        new_user = cls(fake_email, uuid, password, learned_language=learned_language, native_language=native_language)
+        return new_user
 
     def __repr__(self):
         return '<User %r>' % (self.email)
@@ -243,6 +254,17 @@ class User(db.Model):
 
     @classmethod
     def authorize(cls, email, password):
+        try:
+            user = cls.query.filter(cls.email == email).one()
+            if user.password == util.password_hash(password,
+                                                   user.password_salt):
+                return user
+        except sqlalchemy.orm.exc.NoResultFound:
+            return None
+
+    @classmethod
+    def authorize_anonymous(cls, uuid, password):
+        email = uuid + ANONYMOUS_EMAIL_DOMAIN
         try:
             user = cls.query.filter(cls.email == email).one()
             if user.password == util.password_hash(password,
