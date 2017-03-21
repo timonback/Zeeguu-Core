@@ -16,7 +16,7 @@ if __name__ == "__main__":
     print ("!!!! in populate...")
     zeeguu.app = Flask("Zeeguu-Core-Test")
 
-    config_file = os.path.expanduser('~/.zeeguu/model_test.cfg')
+    config_file = os.path.expanduser('~/.zeeguu/zeeguu_core.cfg')
     if os.environ.has_key("CONFIG_FILE"):
         config_file = os.environ["CONFIG_FILE"]
     zeeguu.app.config.from_pyfile(config_file, silent=False)  # config.cfg is in the instance folder
