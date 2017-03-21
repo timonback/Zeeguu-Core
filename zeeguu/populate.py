@@ -32,6 +32,7 @@ from zeeguu.model.user_word import UserWord
 from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.language import Language
 from zeeguu.model.user import User
+from zeeguu.model.unique_code import UniqueCode
 
 WORD_PATTERN = re.compile("\[?([^{\[]+)\]?( {[^}]+})?( \[[^\]]\])?")
 
