@@ -5,7 +5,6 @@ from zeeguu.tests.model_test_mixin import ModelTestMixIn
 from zeeguu.model import Url, RSSFeed
 
 from zeeguu.language.retrieve_and_compute import retrieve_urls_and_compute_metrics
-from zeeguu.model import RankedWord
 from zeeguu.tests.testing_data import *
 
 
@@ -14,7 +13,6 @@ class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
     def setUp(self):
         self.maximal_populate = True
         super(TestRetrieveAndCompute, self).setUp()
-        RankedWord.cache_ranked_words()
 
     def testSimple(self):
 

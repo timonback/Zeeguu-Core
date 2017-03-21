@@ -1,9 +1,29 @@
 # -*- coding: utf8 -*-
+import os
 import re
 
+import flask_sqlalchemy
 import zeeguu
 import datetime
-from zeeguu.model.ranked_word import RankedWord
+
+from flask import Flask
+
+
+# zeeguu.db must be setup before we load the model classes the first time
+
+if __name__ == "__main__":
+
+    print ("!!!! in populate...")
+    zeeguu.app = Flask("Zeeguu-Core-Test")
+
+    config_file = os.path.expanduser('~/.zeeguu/model_test.cfg')
+    if os.environ.has_key("CONFIG_FILE"):
+        config_file = os.environ["CONFIG_FILE"]
+    zeeguu.app.config.from_pyfile(config_file, silent=False)  # config.cfg is in the instance folder
+
+    zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
+    print ("running with DB: " + zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI"))
+
 from zeeguu.model.url import Url
 from zeeguu.model.text import Text
 from zeeguu.model.exercise_outcome import ExerciseOutcome
@@ -19,7 +39,6 @@ TEST_PASS='test'
 TEST_EMAIL='i@mir.lu'
 
 TEST_BOOKMARKS_COUNT = 2
-RANKED_WORDS_IN_DB = 0
 
 
 def drop_current_tables(db):
@@ -97,7 +116,6 @@ def create_minimal_test_db(db):
     TEST_BOOKMARKS_COUNT = 2
     db.session.commit()
 
-    add_ranked_word_to_db(db, 'de')
 
 
 
@@ -161,23 +179,6 @@ def test_word_list(lang_code):
     words_file = open(path_of_language_resources()+lang_code+"-test.txt")
     words_list = words_file.read().splitlines()
     return words_list
-
-
-def add_ranked_word_to_db(db, lang_code):
-    # zeeguu.app.test_request_context().push()
-    db.session.commit()
-    from_lang = Language.find(lang_code)
-    line_number = 1
-
-    for word in filter_word_list(test_word_list(lang_code)):
-        r = RankedWord(word.lower(), from_lang,line_number)
-        db.session.add(r)
-        line_number+=1
-        # print "added " + str(r.word)
-    global RANKED_WORDS_IN_DB
-    RANKED_WORDS_IN_DB = line_number
-    db.session.commit()
-
 
 def clean_word(word):
     match = re.match(WORD_PATTERN, word)
@@ -294,8 +295,6 @@ def create_test_db(db):
             ['Entsetzen','horror','Entsetzt starrte Teramichi auf die Wolke',story_url]
         ]
 
-    add_ranked_word_to_db(db, 'de')
-
     for key in today_dict:
         add_bookmark(db, user, de, key, en, today_dict[key], jan111, "Keine bank durfe auf immunitat pochen, nur weil sie eine besonders herausgehobene bedeutung fur das finanzsystem habe, sagte holder, ohne namen von banken zu nennen",
                          "http://url2", "title of url2")
@@ -315,6 +314,5 @@ def create_test_db(db):
 
 if __name__ == "__main__":
 
-    "in populate..."
-    zeeguu.app.test_request_context().push()
+    print ("Populating the db")
     create_test_db(zeeguu.db)

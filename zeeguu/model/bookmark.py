@@ -11,7 +11,6 @@ from zeeguu.model.exercise import Exercise
 
 from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.user_word import UserWord
-from zeeguu.model.ranked_word import RankedWord
 from datetime import datetime
 
 

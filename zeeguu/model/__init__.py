@@ -10,7 +10,6 @@ from .feeds import RSSFeed, RSSFeedRegistration
 from .knowledge_estimator import SethiKnowledgeEstimator
 from .known_word_probability import KnownWordProbability
 from .language import Language
-from .ranked_word import RankedWord
 from .session import Session
 from .text import Text
 from .url import Url
