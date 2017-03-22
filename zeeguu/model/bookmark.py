@@ -280,5 +280,10 @@ class Bookmark(db.Model):
             db.session.add(stat)
         db.session.commit()
         b = datetime.now()
-        print (b - a) * 1000
+        delta = b - a
+        print ("calculating proabilities for user {1} and bookmark {2} took {0}ms".
+               format(int(delta.total_seconds() * 1000),
+                      user.id,
+                      self.id))
+
 
