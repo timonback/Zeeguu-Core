@@ -4,6 +4,9 @@ from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
 import zeeguu
+from wordstats import Word
+from zeeguu.model.ranked_word import WordForm
+
 db = zeeguu.db
 
 from zeeguu.model.exercise_source import ExerciseSource
@@ -99,19 +102,15 @@ class Bookmark(db.Model):
         db.session.add(exercise)
 
     def split_words_from_context(self):
-        words_of_bookmark_content = []
-        bookmark_content_words = re.findall(r'(?u)\w+', self.text.content)
-        words_of_bookmark_content.extend(bookmark_content_words)
-        return words_of_bookmark_content
 
-    def context_words_with_rank(self):
-        ranked_context_words = self.split_words_from_context()
-        while self.origin.word in ranked_context_words: ranked_context_words.remove(self.origin.word)
-        filtered_words_known_from_user = []
-        for word_known in ranked_context_words:
-            if RankedWord.exists(word_known.lower(), self.origin.language):
-                filtered_words_known_from_user.append(word_known)
-        return filtered_words_known_from_user
+        result = []
+        bookmark_content_words = re.findall(r'(?u)\w+', self.text.content)
+        for word in bookmark_content_words:
+            if word.lower() != self.origin.word.lower():
+                result.append(word)
+
+        return result
+
 
     def json_serializable_dict(self, with_context=True):
         result = dict(
@@ -121,99 +120,12 @@ class Bookmark(db.Model):
                     to_lang=self.translation().language.id,
                     title=self.text.url.title,
                     url=self.text.url.as_string(),
-                    origin_rank=self.origin.get_rank()
+                    origin_importance=Word.stats(self.origin.word, self.origin.language_id).importance
                 )
         result["from"] = self.origin.word
         if with_context:
             result['context'] = self.text.content
         return result
-
-    def calculate_probabilities_after_adding_a_bookmark(self, user,language):
-        a = datetime.now()
-
-        from zeeguu.model.known_word_probability import KnownWordProbability
-        from zeeguu.model.exercise_based_probability import ExerciseBasedProbability
-        from zeeguu.model.encounter_based_probability import EncounterBasedProbability
-
-        # TODO: This should take the DB as an argument!
-        # TODO: Should be moved to the KnownWordProbability
-        """
-        ML: This has to be refactored.
-        It's a mess.
-
-
-         The idea is: you've just added a bookmark.
-         There are two things to do:
-
-          1. update the probabilities of the context words (they have been
-          encountered, and not translated)
-
-          2. update the probabilities of the word itself
-
-         -
-
-
-        :param user:
-        :param language:
-        :return:
-        """
-
-        # 1. computations for adding encounter based probability for the context words
-        for word in self.context_words_with_rank():
-            enc_prob = EncounterBasedProbability.find_or_create(word, user, language)
-            zeeguu.db.session.add(enc_prob)
-            # zeeguu.db.session.commit()
-            user_word = None
-            ranked_word = enc_prob.ranked_word
-            if UserWord.exists(word,language):
-                user_word = UserWord.find(word,language)
-                if ExerciseBasedProbability.exists(user,user_word): #checks if exercise based probability exists for words in context
-                    ex_prob = ExerciseBasedProbability.find_or_create(user,user_word)
-                    known_word_prob = KnownWordProbability.find(user,user_word,ranked_word)
-                    known_word_prob.probability = known_word_prob.calculate_known_word_prob(ex_prob.probability, enc_prob.probability) #updates known word probability as exercise based probability already existed.
-            else:
-                if KnownWordProbability.exists(user, user_word,ranked_word):
-                    known_word_prob = KnownWordProbability.find(user,user_word,ranked_word)
-                    known_word_prob.probability = enc_prob.probability # updates known word probability as encounter based probability already existed
-                else:
-                    known_word_prob = KnownWordProbability.find(user,user_word,ranked_word, enc_prob.probability) # new known word probability created as it did not exist
-                    zeeguu.db.session.add(known_word_prob)
-
-        # 2. Update the probabilities of the word itself
-
-        # 2.a) exercise based prob
-        # ML: Should this thing change?
-        # The ex based probability should probably not change after I add a bookmark
-        # Commenting out the following lines: s
-        # ex_prob = ExerciseBasedProbability.find_or_create(user, self.origin)
-        # if ex_prob:
-        #     ex_prob.update_probability_after_adding_bookmark_with_same_word(self,user)
-        #     zeeguu.db.session.add(ex_prob)
-
-        # 2.b) encounter based prob
-        ranked_word = RankedWord.find(self.origin.word, language)
-        if ranked_word: #checks if ranked_word exists for that looked up word
-            if EncounterBasedProbability.exists(user, ranked_word): # checks if encounter based probability exists for that looked up word
-                enc_prob = EncounterBasedProbability.find(user, ranked_word)
-                enc_prob.word_has_just_beek_bookmarked()
-                db.session.add(enc_prob)
-                # db.session.commit()
-
-            # 2.c) update known word probability if it exists
-            if KnownWordProbability.exists(user, self.origin,ranked_word):
-                known_word_prob = KnownWordProbability.find(user,self.origin,ranked_word)
-                known_word_prob.word_has_just_beek_bookmarked()
-                db.session.add(known_word_prob)
-                # db.session.commit()
-
-        db.session.commit()
-
-        b = datetime.now()
-        delta = b - a
-        print ("calculating proabilities for user {1} and bookmark {2} took {0}ms".
-               format(int(delta.total_seconds() * 1000),
-                      user.id,
-                      self.id))
 
 
     @classmethod
@@ -350,3 +262,23 @@ class Bookmark(db.Model):
             return False, None
 
         return False
+
+    def update_encounter_stats_after_adding_a_bookmark(self, user, language):
+        from zeeguu.model.learner_stats.word_encounter_stats import EncounterStats
+        """
+        The main thing:
+        - go through the words in the context, and update their
+        encounter statistics
+        :return:
+        """
+        a = datetime.now()
+        context_words = self.split_words_from_context()
+        for word in context_words:
+            word_form = WordForm.find_or_create(word, language)
+            stat = EncounterStats.find_or_create_wordform(user, word_form)
+            stat.event_seen_but_not_looked_up()
+            db.session.add(stat)
+        db.session.commit()
+        b = datetime.now()
+        print (b - a) * 1000
+

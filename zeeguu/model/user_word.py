@@ -1,9 +1,12 @@
 import sqlalchemy.orm
+from wordstats import Word
 
 from zeeguu import util
-from zeeguu.model.ranked_word import RankedWord
 import zeeguu
 db = zeeguu.db
+
+from zeeguu.model.language import Language
+
 
 class UserWord(db.Model, util.JSONSerializable):
     __tablename__ = 'user_word'
@@ -13,21 +16,15 @@ class UserWord(db.Model, util.JSONSerializable):
     word = db.Column(db.String(255), nullable =False, unique = True)
     language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
     language = db.relationship("Language")
-    rank_id = db.Column(db.Integer, db.ForeignKey("ranked_word.id"), nullable=True)
-    rank = db.relationship("RankedWord")
     db.UniqueConstraint(word, language_id)
 
     IMPORTANCE_LEVEL_STEP = 1000
     IMPOSSIBLE_RANK = 1000000
     IMPOSSIBLE_IMPORTANCE_LEVEL = IMPOSSIBLE_RANK / IMPORTANCE_LEVEL_STEP
 
-    def __init__(self, word, language, rank = None):
+    def __init__(self, word, language):
         self.word = word
         self.language = language
-        self.rank = rank
-
-    def set_rank(self, new_rank):
-        self.rank = new_rank
 
     def __repr__(self):
         return '<UserWord %r>' % (self.word)
@@ -35,26 +32,16 @@ class UserWord(db.Model, util.JSONSerializable):
     def serialize(self):
         return self.word
 
-    # returns a number between
+    # returns a number between 0 and 10
     def importance_level(self):
-        if self.rank is not None:
-            return max((10 - self.rank.rank / UserWord.IMPORTANCE_LEVEL_STEP), 0)
+        stats = Word.stats(self.word, self.language.id)
+        if stats:
+            return int(min(stats.importance, 10))
         else:
-            return  0
+            return 0
 
-    # returns the rank if in the DB, or the impossible rank
-    def get_rank(self):
-        if self.rank is not None:
-            return self.rank.rank
-        else:
-            return UserWord.IMPOSSIBLE_RANK
-
-
-    # we use this in the bookmarks.html to show the rank.
-    # for words in which there is no rank info, we don't display anything
+    # we use this in the bookmarks.html to show the importance of a word
     def importance_level_string(self):
-        if self.rank == None:
-            return ""
         b = "|"
         return b * self.importance_level()
 
@@ -65,13 +52,8 @@ class UserWord(db.Model, util.JSONSerializable):
                              .filter(cls.language == language)
                              .one())
         except sqlalchemy.orm.exc.NoResultFound as e:
-            rank = UserWord.find_rank(word.lower(),language)
-            return cls(word, language,rank)
+            return cls(word, language)
 
-
-    @classmethod
-    def find_rank(cls, word, language):
-        return RankedWord.find(word, language)
 
     @classmethod
     def find_all(cls):

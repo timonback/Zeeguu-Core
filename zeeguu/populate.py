@@ -57,14 +57,12 @@ def add_bookmark(db, user, original_language, original_word, translation_languag
 
     url = Url.find (the_url)
     text = Text.find_or_create(the_context, translation_language, url)
-    origin = UserWord.find(original_word.lower(), original_language)
-    translation = UserWord.find(translation_word.lower(), translation_language)
+    origin = UserWord.find(original_word, original_language)
+    translation = UserWord.find(translation_word, translation_language)
 
     b1 = Bookmark(origin, translation, user, text, date)
     db.session.add_all([url,text,origin,translation,b1])
     db.session.commit()
-
-    add_probability_to_existing_words_of_user(user,b1,original_language)
 
 
 #
@@ -186,12 +184,6 @@ def clean_word(word):
         return word.decode("utf8")
     return match.group(1).decode("utf8")
 
-
-
-
-
-def add_probability_to_existing_words_of_user(user,bookmark,language):
-    bookmark.calculate_probabilities_after_adding_a_bookmark(user,language)
 
 
 def create_test_db(db):

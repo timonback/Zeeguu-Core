@@ -7,7 +7,6 @@ from zeeguu.tests.model_test_mixin import ModelTestMixIn
 
 from zeeguu.model import RSSFeed
 from zeeguu.model import Url
-from zeeguu.model import RankedWord
 
 SIMPLE_TEXT = "Das ist "
 COMPLEX_TEXT = u"Alle hatten in sein Lachen eingestimmt, hauptsächlich aus Ehrerbietung " \
@@ -19,7 +18,6 @@ class TextDifficultyTest(ModelTestMixIn, TestCase):
     def setUp(self):
         self.maximal_populate = True
         super(TextDifficultyTest, self).setUp()
-        RankedWord.cache_ranked_words()
 
     def very_simple_test(self):
 

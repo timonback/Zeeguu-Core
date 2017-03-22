@@ -19,11 +19,15 @@ class ExerciseBasedProbability(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False)
     user = db.relationship("User")
+
     user_word_id = db.Column(db.Integer, db.ForeignKey('user_word.id'), nullable = False)
     user_word = db.relationship("UserWord")
+
     probability = db.Column(db.DECIMAL(10,9), nullable = False)
+
     db.UniqueConstraint(user_id, user_word_id)
     db.CheckConstraint('probability>=0', 'probability<=1')
 

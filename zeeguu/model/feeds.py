@@ -9,6 +9,7 @@ from zeeguu.model.user import User
 
 db = zeeguu.db
 
+
 class RSSFeed(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
     __tablename__ = 'rss_feed'

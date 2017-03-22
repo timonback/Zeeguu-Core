@@ -10,7 +10,7 @@
 #
 # __author__ = 'mircea'
 #
-from zeeguu.model import KnownWordProbability
+from wordstats import Word
 from zeeguu.the_librarian.text import split_words_from_text
 
 
@@ -42,8 +42,7 @@ def text_difficulty_for_user(user, text, language, difficulty_computer = 'defaul
     :param rank_boundary:
     :return:
     """
-    known_probabilities = KnownWordProbability.find_all_by_user_cached(user)
-    return text_difficulty(text, language, known_probabilities, difficulty_computer, rank_boundary)
+    return text_difficulty(text, language, {}, difficulty_computer, rank_boundary)
 
 def text_difficulty(text, language, known_probabilities, difficulty_computer = 'default', rank_boundary = REFERENCE_VOCABULARY_SIZE):
     """
@@ -65,7 +64,7 @@ def text_difficulty(text, language, known_probabilities, difficulty_computer = '
     words = split_words_from_text(text)
 
     for word in words:
-        difficulty = word_difficulty(known_probabilities, True, rank_boundary, ranked_word, word)
+        difficulty = word_difficulty(known_probabilities, True, Word.stats(word, language.id), word)
         word_difficulties.append(difficulty)
 
     # If we can't compute the text difficulty, we estimate hard
