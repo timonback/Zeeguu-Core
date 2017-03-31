@@ -29,5 +29,6 @@ setuptools.setup(
                       "regex",
                       "beautifulsoup4",
                       "feedparser",
-                      "wordstats")
+                      "wordstats",
+                      "requests")
 )
