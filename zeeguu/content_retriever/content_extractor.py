@@ -1,5 +1,5 @@
 import requests
-from readability import Document
+from readability.readability import Document
 
 
 class ContentExtractorFromUrl:
