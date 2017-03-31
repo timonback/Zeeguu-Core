@@ -3,7 +3,7 @@
 from unittest import TestCase
 
 import zeeguu
-from zeeguu.tests.model_test_mixin import ModelTestMixIn
+from model_test_mixin import ModelTestMixIn
 
 from zeeguu.model import RSSFeed
 from zeeguu.model import Url

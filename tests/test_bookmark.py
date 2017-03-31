@@ -1,12 +1,8 @@
-from zeeguu.tests.model_test_mixin import ModelTestMixIn
-from zeeguu.model.learner_stats.encounter_stats import EncounterStats
-
-import random
-import unittest
+from model_test_mixin import ModelTestMixIn
 from datetime import datetime
 from unittest import TestCase
 
-from zeeguu.model import Bookmark, UserWord
+from zeeguu.model import UserWord
 
 
 class BookmarkTest(ModelTestMixIn, TestCase):

@@ -1,8 +1,8 @@
 from unittest import TestCase
+from model_test_mixin import ModelTestMixIn
 
 from zeeguu.content_retriever.parallel_retriever import get_content_for_urls
-from zeeguu.tests.model_test_mixin import ModelTestMixIn
-from zeeguu.tests.testing_data import *
+from testing_data import *
 
 
 class TestContentRetrieval(ModelTestMixIn, TestCase):

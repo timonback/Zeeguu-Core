@@ -14,7 +14,8 @@ from wordstats import Word
 from zeeguu.the_librarian.text import split_words_from_text
 
 
-REFERENCE_VOCABULARY_SIZE = 10000.0
+REFERENCE_VOCABULARY_SIZE = 50000.0
+
 
 def discrete_text_difficulty(median_difficulty, average_difficulty):
     """
@@ -43,6 +44,7 @@ def text_difficulty_for_user(user, text, language, difficulty_computer = 'defaul
     :return:
     """
     return text_difficulty(text, language, {}, difficulty_computer, rank_boundary)
+
 
 def text_difficulty(text, language, known_probabilities, difficulty_computer = 'default', rank_boundary = REFERENCE_VOCABULARY_SIZE):
     """

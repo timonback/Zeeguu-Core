@@ -5,7 +5,7 @@ import os
 
 os.environ["CONFIG_FILE"]= os.path.expanduser('~/.config/zeeguu/full_db_test.cfg')
 from unittest import TestCase
-from zeeguu.tests.model_test_mixin import ModelTestMixIn
+from model_test_mixin import ModelTestMixIn
 
 from zeeguu.model import SimpleKnowledgeEstimator
 from datetime import datetime

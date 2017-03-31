@@ -11,7 +11,8 @@ def retrieve_urls_and_compute_metrics(urls, language, user, timeout = 10):
         urls_and_metrics[each['url']] = {
             'difficulty': {
                 'normalized':   difficulty['normalized'],
-                'discrete'  :   difficulty['discrete']
+                'discrete'  :   difficulty['discrete'],
+                'average'   :   difficulty['score_average']
             }
         }
 

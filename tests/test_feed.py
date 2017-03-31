@@ -1,5 +1,5 @@
 from unittest import TestCase
-from zeeguu.tests.model_test_mixin import ModelTestMixIn
+from model_test_mixin import ModelTestMixIn
 from zeeguu.model import RSSFeed, Url
 
 
