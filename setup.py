@@ -31,6 +31,5 @@ setuptools.setup(
                       "feedparser",
                       "wordstats",
                       "requests",
-                      "readability-lxml",
-                      "readability")
+                      "readability-lxml")
 )
