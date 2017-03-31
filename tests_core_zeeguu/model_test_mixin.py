@@ -1,5 +1,4 @@
 import os
-
 os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
 import zeeguu
 
