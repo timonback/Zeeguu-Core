@@ -1,4 +1,6 @@
 import os
+# Assume this is where the core test config file is
+# TODO: allow the user to overwrite this via an environment variable
 os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
 import zeeguu
 

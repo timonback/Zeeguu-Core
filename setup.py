@@ -14,8 +14,10 @@ setuptools.setup(
     author_email="me@mir.lu",
     description="API for Zeeguu",
     keywords="second language acquisition api",
-    package_data={'': ['language_data/*']},
-    install_requires=("flask>=0.10.1", 
+    dependency_links=[
+        "git+https://github.com/mircealungu/python-wordstats.git#egg=wordstats"
+    ],
+    install_requires=("flask>=0.10.1",
                       "Flask-SQLAlchemy",
                       "readability",
                       "cssmin",
@@ -26,5 +28,6 @@ setuptools.setup(
                       "MySQL-python",
                       "regex",
                       "beautifulsoup4",
-                      "feedparser")
+                      "feedparser",
+                      "wordstats")
 )
