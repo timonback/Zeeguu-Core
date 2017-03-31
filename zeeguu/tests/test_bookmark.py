@@ -1,5 +1,5 @@
 from zeeguu.tests.model_test_mixin import ModelTestMixIn
-from zeeguu.model.learner_stats.word_encounter_stats import EncounterStats
+from zeeguu.model.learner_stats.encounter_stats import EncounterStats
 
 import random
 import unittest
@@ -17,10 +17,9 @@ class BookmarkTest(ModelTestMixIn, TestCase):
 
     def test_user_bookmark_count(self):
         assert len(self.mir.all_bookmarks()) > 0
-        print self.mir.all_bookmarks()
 
     def test_bookmark_is_serializable(self):
-        print self.first_bookmark.json_serializable_dict()
+        assert self.first_bookmark.json_serializable_dict()
 
     def test_user_daily_bookmarks(self):
 
@@ -41,15 +40,4 @@ class BookmarkTest(ModelTestMixIn, TestCase):
         reg = UserWord.find("regierung", self.de)
         assert mutter.importance_level() == 10
         assert reg.importance_level() == 8
-
-    def test_update_encounter_stats(self):
-
-        assert len(EncounterStats.find_all(self.mir, self.de.id)) == 0
-
-        self.first_bookmark. \
-            update_encounter_stats_after_adding_a_bookmark(
-            self.mir,
-            self.de)
-
-        assert len(EncounterStats.find_all(self.mir, self.de.id)) > 0
 

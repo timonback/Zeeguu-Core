@@ -111,7 +111,6 @@ class Bookmark(db.Model):
 
         return result
 
-
     def json_serializable_dict(self, with_context=True):
         result = dict(
                     id=self.id,
@@ -163,18 +162,6 @@ class Bookmark(db.Model):
             text = text
         ).all()
 
-
-
-
-
-    # @classmethod
-    # def is_sorted_exercise_log_after_date_outcome(cls,outcome, bookmark):
-    #     sorted_exercise_log_after_date=sorted(bookmark.exercise_log, key=lambda x: x.time, reverse=True)
-    #     if sorted_exercise_log_after_date:
-    #         if sorted_exercise_log_after_date[0].outcome.outcome == outcome:
-    #             return True
-    #     return False
-
     def check_is_latest_outcome_too_easy(self, add_to_result_time=False):
         sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)
         for exercise in sorted_exercise_log_by_latest:
@@ -219,7 +206,6 @@ class Bookmark(db.Model):
             return False, None
         return False
 
-
     def events_indicate_its_learned(self):
         from zeeguu.model.smartwatch.watch_interaction_event import WatchInteractionEvent
         events_for_self = WatchInteractionEvent.events_for_bookmark(self)
@@ -229,7 +215,6 @@ class Bookmark(db.Model):
                 return True, event.time
 
         return False, None
-
 
     def has_been_learned(self, also_return_time=False):
         # TODO: This must be stored in the DB together with the
@@ -262,28 +247,4 @@ class Bookmark(db.Model):
             return False, None
 
         return False
-
-    def update_encounter_stats_after_adding_a_bookmark(self, user, language):
-        from zeeguu.model.learner_stats.word_encounter_stats import EncounterStats
-        """
-        The main thing:
-        - go through the words in the context, and update their
-        encounter statistics
-        :return:
-        """
-        a = datetime.now()
-        context_words = self.split_words_from_context()
-        for word in context_words:
-            word_form = WordForm.find_or_create(word, language)
-            stat = EncounterStats.find_or_create_wordform(user, word_form)
-            stat.event_seen_but_not_looked_up()
-            db.session.add(stat)
-        db.session.commit()
-        b = datetime.now()
-        delta = b - a
-        print ("calculating proabilities for user {1} and bookmark {2} took {0}ms".
-               format(int(delta.total_seconds() * 1000),
-                      user.id,
-                      self.id))
-
 

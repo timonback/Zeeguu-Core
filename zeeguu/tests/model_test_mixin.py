@@ -6,8 +6,11 @@ import zeeguu
 
 from flask import Flask
 
-# We initialize here the zeeguu.app because in several places
+# Initialize here the zeeguu.app because in several places
 # in the zeeguu code it is expected especially for its config
+# Also, the zeeguu.db which is a flask_sqlalchemy object
+# requires the zeeguu.app for initialization
+# In the future we should remove the dependnecy on flask_sqlalchemy
 
 zeeguu.app = Flask("Zeeguu-Core-Test")
 
@@ -16,11 +19,10 @@ if os.environ.has_key("CONFIG_FILE"):
     config_file = os.environ["CONFIG_FILE"]
 zeeguu.app.config.from_pyfile(config_file, silent=False) #config.cfg is in the instance folder
 
+# BEGIN LINKING MODEL WITH DB
 zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
-print ("running with DB: "+zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI")) 
-
-# CRITICAL IMPORT: Load all the model classes so they all get initialized with the zeeguu.db object
 import zeeguu.model
+# END LINKING MODEL WITH DB
 
 from zeeguu.populate import create_test_db, create_minimal_test_db
 
@@ -54,7 +56,6 @@ class ModelTestMixIn(TestCase):
         self.mir = zeeguu.model.User.find("i@mir.lu")
         self.de = zeeguu.model.Language.find("de")
         self.en = zeeguu.model.Language.find("en")
-
 
     def tearDown(self):
         super(ModelTestMixIn, self).tearDown()

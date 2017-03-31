@@ -1,3 +1,6 @@
+import zeeguu
+print ('Importing the zeeguu model linked with DB : ' + zeeguu.app.config["SQLALCHEMY_DATABASE_URI"])
+
 from .bookmark import Bookmark
 from .domain_name import DomainName
 from .user import User
