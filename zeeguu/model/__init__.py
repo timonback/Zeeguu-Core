@@ -2,15 +2,11 @@ from .bookmark import Bookmark
 from .domain_name import DomainName
 from .user import User
 from .exercise import Exercise
-from .exercise_based_probability import ExerciseBasedProbability
-from .encounter_based_probability import EncounterBasedProbability
 from .exercise_outcome import ExerciseOutcome
 from .exercise_source import ExerciseSource
 from .feeds import RSSFeed, RSSFeedRegistration
-from .knowledge_estimator import SethiKnowledgeEstimator
-from .known_word_probability import KnownWordProbability
+from .knowledge_estimator import SimpleKnowledgeEstimator
 from .language import Language
-from .ranked_word import RankedWord
 from .session import Session
 from .text import Text
 from .url import Url

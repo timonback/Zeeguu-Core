@@ -1,28 +1,11 @@
 import os
-from unittest import TestCase
 
-import flask_sqlalchemy
+os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
 import zeeguu
 
-from flask import Flask
-
-# We initialize here the zeeguu.app because in several places
-# in the zeeguu code it is expected especially for its config
-
-zeeguu.app = Flask("Zeeguu-Core-Test")
-
-config_file = os.path.expanduser('~/.config/zeeguu/test_core.cfg')
-if os.environ.has_key("CONFIG_FILE"):
-    config_file = os.environ["CONFIG_FILE"]
-zeeguu.app.config.from_pyfile(config_file, silent=False) #config.cfg is in the instance folder
-
-zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
-print ("running with DB: "+zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI")) 
-
-# CRITICAL IMPORT: Load all the model classes so they all get initialized with the zeeguu.db object
-import zeeguu.model
-
 from zeeguu.populate import create_test_db, create_minimal_test_db
+
+from unittest import TestCase
 
 
 class ModelTestMixIn(TestCase):
@@ -54,7 +37,6 @@ class ModelTestMixIn(TestCase):
         self.mir = zeeguu.model.User.find("i@mir.lu")
         self.de = zeeguu.model.Language.find("de")
         self.en = zeeguu.model.Language.find("en")
-
 
     def tearDown(self):
         super(ModelTestMixIn, self).tearDown()

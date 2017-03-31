@@ -10,12 +10,12 @@
 #
 # __author__ = 'mircea'
 #
-from zeeguu.model import KnownWordProbability
+from wordstats import Word
 from zeeguu.the_librarian.text import split_words_from_text
-from zeeguu.model.ranked_word import RankedWord
 
 
-REFERENCE_VOCABULARY_SIZE = 10000.0
+REFERENCE_VOCABULARY_SIZE = 50000.0
+
 
 def discrete_text_difficulty(median_difficulty, average_difficulty):
     """
@@ -43,8 +43,8 @@ def text_difficulty_for_user(user, text, language, difficulty_computer = 'defaul
     :param rank_boundary:
     :return:
     """
-    known_probabilities = KnownWordProbability.find_all_by_user_cached(user)
-    return text_difficulty(text, language, known_probabilities, difficulty_computer, rank_boundary)
+    return text_difficulty(text, language, {}, difficulty_computer, rank_boundary)
+
 
 def text_difficulty(text, language, known_probabilities, difficulty_computer = 'default', rank_boundary = REFERENCE_VOCABULARY_SIZE):
     """
@@ -66,8 +66,7 @@ def text_difficulty(text, language, known_probabilities, difficulty_computer = '
     words = split_words_from_text(text)
 
     for word in words:
-        ranked_word = RankedWord.find_cache(word, language)
-        difficulty = word_difficulty(known_probabilities, True, rank_boundary, ranked_word, word)
+        difficulty = word_difficulty(known_probabilities, True, Word.stats(word, language.id), word)
         word_difficulties.append(difficulty)
 
     # If we can't compute the text difficulty, we estimate hard
@@ -102,7 +101,8 @@ def text_difficulty(text, language, known_probabilities, difficulty_computer = '
     return difficulty_scores
 
 
-def word_difficulty(known_probabilities, personalized, rank_boundary, ranked_word, word):
+# TODO: must test this thing
+def word_difficulty(known_probabilities, personalized, word_info, word):
     """
     # estimate the difficulty of a word, given:
         :param known_probabilities:
@@ -117,9 +117,6 @@ def word_difficulty(known_probabilities, personalized, rank_boundary, ranked_wor
     # Assume word is difficult and unknown
     estimated_difficulty = 1.0
 
-    if not ranked_word:
-        return estimated_difficulty
-
     # Check if the user knows the word
     try:
         known_probability = known_probabilities[word]  # Value between 0 (unknown) and 1 (known)
@@ -128,9 +125,8 @@ def word_difficulty(known_probabilities, personalized, rank_boundary, ranked_wor
 
     if personalized and known_probability is not None:
         estimated_difficulty -= float(known_probability)
-    elif ranked_word.rank <= rank_boundary:
-        word_frequency = (rank_boundary - (
-            ranked_word.rank - 1)) / rank_boundary  # Value between 0 (rare) and 1 (frequent)
-        estimated_difficulty -= word_frequency
+    elif word_info:
+        estimated_difficulty = word_info.difficulty
+
     return estimated_difficulty
 
