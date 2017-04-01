@@ -10,3 +10,5 @@ instance
 *.orig
 
 zeeguu/tests/model_tests/testing.cfg
+
+wordinfo.db
