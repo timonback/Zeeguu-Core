@@ -1,15 +1,15 @@
 import os
 
 
-def assert_configs(config, required_keys, config_file_name):
+def assert_configs(config, required_keys, config_file_name = None):
     for key in required_keys:
         config_value = config.get(key, None)
         if config_value is None:
-            print "Please define the {key} key in the {config} file!".format(key=key, config=config_file_name)
+            print "Please define the {key} key in the {config} file!".format(key=key, config=config_file_name or 'config')
             exit(-1)
 
 
-def load_configuration_or_abort(app, environ_variable, mandatory_config_keys):
+def load_configuration_or_abort(app, environ_variable, mandatory_config_keys=[]):
     """
     
         Try to load config from the file named in the environ variable. 
@@ -25,7 +25,7 @@ def load_configuration_or_abort(app, environ_variable, mandatory_config_keys):
         config_file = os.environ[environ_variable]
         app.config.from_pyfile(config_file, silent=False)
         assert_configs(app.config, mandatory_config_keys, config_file)
-        print ("Successfully loaded zeeguu config from {0}".format(config_file))
+        print ("ZEEGUU: Loaded {0} config from {1}".format(app.name, config_file))
         return
     except Exception as e:
 

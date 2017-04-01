@@ -16,7 +16,7 @@ class ModelTestMixIn(TestCase):
         # is needed we explicitly set it here
         # zeeguu.db.app = zeeguu.app
 
-        self.ctx = zeeguu.app.test_request_context().push()
+        # self.ctx = zeeguu.app.test_request_context().push()
 
         # if no_need_for_db is set to True, the DB is not recreated
         # this speeds up the tests a little

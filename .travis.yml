@@ -14,4 +14,4 @@ cache: pip
 
 install: "python setup.py develop"
 
-script: "./run_all.sh"
+script: "./run_tests.sh"
