@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
-import os
 import flask_sqlalchemy
 from flask import Flask
+from zeeguu.util.configuration import load_configuration_or_abort
 
 # Initialize here the zeeguu.app because in several places
 # in the zeeguu code it is expected especially for its config
@@ -11,19 +11,13 @@ from flask import Flask
 
 app = Flask("Zeeguu-Core")
 
-# You always must setup the ZEEGUU_CORE_CONFIG before
-# being able to import zeeguu
-try:
-    config_file = os.environ["ZEEGUU_CORE_CONFIG"]
-    app.config.from_pyfile(config_file, silent=False)
-except Exception as e:
-    print (e)
-    raise Exception("You must define a ZEEGUU_CORE_CONFIG environment var to be able to import zeeguu")
+load_configuration_or_abort(app, 'ZEEGUU_CORE_CONFIG',
+                            ['SQLALCHEMY_DATABASE_URI', 'MAX_SESSION', 'SQLALCHEMY_TRACK_MODIFICATIONS'])
 
 
 # BEGIN LINKING MODEL WITH DB
 db = flask_sqlalchemy.SQLAlchemy(app)
 import zeeguu.model
-print ('Imported the zeeguu model linked with DB : ' + app.config["SQLALCHEMY_DATABASE_URI"])
+print ('Zeeguu model linked with: ' + app.config["SQLALCHEMY_DATABASE_URI"])
 # END LINKING MODEL WITH DB
 
