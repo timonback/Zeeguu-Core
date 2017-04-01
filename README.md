@@ -1,4 +1,4 @@
-# Zeeguu-Core ![Travis CI Build Icon](https://travis-ci.org/mircealungu/Zeeguu-Core.svg?branch=master)
+# Zeeguu-Core [![Build Status](https://travis-ci.org/mircealungu/Zeeguu-Core.svg?branch=master)](https://travis-ci.org/mircealungu/Zeeguu-Core)
 
 
 The main model behind the zeeguu infrastructure.
