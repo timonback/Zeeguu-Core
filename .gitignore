@@ -4,11 +4,5 @@ instance
 .cache/
 
 *.pyc
-*.map
 *.egg-info
-*~
-*.orig
-
-zeeguu/tests/model_tests/testing.cfg
-
 wordinfo.db
