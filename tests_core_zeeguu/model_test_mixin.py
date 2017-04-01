@@ -1,7 +1,10 @@
 import os
-# Assume this is where the core test config file is
-os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
-import zeeguu
+
+# Before we load the zeeguu module
+# If the configuration file path is not set, try to load it from the default location
+if not os.environ.has_key("ZEEGUU_CORE_CONFIG"):
+    os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
+import zeeguu.model
 
 from zeeguu.populate import create_test_db, create_minimal_test_db
 
