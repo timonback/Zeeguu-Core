@@ -1,4 +1,4 @@
-# Zeeguu-Core
+# Zeeguu-Core ![Travis CI Build Icon](https://travis-ci.org/mircealungu/Zeeguu-Core.svg?branch=master)
 
 
 The main model behind the zeeguu infrastructure.
@@ -24,3 +24,4 @@ Run `python populate.py` from the zeeguu folder to create a first version of the
 
 The tests overwrite the `ZEEGUU_CORE_CONFIG` by setting it to 
 `~/.config/zeeguu/core_test.cfg`. 
+
