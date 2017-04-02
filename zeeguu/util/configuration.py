@@ -23,12 +23,19 @@ def load_configuration_or_abort(app, environ_variable, mandatory_config_keys=[])
 
     try:
         config_file = os.environ[environ_variable]
-        app.config.from_pyfile(config_file, silent=False)
-        assert_configs(app.config, mandatory_config_keys, config_file)
-        print ("ZEEGUU: Loaded {0} config from {1}".format(app.name, config_file))
-        return
     except Exception as e:
-
-        raise Exception(
+        print (
             "You must define a {0} environment var to be able to load the configuration. "
             .format(environ_variable))
+        exit (-1)
+
+    try:
+        app.config.from_pyfile(config_file, silent=False)
+    except Exception as e:
+        print str(e)
+        exit (-1)
+
+    assert_configs(app.config, mandatory_config_keys, config_file)
+
+    print ("ZEEGUU: Loaded {0} config from {1}".format(app.name, config_file))
+
