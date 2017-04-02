@@ -30,7 +30,8 @@ setuptools.setup(
                       "beautifulsoup4",
                       "feedparser",
                       "wordstats",
-                      "requests",
-                      "readability-lxml",
-                      "readability")
+                      "requests"
+                      #,"readability-lxml",
+                      #"readability"
+                      )
 )
