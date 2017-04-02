@@ -15,7 +15,7 @@ class BookmarkTest(ModelTestMixIn, TestCase):
         assert len(self.mir.all_bookmarks()) > 0
 
     def test_bookmark_is_serializable(self):
-        assert not self.first_bookmark.json_serializable_dict()
+        assert self.first_bookmark.json_serializable_dict()
 
     def test_user_daily_bookmarks(self):
 
