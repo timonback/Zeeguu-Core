@@ -31,7 +31,9 @@ setuptools.setup(
                       "feedparser",
                       "wordstats",
                       "requests"
-                      #,"readability-lxml",
-                      #"readability"
+                      # These two must be installed by hand in this order
+                      # when installed from here something is broken.
+                      #"readability",
+                      #"readability-lxml"
                       )
 )
