@@ -293,14 +293,14 @@ def create_test_db(db):
                          "http://url2", "title of url2")
 
     for key in dict:
-        add_bookmark(db, user, de, key, en, dict[key], ian101, "Deutlich uber dem medianlohn liegen beispielsweise forschung und entwicklung, tabakverarbeitung, pharma oder bankenwesen, am unteren ende der skala liegen die tieflohnbranchen detailhandel, gastronomie oder personliche dienstleistungen. ",
+        add_bookmark(db, user2, de, key, en, dict[key], ian101, "Deutlich uber dem medianlohn liegen beispielsweise forschung und entwicklung, tabakverarbeitung, pharma oder bankenwesen, am unteren ende der skala liegen die tieflohnbranchen detailhandel, gastronomie oder personliche dienstleistungen. ",
                          "http://url1", "title of url1")
 
     for key in french_dict:
-        add_bookmark(db, user, de, key, en, french_dict[key], ian101, "Deutlich uber dem medianlohn liegen beispielsweise forschung und entwicklung, tabakverarbeitung, pharma oder bankenwesen, am unteren ende der skala liegen die tieflohnbranchen detailhandel, gastronomie oder personliche dienstleistungen. ",
+        add_bookmark(db, user2, de, key, en, french_dict[key], ian101, "Deutlich uber dem medianlohn liegen beispielsweise forschung und entwicklung, tabakverarbeitung, pharma oder bankenwesen, am unteren ende der skala liegen die tieflohnbranchen detailhandel, gastronomie oder personliche dienstleistungen. ",
                          "http://url1", "title of url1")
     for w in japanese_story:
-        add_bookmark(db, user, de, w[0], en, w[1],jan14, w[2],w[3], "japanese story")
+        add_bookmark(db, user2, de, w[0], en, w[1],jan14, w[2],w[3], "japanese story")
 
     db.session.commit()
 

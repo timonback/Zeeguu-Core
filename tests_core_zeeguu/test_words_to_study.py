@@ -10,6 +10,7 @@ from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
 class WordsToStudyTest(ModelTestMixIn, TestCase):
 
     def setUp(self):
+        self.maximal_populate = True
         super(WordsToStudyTest, self).setUp()
 
     def test_bookmarks_to_study(self):
@@ -20,6 +21,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
               
         """
         original_bookmarks_to_study = self.mir.bookmarks_to_study()
+        print original_bookmarks_to_study
         first_bookmark_to_study = original_bookmarks_to_study[0]
 
         # solve one exercise
@@ -35,6 +37,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
         # now let's get a new recommendation and make sure that the
         # exercise we just did is not in there again
         bookmarks_to_study = self.mir.bookmarks_to_study()
+        print bookmarks_to_study
 
         assert first_bookmark_to_study not in bookmarks_to_study
 
