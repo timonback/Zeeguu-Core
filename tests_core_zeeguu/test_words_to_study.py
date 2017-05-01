@@ -10,7 +10,6 @@ from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
 class WordsToStudyTest(ModelTestMixIn, TestCase):
 
     def setUp(self):
-        self.maximal_populate = True
         super(WordsToStudyTest, self).setUp()
 
     def test_bookmarks_to_study(self):
