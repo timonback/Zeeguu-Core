@@ -159,39 +159,13 @@ class User(db.Model):
             dates.append(date_entry)
         return dates
 
-    def bookmarks_to_study(self, bookmark_count):
-        all_bookmarks = Bookmark.find_by_specific_user(self)
-
-        good_for_study=[]
-        size = 0
-        for b in all_bookmarks:
-            if b.good_for_study():
-                good_for_study.append(b)
-                size += 1
-
-            if size == bookmark_count:
-                break
-
-        if size < bookmark_count:
-        # we did not find enough words to study which are ranked
-        # add all the non-ranked ones, in chronological order
-
-            all_bookmarks = Bookmark.query. \
-                filter_by(user_id=self.id). \
-                join(UserWord). \
-                filter(UserWord.id == Bookmark.origin_id). \
-                order_by(Bookmark.time.desc()).all()
-
-            for b in all_bookmarks:
-                if b.good_for_study():
-                    good_for_study.append(b)
-                    size += 1
-
-                if size == bookmark_count:
-                    break
-
-        return map(lambda x: x.json_serializable_dict(), good_for_study)
-
+    def bookmarks_to_study(self, bookmark_count = 10):
+        """
+        :param bookmark_count: by default we recommend 10 words 
+        :return: 
+        """
+        from zeeguu.algos import words_to_study
+        return words_to_study.bookmarks_to_study(self, bookmark_count)
 
     # returns array with added bookmark amount per each date for the last year
     # this function is for the activity_graph, generates data

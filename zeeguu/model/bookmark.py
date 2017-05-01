@@ -56,6 +56,9 @@ class Bookmark(db.Model):
         self.time = time
         self.text = text
 
+    def __repr__(self):
+        return "Bookmark[{3}: {0}->{1} in '{2}...']".format(self.origin, self.translation(), self.text.content[0:10], self.id)
+
     def add_new_exercise(self, exercise):
         self.exercise_log.append(exercise)
 
@@ -176,6 +179,20 @@ class Bookmark(db.Model):
         if add_to_result_time:
             return False, None
         return False
+
+    def already_seen_today(self, add_to_result_time=False):
+        sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)
+
+        if not sorted_exercise_log_by_latest:
+            # no exercise log => clearly not seen today
+            return False
+
+        last_seen = sorted_exercise_log_by_latest[0]
+        if last_seen.time.date() == datetime.now().date():
+            return True
+
+        return False
+
 
     def check_if_learned_based_on_exercise_outcomes (self, add_to_result_time=False):
         """
