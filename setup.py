@@ -3,7 +3,6 @@
 
 import setuptools
 
-
 setuptools.setup(
     name="zeeguu",
     version="0.1",
@@ -17,9 +16,11 @@ setuptools.setup(
     dependency_links=[
         "git+https://github.com/mircealungu/python-wordstats.git#egg=wordstats"
     ],
-    install_requires=("flask>=0.10.1",
+    install_requires=(
+                      "readability", # this must be installed first
+                      "readability-lxml", #this must be installed second
+                      "flask>=0.10.1",
                       "Flask-SQLAlchemy",
-                      "readability",
                       "cssmin",
                       "jsmin",
                       "flask-wtf",
@@ -31,9 +32,5 @@ setuptools.setup(
                       "feedparser",
                       "wordstats",
                       "requests"
-                      # These two must be installed by hand in this order
-                      # when installed from here something is broken.
-                      #"readability",
-                      #"readability-lxml"
                       )
 )
