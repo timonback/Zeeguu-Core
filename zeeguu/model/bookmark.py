@@ -57,7 +57,7 @@ class Bookmark(db.Model):
         self.text = text
 
     def __repr__(self):
-        return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n".\
+        return u"Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n".\
             format(self.origin.word, self.translation().word, self.text.content[0:10], self.id, self.user_id).\
             encode('ascii', 'ignore')
 
