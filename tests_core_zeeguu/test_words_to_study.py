@@ -38,7 +38,31 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
 
         assert first_bookmark_to_study not in bookmarks_to_study
 
+    def test_possible_to_have_nothing_to_study(self):
+        """
 
+            Once all the bookmarks have been studied
+            we don't have anything else
+
+        """
+        bookmarks_to_study = self.mir.bookmarks_to_study()
+
+        # solve one exercise
+        for bookmark in bookmarks_to_study:
+            correct = ExerciseOutcome(ExerciseOutcome.CORRECT)
+            recognize = ExerciseSource("Recognize")
+            exercise = Exercise(correct, recognize, 100, datetime.now())
+            bookmark.exercise_log.append(exercise)
+
+            # save the thing to the db
+            zeeguu.db.session.add(exercise)
+            zeeguu.db.session.commit()
+
+        # now let's get a new recommendation and make sure that the
+        # exercise we just did is not in there again
+        bookmarks_to_study = self.mir.bookmarks_to_study()
+
+        assert not bookmarks_to_study
 
 
 
