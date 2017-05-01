@@ -58,7 +58,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
 
             # save the thing to the db
             zeeguu.db.session.add(exercise)
-            zeeguu.db.session.commit()
+        zeeguu.db.session.commit()
 
         # now let's get a new recommendation and make sure that the
         # exercise we just did is not in there again
