@@ -1,13 +1,11 @@
 # -*- coding: utf8 -*-
-import os
+import datetime
 import re
 
 import flask_sqlalchemy
+import os
 import zeeguu
-import datetime
-
 from flask import Flask
-
 
 # zeeguu.db must be setup before we load the model classes the first time
 
@@ -30,9 +28,9 @@ from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.exercise_source import ExerciseSource
 from zeeguu.model.user_word import UserWord
 from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 from zeeguu.model.language import Language
 from zeeguu.model.user import User
-from zeeguu.model.unique_code import UniqueCode
 
 WORD_PATTERN = re.compile("\[?([^{\[]+)\]?( {[^}]+})?( \[[^\]]\])?")
 
@@ -65,6 +63,13 @@ def add_bookmark(db, user, original_language, original_word, translation_languag
     db.session.add_all([url,text,origin,translation,b1])
     db.session.commit()
 
+    add_bookmark_priority_arts(db, b1, 1)
+
+
+def add_bookmark_priority_arts(db, bookmark, priority):
+    bp = BookmarkPriorityARTS(bookmark.id, priority)
+    db.session.add(bp)
+    db.session.commit()
 
 #
 def create_minimal_test_db(db):
