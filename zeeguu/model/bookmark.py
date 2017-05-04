@@ -1,11 +1,9 @@
 import re
 
+import zeeguu
 from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
-
-import zeeguu
 from wordstats import Word
-from zeeguu.model.ranked_word import WordForm
 
 db = zeeguu.db
 
@@ -47,7 +45,7 @@ class Bookmark(db.Model):
 
     time = db.Column(db.DateTime)
 
-    exercise_log = relationship("Exercise", secondary="bookmark_exercise_mapping")
+    exercise_log = relationship("Exercise", secondary="bookmark_exercise_mapping", order_by="Exercise.id")
 
     def __init__(self, origin, translation, user, text, time):
         self.origin = origin

@@ -27,6 +27,7 @@ from zeeguu.model.text import Text
 from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.exercise_source import ExerciseSource
 from zeeguu.model.user_word import UserWord
+from zeeguu.model.exercise import Exercise
 from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 from zeeguu.model.language import Language
@@ -65,9 +66,11 @@ def add_bookmark(db, user, original_language, original_word, translation_languag
 
     add_bookmark_priority_arts(db, b1, 1)
 
+    return b1
+
 
 def add_bookmark_priority_arts(db, bookmark, priority):
-    bp = BookmarkPriorityARTS(bookmark.id, priority)
+    bp = BookmarkPriorityARTS(bookmark, priority)
     db.session.add(bp)
     db.session.commit()
 
@@ -88,12 +91,12 @@ def create_minimal_test_db(db):
 
     db.session.add(mir)
 
-    show_solution = ExerciseOutcome("Show solution")
-    retry = ExerciseOutcome("Retry")
-    correct = ExerciseOutcome("Correct")
-    wrong = ExerciseOutcome("Wrong")
-    typo = ExerciseOutcome("Typo")
-    too_easy = ExerciseOutcome("Too easy")
+    show_solution = ExerciseOutcome("Show solution", False)
+    retry = ExerciseOutcome("Retry", False)
+    correct = ExerciseOutcome("Correct", True)
+    wrong = ExerciseOutcome("Wrong", False)
+    typo = ExerciseOutcome("Typo", False)
+    too_easy = ExerciseOutcome("Too easy", True)
 
     db.session.add_all([show_solution, retry,
                         correct, wrong, typo,
@@ -104,17 +107,33 @@ def create_minimal_test_db(db):
 
     db.session.add_all([recognize, translate])
 
-    add_bookmark(db, mir, de, "Schaf", en, "sheep",
-                    datetime.datetime(2011, 01, 01, 01, 01, 01),
+    b1 = add_bookmark(db, mir, de, "Schaf", en, "sheep",
+                      datetime.datetime(2011, 01, 01, 01, 01, 01),
                     "Bitte... zeichne mir ein Schaf!",
                     "http://www.derkleineprinz-online.de/text/2-kapitel/",
                     "Der Kleine Prinz - Kapitel 2")
 
-    add_bookmark(db, mir, de, "sprang", en, "jumped",
-                    datetime.datetime(2011, 01, 01, 01, 01, 01),
+    b2 = add_bookmark(db, mir, de, "sprang", en, "jumped",
+                      datetime.datetime(2011, 01, 01, 01, 01, 01),
                     "Ich sprang auf die Fusse.",
                     "http://www.derkleineprinz-online.de/text/2-kapitel/",
                     "Der Kleine Prinz - Kapitel 2")
+
+    # create exercises
+    e1 = Exercise(wrong, recognize, 1500, datetime.datetime(2011, 01, 02, 01, 01, 01))
+    e2 = Exercise(correct, recognize, 1000, datetime.datetime(2011, 01, 03, 01, 01, 01))
+    e3 = Exercise(typo, recognize, 1800, datetime.datetime(2011, 01, 04, 01, 01, 01))
+    db.session.add(e1)
+    db.session.add(e2)
+    db.session.add(e3)
+
+    b1.add_new_exercise(e1)
+    b1.add_new_exercise(e2)
+    b2.add_new_exercise(e3)
+
+    db.session.commit()
+
+
 
     global TEST_BOOKMARKS_COUNT
     TEST_BOOKMARKS_COUNT = 2
@@ -219,12 +238,12 @@ def create_test_db(db):
     db.session.add(ro)
     db.session.commit()
 
-    show_solution = ExerciseOutcome("Show solution")
-    retry = ExerciseOutcome("Retry")
-    correct = ExerciseOutcome("Correct")
-    wrong = ExerciseOutcome("Wrong")
-    typo = ExerciseOutcome("Typo")
-    too_easy = ExerciseOutcome("Too easy")
+    show_solution = ExerciseOutcome("Show solution", False)
+    retry = ExerciseOutcome("Retry", False)
+    correct = ExerciseOutcome("Correct", True)
+    wrong = ExerciseOutcome("Wrong", False)
+    typo = ExerciseOutcome("Typo", False)
+    too_easy = ExerciseOutcome("Too easy", True)
 
     recognize = ExerciseSource("Recognize")
     translate = ExerciseSource("Translate")
@@ -250,6 +269,30 @@ def create_test_db(db):
     jan111 = datetime.datetime(2011,01,01,01,01,01)
     ian101 = datetime.datetime(2001,01,01,01,01,01)
     jan14 = datetime.datetime(2014,1,14,01,01,01)
+
+    b1 = add_bookmark(db, user, de, "Schaf", en, "sheep",
+                      datetime.datetime(2011, 01, 01, 01, 01, 01),
+                      "Bitte... zeichne mir ein Schaf!",
+                      "http://www.derkleineprinz-online.de/text/2-kapitel/",
+                      "Der Kleine Prinz - Kapitel 2")
+
+    b2 = add_bookmark(db, user, de, "sprang", en, "jumped",
+                      datetime.datetime(2011, 01, 01, 01, 01, 01),
+                      "Ich sprang auf die Fusse.",
+                      "http://www.derkleineprinz-online.de/text/2-kapitel/",
+                      "Der Kleine Prinz - Kapitel 2")
+
+    # create exercises
+    e1 = Exercise(wrong, recognize, 1500, datetime.datetime(2011, 01, 02, 01, 01, 01))
+    e2 = Exercise(correct, recognize, 1000, datetime.datetime(2011, 01, 03, 01, 01, 01))
+    e3 = Exercise(typo, recognize, 1800, datetime.datetime(2011, 01, 04, 01, 01, 01))
+    db.session.add(e1)
+    db.session.add(e2)
+    db.session.add(e3)
+
+    b1.add_new_exercise(e1)
+    b1.add_new_exercise(e2)
+    b2.add_new_exercise(e3)
 
     today_dict = {
         'sogar':'actually',
