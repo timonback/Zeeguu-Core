@@ -20,3 +20,14 @@ create.
 The tests overwrite the `ZEEGUU_CORE_CONFIG` by setting it to 
 `~/.config/zeeguu/core_test.cfg`. 
 
+# MySQL
+
+Install mysql and also the connection to python
+```
+apt-get install mysql-server libmysqlclient-dev
+```
+
+```
+apt-get install python libxml2-dev libxslt1-dev
+```
+
