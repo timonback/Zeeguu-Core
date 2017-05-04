@@ -8,6 +8,7 @@ from zeeguu.model import Session, User
 WANNABE_UUID = '2b4a7c0d1e8f'
 TEST_PASS = 'cherrypie'
 
+
 class UserPreferenceTest(ModelTestMixIn, TestCase):
 
     #
