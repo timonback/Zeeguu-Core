@@ -6,3 +6,5 @@ instance
 *.pyc
 *.egg-info
 wordinfo.db
+
+testing_default.cfg

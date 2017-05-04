@@ -8,11 +8,9 @@ class Exercise(db.Model):
     __tablename__ = 'exercise'
 
     id = db.Column(db.Integer, primary_key=True)
-    outcome_id = db.Column(db.Integer, db.ForeignKey('exercise_outcome.id'),
-                           nullable=False)
+    outcome_id = db.Column(db.Integer, db.ForeignKey('exercise_outcome.id'), nullable=False)
     outcome = db.relationship("ExerciseOutcome", backref="exercise")
-    source_id = db.Column(db.Integer, db.ForeignKey('exercise_source.id'),
-                          nullable=False)
+    source_id = db.Column(db.Integer, db.ForeignKey('exercise_source.id'), nullable=False)
     source = db.relationship("ExerciseSource", backref="exercise")
     solving_speed = db.Column(db.Integer)
     time = db.Column(db.DateTime, nullable=False)

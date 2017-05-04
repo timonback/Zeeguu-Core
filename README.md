@@ -44,3 +44,15 @@ The tests overwrite the `ZEEGUU_CORE_CONFIG` by setting it to
    1. From inside the project folder, run `mkdir -p ~/.config/zeeguu/ && cp testing_default.cfg ~/.config/zeeguu/core.cfg`
    2. Run `python zeeguu/populate.py`
    3. The database *should* be populated by now.
+
+# MySQL
+
+Install mysql and also the connection to python
+```
+apt-get install mysql-server libmysqlclient-dev
+```
+
+# Project dev dependencies
+```
+apt-get install libxml2-dev libxslt1-dev
+```
