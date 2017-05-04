@@ -24,18 +24,18 @@ The tests overwrite the `ZEEGUU_CORE_CONFIG` by setting it to
 1. Clone the project
 2. Create a [new Virtual Environment](http://www.pythonforbeginners.com/basics/how-to-use-python-virtualenv)
    1. Activate your Virtual Environment by running `source bin/activate` from within the Virtual Environment folder
-3. `cd` into the project folder
-4. Run `python setup`
+3. Run `pip install mysql` (if you don't have MySQL installed already)
+4. `cd` into the project folder
+5. Run `python setup`
    1. Fix all the install exceptions.
-5. Run `pip install mysql` (if you don't have MySQL installed already
 6. Run `mysql -u root`
    1. Run `CREATE DATABASE zeeguu;`
-   2. run `exit`
+   2. Run `exit`
 6. Run `mysql.server start`
 7. Open the `testing_default.cfg` file
    1. Change the value of `SQLALCHEMY_DATABASE_URI` from `("mysql://zeeguu_test:zeeguu_test@localhost/zeeguu_test")` to `("mysql://root@localhost/zeeguu")`
    2. Save and close `testing_default.cfg`
-8. Let's check whether the Tests can be run and complete successfully.
+8. Let's check whether the Tests can be run and completed successfully.
    1. Make sure that the Virtual Environment is still active. Otherwise, redo Step 2.1
    2. `cd` into the project folder
    3. Run `./run_tests.sh`
