@@ -1,10 +1,10 @@
 from datetime import datetime
 
 import zeeguu
-from model_test_mixin import ModelTestMixIn
 from unittest import TestCase
-
 from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
+
+from model_test_mixin import ModelTestMixIn
 
 
 class WordsToStudyTest(ModelTestMixIn, TestCase):
@@ -23,7 +23,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
         first_bookmark_to_study = original_bookmarks_to_study[0]
 
         # solve one exercise
-        correct = ExerciseOutcome(ExerciseOutcome.CORRECT)
+        correct = ExerciseOutcome(ExerciseOutcome.CORRECT, True)
         recognize = ExerciseSource("Recognize")
         exercise = Exercise(correct, recognize, 100, datetime.now())
         first_bookmark_to_study.exercise_log.append(exercise)
@@ -49,7 +49,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
 
         # solve one exercise
         for bookmark in bookmarks_to_study:
-            correct = ExerciseOutcome(ExerciseOutcome.CORRECT)
+            correct = ExerciseOutcome(ExerciseOutcome.CORRECT, True)
             recognize = ExerciseSource("Recognize")
             exercise = Exercise(correct, recognize, 100, datetime.now())
             bookmark.exercise_log.append(exercise)

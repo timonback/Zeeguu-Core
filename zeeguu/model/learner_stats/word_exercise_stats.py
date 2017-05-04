@@ -115,6 +115,7 @@ class ExerciseBasedProbability(db.Model):
             print e.message
 
     def _get_exercise_of_bookmarks(self, bookmark):
+        # TODO some bookmarks have no exercise (give highest priority)
         return bookmark.exercise_log[-1]
 
     @classmethod
