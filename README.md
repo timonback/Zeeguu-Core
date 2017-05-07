@@ -49,7 +49,7 @@ The tests overwrite the `ZEEGUU_CORE_CONFIG` by setting it to
 
 Install mysql and also the connection to python
 ```
-apt-get install mysql-server libmysqlclient-dev
+apt-get install mysql-server libmysqlclient-dev python-mysqldb
 ```
 
 # Project dev dependencies
