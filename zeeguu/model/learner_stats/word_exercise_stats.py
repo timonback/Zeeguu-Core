@@ -97,12 +97,17 @@ class ExerciseBasedProbability(db.Model):
     def _update_bookmark_priority(cls, db, user):
         try:
             bookmarks_for_user = Bookmark.find_by_specific_user(user)
-            bookmark_exercise_of_user = map(cls._get_exercise_of_bookmarks, bookmarks_for_user)
-            max_iterations = max(exercise.id for exercise in bookmark_exercise_of_user)
+            # tuple(0=bookmark, 1=exercise)
+            bookmark_exercise_of_user = map(ExerciseBasedProbability._get_exercise_of_bookmarks, bookmarks_for_user)
+            max_iterations = max(pair[1].id for pair in bookmark_exercise_of_user)
+            algorithm = ARTS()
             exercises_and_priorities = map(
-                (lambda x:
-                 (x,
-                  ARTS.calculate(max_iterations - x.id, int(x.outcome.correct), x.solving_speed))
+                (lambda x: (
+                    x[0],
+                    algorithm.calculate(
+                        max_iterations - x[1].id,
+                        int(x[1].outcome.correct),
+                        x[1].solving_speed))
                  )
                 , bookmark_exercise_of_user)
 
@@ -114,9 +119,10 @@ class ExerciseBasedProbability(db.Model):
         except Exception as e:
             print e.message
 
-    def _get_exercise_of_bookmarks(self, bookmark):
+    @staticmethod
+    def _get_exercise_of_bookmarks(bookmark):
         # TODO some bookmarks have no exercise (give highest priority)
-        return bookmark.exercise_log[-1]
+        return (bookmark, bookmark.exercise_log[-1])
 
     @classmethod
     def _update_bookmark_propability(cls, db, user, word):
