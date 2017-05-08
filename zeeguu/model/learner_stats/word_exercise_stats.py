@@ -91,7 +91,7 @@ class ExerciseBasedProbability(db.Model):
     # TODO: rather than words...
     def update_after_exercise(cls, db, user, word):
         cls._update_bookmark_priority(db, user)
-        cls._update_bookmark_propability(db, user, word)
+        cls._update_bookmark_probability(db, user, word)
 
     @classmethod
     def _update_bookmark_priority(cls, db, user):
@@ -128,7 +128,7 @@ class ExerciseBasedProbability(db.Model):
         return (bookmark, None)
 
     @classmethod
-    def _update_bookmark_propability(cls, db, user, word):
+    def _update_bookmark_probability(cls, db, user, word):
         try:
             bookmarks_for_this_word = Bookmark.find_all_by_user_and_word(user, word)
 
