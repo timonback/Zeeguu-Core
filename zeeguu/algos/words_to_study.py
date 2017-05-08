@@ -1,4 +1,16 @@
-from zeeguu.model import Bookmark, UserWord
+from zeeguu.model import Bookmark, UserWord, BookmarkPriorityARTS
+
+
+def bookmarks_to_study_new(user, desired_bookmarks_count=-1):
+    bookmarks = Bookmark.query. \
+        filter_by(user_id=user.id). \
+        join(BookmarkPriorityARTS). \
+        filter(BookmarkPriorityARTS.bookmark_id == Bookmark.id). \
+        order_by(BookmarkPriorityARTS.priority.desc()). \
+        limit(desired_bookmarks_count)
+
+    # TODO: Filter by Bookmark.already_seen_today()
+    return bookmarks
 
 
 def bookmarks_to_study(user, bookmark_count):
