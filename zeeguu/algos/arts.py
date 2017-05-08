@@ -1,21 +1,27 @@
 import math
 
-
+"""
+ARTS algorithm with default values as described in:
+Adaptive response-time-based category sequencing in perceptual learning
+by Everett Mettler and Philip J. Kellman
+"""
 class ARTS:
     """ Constant: enforced delay (trials) """
-    D = 1
+    D = 2
 
-    """ Constant: weight """
-    a = 2
+    """ Constant: general weight """
+    a = 0.1
 
-    """ Constant: weight """
-    b = 4
+    """ Constant: weight for the response time """
+    b = 1.1
 
-    """ Constant: weight """
-    r = 8
+    """ Constant: weight for the response time (inside log) """
+    r = 1.7
 
-    """ Constant: priority increment for an error """
-    w = 16
+    """ Constant: priority increment for an error 
+    Higher values let incorrect items appear quicker again
+    """
+    w = 20
 
     """ Calculate the ARTS priority
     
