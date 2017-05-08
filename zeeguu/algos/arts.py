@@ -1,11 +1,16 @@
 import math
 
-"""
-ARTS algorithm with default values as described in:
-Adaptive response-time-based category sequencing in perceptual learning
-by Everett Mettler and Philip J. Kellman
-"""
+
 class ARTS:
+    """
+    ARTS algorithm with default values as described in:
+    Adaptive response-time-based category sequencing in perceptual learning
+    by Everett Mettler and Philip J. Kellman
+    """
+
+    """ Constant: maximal possible priority """
+    MAX_PRIORITY = 1000
+
     """ Constant: enforced delay (trials) """
     D = 2
 

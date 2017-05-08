@@ -108,6 +108,8 @@ class ExerciseBasedProbability(db.Model):
                         max_iterations - x[1].id,
                         int(x[1].outcome.correct),
                         x[1].solving_speed))
+                # in case the item has not been studied before
+                if x[1] is not None else algorithm.MAX_PRIORITY
                  )
                 , bookmark_exercise_of_user)
 
@@ -121,8 +123,9 @@ class ExerciseBasedProbability(db.Model):
 
     @staticmethod
     def _get_exercise_of_bookmarks(bookmark):
-        # TODO some bookmarks have no exercise (give highest priority)
-        return (bookmark, bookmark.exercise_log[-1])
+        if 0 < len(bookmark.exercise_log):
+            return (bookmark, bookmark.exercise_log[-1])
+        return (bookmark, None)
 
     @classmethod
     def _update_bookmark_propability(cls, db, user, word):
