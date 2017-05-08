@@ -1,8 +1,8 @@
-import zeeguu
 import flask_sqlalchemy
+import zeeguu
 from flask import Flask
-from zeeguu.util.configuration import load_configuration_or_abort, assert_configs
 
+from zeeguu.util.configuration import load_configuration_or_abort, assert_configs
 
 # If zeeguu.app is already defined we use that object
 # as the app for the db_init that we do later. If not,
@@ -24,6 +24,7 @@ zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
 
 
 from .bookmark import Bookmark
+from .bookmark_priority_arts import BookmarkPriorityARTS
 from .domain_name import DomainName
 from .user import User
 from .exercise import Exercise
