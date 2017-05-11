@@ -46,19 +46,19 @@ bookmark_data['de'] = [
     ["langweilig", "boring", "Mir ist langweilig", lingnaut_de]
 ]
 
-lingnaut_de = 'http://www.linguanaut.com/english_spanish.htm'
+lingnaut_es = 'http://www.linguanaut.com/english_spanish.htm'
 bookmark_data['es'] = [
-    ["Dónde", "where", "¿Dónde Vives?", lingnaut_de],
-    ["Sueños", "dreams", "¡Buenas Noches Y Dulces Sueños!", lingnaut_de],
-    ["País", "country", "Me Gustaría Visitar Algún Día Tu País", lingnaut_de],
-    ["Gustaría", "I'd like to", "Me Gustaría Visitar Algún Día Tu País", lingnaut_de],
-    ["Saludos", "greetings", "Dale Saludos A Juan De Mi Parte", lingnaut_de],
-    ["Despacio", "slow", "¡Puedes Hablar Más Despacio!", lingnaut_de],
-    ["Entiendo", "understand", "¡No Entiendo!", lingnaut_de],
-    ["Malo", "bad", "Mi Español Es Malo", lingnaut_de],
-    ["Hambre", "hunger", "Tengo Hambre", lingnaut_de],
-    ["Mareado", "sick", "Estoy Mareado.", lingnaut_de],
-    ["tomar", "drink", "Qué le gustaría tomar?", lingnaut_de]
+    ["Dónde", "where", "¿Dónde Vives?", lingnaut_es],
+    ["Sueños", "dreams", "¡Buenas Noches Y Dulces Sueños!", lingnaut_es],
+    ["País", "country", "Me Gustaría Visitar Algún Día Tu País", lingnaut_es],
+    ["Gustaría", "I'd like to", "Me Gustaría Visitar Algún Día Tu País", lingnaut_es],
+    ["Saludos", "greetings", "Dale Saludos A Juan De Mi Parte", lingnaut_es],
+    ["Despacio", "slow", "¡Puedes Hablar Más Despacio!", lingnaut_es],
+    ["Entiendo", "understand", "¡No Entiendo!", lingnaut_es],
+    ["Malo", "bad", "Mi Español Es Malo", lingnaut_es],
+    ["Hambre", "hunger", "Tengo Hambre", lingnaut_es],
+    ["Mareado", "sick", "Estoy Mareado.", lingnaut_es],
+    ["tomar", "drink", "Qué le gustaría tomar?", lingnaut_es]
 ]
 
 
