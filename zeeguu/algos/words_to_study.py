@@ -1,3 +1,4 @@
+import zeeguu
 from zeeguu.model import Bookmark, UserWord
 
 
@@ -41,5 +42,24 @@ def bookmarks_to_study(user, bookmark_count):
 
             if size == bookmark_count:
                 break
+
+    if size < bookmark_count:
+        # we still don't have enough bookmarks.
+        # in this case, we add some new ones to the user's account
+        needed = bookmark_count - size
+        from zeeguu.temporary.default_words import default_bookmarks
+        new_bookmarks = default_bookmarks(user, user.learned_language_id)
+
+        for each_new in new_bookmarks:
+            # try to find if the user has seen this in the past
+            good_for_study.add(each_new)
+            zeeguu.db.session.add(each_new)
+            size += 1
+
+            if size == bookmark_count:
+                break
+
+    zeeguu.db.session.commit()
+
 
     return list(good_for_study)

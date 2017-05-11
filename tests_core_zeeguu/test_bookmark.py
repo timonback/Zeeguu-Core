@@ -37,3 +37,13 @@ class BookmarkTest(ModelTestMixIn, TestCase):
         assert mutter.importance_level() == 10
         assert reg.importance_level() == 8
 
+    def test_default_bookmarks(self):
+        from zeeguu.temporary.default_words import default_bookmarks
+        b = default_bookmarks(self.mir, "es")
+
+        import zeeguu
+        db = zeeguu.db
+        db.session.add_all(b)
+        db.session.commit()
+
+

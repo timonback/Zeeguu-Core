@@ -53,12 +53,25 @@ class User(db.Model):
         self.native_language = native_language or Language.default_native_language()
 
     @classmethod
-    def create_anonymous(cls, uuid, password, learned_language = None, native_language = None):
+    def create_anonymous(cls, uuid, password, learned_language_code, native_language = None):
+        """
+
+        :param uuid:
+        :param password:
+        :param learned_language_code:
+        :param native_language:
+        :return:
+        """
 
         # since the DB must have an email we generate a fake one
         fake_email = uuid+ANONYMOUS_EMAIL_DOMAIN
 
-        new_user = cls(fake_email, uuid, password, learned_language=learned_language, native_language=native_language)
+        new_user = cls(fake_email, uuid, password, learned_language=Language.find(learned_language_code), native_language=native_language)
+
+        # # Until we find a better way of adding exercises for anonymous and new users... we simply
+        # from zeeguu.temporary.default_words import default_bookmarks
+        # default_bookmarks(new_user, learned_language_code)
+
         return new_user
 
     def __repr__(self):
