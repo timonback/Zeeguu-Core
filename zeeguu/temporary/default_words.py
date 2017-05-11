@@ -73,7 +73,7 @@ def default_bookmarks(user, language_code):
         for data_point in bookmark_data[language_code]:
             origin_word = UserWord.find(data_point[0], origin_language)
             translation = UserWord.find(data_point[1], english)
-            url = Url.find(data_point[3])
+            url = Url.find(data_point[3], "Zeeguu Exercises")
             text = Text.find_or_create(data_point[2], origin_language, url)
 
             # we don't create a new bookmark if the user already had it before
