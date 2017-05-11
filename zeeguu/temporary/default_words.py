@@ -17,7 +17,7 @@ bookmark_data = dict()
 
 lingnaut_nl = 'http://www.linguanaut.com/english_dutch.htm'
 bookmark_data['nl'] = [
-    ["voorsichtig", "carefull", "Wees voorsichtig!", lingnaut_nl],
+    ["voorsichtig", "careful", "Wees voorsichtig!", lingnaut_nl],
     ["waar", "where", "Waar woont u?", lingnaut_nl],
     ["begrijp", "understand", "Ik begrijp het niet", lingnaut_nl],
     ["geweldig", "great", "Dat is geweldig!", lingnaut_nl],
