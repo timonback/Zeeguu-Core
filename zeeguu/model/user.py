@@ -3,7 +3,7 @@ import random
 from sqlalchemy import Column, Table, ForeignKey, Integer
 import sqlalchemy.orm
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm.exc import NoResultFound
 
 from zeeguu import util
 from zeeguu.model.bookmark import Bookmark
@@ -53,10 +53,20 @@ class User(db.Model):
         self.native_language = native_language or Language.default_native_language()
 
     @classmethod
-    def create_anonymous(cls, uuid, password, learned_language = None, native_language = None):
+    def create_anonymous(cls, uuid, password, learned_language_code = None, native_language_code = None):
 
         # since the DB must have an email we generate a fake one
         fake_email = uuid+ANONYMOUS_EMAIL_DOMAIN
+
+        try:
+            learned_language = Language.find(learned_language_code)
+        except NoResultFound as e:
+            learned_language = None
+
+        try:
+            native_language = Language.find(native_language_code)
+        except NoResultFound as e:
+            native_language = None
 
         new_user = cls(fake_email, uuid, password, learned_language=learned_language, native_language=native_language)
         return new_user
