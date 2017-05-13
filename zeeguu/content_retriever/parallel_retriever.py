@@ -1,22 +1,24 @@
-import Queue
+
 import threading
 
 import time
-from zeeguu.content_retriever.content_extractor import ContentExtractorFromUrl
+from zeeguu.content_retriever.content_extractor import ArticleContentExtractor
 
 
-def get_content_for_urls(urls, timeout = 10):
+def get_content_for_urls(urls, lang_code, timeout = 10):
     """
     :param data: an array of tuples (url, url_id)
+    :param lang_code: str
     :param timeout: seconds to wait for the contents
     :return:
     """
-    queue = Queue.Queue()
+    import queue
+    queue = queue.Queue()
 
     # Start worker threads to get url contents
     threads = []
     for url in urls:
-        thread = threading.Thread(target=ContentExtractorFromUrl.worker, args=(url, queue))
+        thread = threading.Thread(target=ArticleContentExtractor.worker, args=(url, lang_code, queue))
         thread.daemon = True
         threads.append(thread)
         thread.start()
@@ -27,10 +29,10 @@ def get_content_for_urls(urls, timeout = 10):
         time.sleep(0.1)
 
     content_list = []
-    for i in xrange(len(urls)):
+    for i in range(len(urls)):
         try:
             content_list.append(queue.get_nowait())
-        except Queue.Empty:
+        except queue.Empty:
             pass
 
     return content_list

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import zeeguu
 from zeeguu import util
-from model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from zeeguu.model import Session, User
 
 WANNABE_UUID = '2b4a7c0d1e8f'

@@ -1,4 +1,7 @@
-from model_test_mixin import ModelTestMixIn
+print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(__file__,__name__,str(__package__)))
+
+
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from datetime import datetime
 from unittest import TestCase
 
@@ -19,7 +22,7 @@ class BookmarkTest(ModelTestMixIn, TestCase):
 
     def test_user_daily_bookmarks(self):
 
-        date = datetime(2011,01,01,01,01,01)
+        date = datetime(2011,1,1,1,1,1)
 
         assert len(self.mir.all_bookmarks()) > 0
 

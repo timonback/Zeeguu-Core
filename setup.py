@@ -17,20 +17,13 @@ setuptools.setup(
         "git+https://github.com/mircealungu/python-wordstats.git#egg=wordstats"
     ],
     install_requires=(
-                      "readability", # this must be installed first
-                      "readability-lxml", #this must be installed second
                       "flask>=0.10.1",
                       "Flask-SQLAlchemy",
-                      "cssmin",
-                      "jsmin",
-                      "flask-wtf",
-                      "goslate",
-                      "Markupsafe",
-                      "MySQL-python",
+                      "mysqlclient",
                       "regex",
-                      "beautifulsoup4",
                       "feedparser",
                       "wordstats",
-                      "requests"
+                      "requests",
+                      "newspaper3k"
                       )
 )

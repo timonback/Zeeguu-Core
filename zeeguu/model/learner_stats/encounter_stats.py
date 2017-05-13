@@ -52,7 +52,7 @@ class EncounterStats(db.Model):
     def event_seen_but_not_looked_up(self):
         self.not_looked_up_counter += 1
 
-        if float(self.probability) <> 1.0:
+        if float(self.probability) != 1.0:
             self.probability = float(self.probability) + 0.1
 
     def event_looked_up(self):
