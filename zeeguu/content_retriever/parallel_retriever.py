@@ -12,17 +12,12 @@ def get_content_for_urls(urls, lang_code, timeout = 10):
     :param timeout: seconds to wait for the contents
     :return:
     """
-    print ("in get content for urls!!")
-    import zeeguu
-    zeeguu.log("in get fcontent for urls!")	
-
 
     art_queue = queue.Queue()
 
     # Start worker threads to get url contents
     threads = []
     for url in urls:
-        print ("about to get content of url...")
         thread = threading.Thread(target=ArticleContentExtractor.worker, args=(url, lang_code, art_queue))
         thread.daemon = True
         threads.append(thread)
