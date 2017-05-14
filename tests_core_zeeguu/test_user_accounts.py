@@ -48,15 +48,11 @@ class UserPreferenceTest(ModelTestMixIn, TestCase):
         assert u1.name == WANNABE_UUID
         return u1
 
-
-    @classmethod
     def test_get_session_for_anonymous_user(self):
         self.test_create_anonymous_user_and_get_sessions()
         user = User.authorize(WANNABE_UUID+'@mir.lu',TEST_PASS)
         assert Session.find_for_user(user).id > 0
 
-
-    @classmethod
     def test_even_anonumous_users_have_to_study(self):
         u1 = self.test_create_anonymous_user_and_get_sessions()
         assert len(u1.bookmarks_to_study(4)) == 4
