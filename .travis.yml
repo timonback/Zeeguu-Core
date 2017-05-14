@@ -6,6 +6,7 @@ before_install:
   - mysql -e "grant all on zeeguu_test.* to 'zeeguu_test'@'localhost' identified by 'zeeguu_test';" -uroot
   - mkdir -p ~/.config/zeeguu/ && cp testing_default.cfg ~/.config/zeeguu/core_test.cfg
   - pip3 install jieba3k
+  - pip install coveralls
 
 language: python
 python:
@@ -13,4 +14,8 @@ python:
 
 install: "python3 setup.py install"
 
-script: "./run_tests.sh"
+script: coverage3 run --source zeeguu -m unittest discover
+
+after_success:
+  coveralls
+
