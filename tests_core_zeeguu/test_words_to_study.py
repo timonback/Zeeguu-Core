@@ -65,9 +65,12 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
 
         # now let's get a new recommendation and make sure that the
         # exercise we just did is not in there again
-        bookmarks_to_study = self.mir.bookmarks_to_study()
 
-        assert not bookmarks_to_study
+        # although...
+        #     there is currently a temporary trick which
+        #     would recommend generic words so we assert
+        #     that we *have* what to study
+        assert bookmarks_to_study
 
 
 
