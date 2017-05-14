@@ -1,4 +1,4 @@
-# Zeeguu-Core [![Build Status](https://travis-ci.org/mircealungu/Zeeguu-Core.svg?branch=master)](https://travis-ci.org/mircealungu/Zeeguu-Core)
+# Zeeguu-Core [![Build Status](https://travis-ci.org/mircealungu/Zeeguu-Core.svg?branch=master)](https://travis-ci.org/mircealungu/Zeeguu-Core) [![Coverage Status](https://coveralls.io/repos/github/mircealungu/Zeeguu-Core/badge.svg?branch=master)](https://coveralls.io/github/mircealungu/Zeeguu-Core?branch=master)
 
 The main model behind the zeeguu infrastructure.
 
