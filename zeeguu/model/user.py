@@ -53,7 +53,7 @@ class User(db.Model):
         self.native_language = native_language or Language.default_native_language()
 
     @classmethod
-    def create_anonymous(cls, uuid, password, learned_language_code, native_language_code = None):
+    def create_anonymous(cls, uuid, password, learned_language_code = None, native_language_code = None):
         """
 
         :param uuid:
@@ -131,10 +131,17 @@ class User(db.Model):
         return name
 
     def update_password(self, password):
+        """
+        
+        :param password: str
+        :return: 
+        """
         self.password_salt = "".join(
             chr(random.randint(0, 255)) for i in range(32)
-        )
+        ).encode('utf-8')
+
         self.password = util.password_hash(password, self.password_salt)
+        self.password_salt = self.password_salt
 
     def all_bookmarks(self, after_date=datetime.datetime(1970,1,1), before_date=datetime.date.today() + datetime.timedelta(days=1)):
         from zeeguu.model.bookmark import Bookmark
@@ -163,7 +170,7 @@ class User(db.Model):
         for elem in map(extract_day_from_date, bookmarks):
             bookmarks_by_date.setdefault(elem[1],[]).append(elem[0])
 
-        sorted_dates = bookmarks_by_date.keys()
+        sorted_dates = list(bookmarks_by_date.keys())
         sorted_dates.sort(reverse=True)
         return bookmarks_by_date, sorted_dates
 
@@ -219,7 +226,7 @@ class User(db.Model):
         return learner_stats_data
 
     def user_words(self):
-        return map((lambda x: x.origin.word), self.all_bookmarks())
+        return list(map((lambda x: x.origin.word), self.all_bookmarks()))
 
     def bookmark_count(self):
         return len(self.all_bookmarks())

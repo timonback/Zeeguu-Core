@@ -1,8 +1,8 @@
 from unittest import TestCase
-from model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 from zeeguu.content_retriever.parallel_retriever import get_content_for_urls
-from testing_data import *
+from tests_core_zeeguu.testing_data import *
 
 
 class TestContentRetrieval(ModelTestMixIn, TestCase):
@@ -15,12 +15,12 @@ class TestContentRetrieval(ModelTestMixIn, TestCase):
         urls = [EASIEST_STORY_URL,
                 VERY_EASY_STORY_URL]
 
-        content_and_urls = get_content_for_urls(urls)
+        content_and_urls = get_content_for_urls(urls, 'de')
 
         for each in content_and_urls:
             assert each['url']
             assert each['content']
 
     def test_with_redirect(self):
-        content_and_urls = get_content_for_urls([URL_WITH_REDIRECT])
+        content_and_urls = get_content_for_urls([URL_WITH_REDIRECT], 'de')
         assert content_and_urls
