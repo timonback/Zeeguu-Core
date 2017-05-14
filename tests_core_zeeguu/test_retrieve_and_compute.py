@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 from zeeguu.model import Url, RSSFeed
 
 from zeeguu.language.retrieve_and_compute import retrieve_urls_and_compute_metrics
-from testing_data import *
+from tests_core_zeeguu.testing_data import *
 
 
 class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
