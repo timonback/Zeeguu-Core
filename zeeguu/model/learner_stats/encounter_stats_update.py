@@ -10,7 +10,7 @@ from zeeguu.model.ranked_word import WordForm
 
 
 def update_encounter_stats_after_adding_a_bookmark(bookmark, user, language, db):
-    from encounter_stats import EncounterStats
+    from .encounter_stats import EncounterStats
     """
     The main thing:
     - go through the words in the context, and update their
@@ -28,7 +28,7 @@ def update_encounter_stats_after_adding_a_bookmark(bookmark, user, language, db)
     db.session.commit()
     b = datetime.now()
     delta = b - a
-    print ("calculating probabilities for user {1} and bookmark {2} took {0}ms".
+    print(("calculating probabilities for user {1} and bookmark {2} took {0}ms".
            format(int(delta.total_seconds() * 1000),
                   user.id,
-                  bookmark.id))
+                  bookmark.id)))

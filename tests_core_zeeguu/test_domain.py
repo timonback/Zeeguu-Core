@@ -1,13 +1,13 @@
 from unittest import TestCase
 
 import zeeguu
-from model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 db = zeeguu.db
 from zeeguu.model.domain_name import DomainName
 from zeeguu.model.url import Url
 
-from zeeguu.the_librarian.website_recommender import recent_domains_with_times, frequent_domains
+from zeeguu.the_librarian.website_recommender import recent_domains_with_times
 
 
 class DomainTest(ModelTestMixIn, TestCase):

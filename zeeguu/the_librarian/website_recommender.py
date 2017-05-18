@@ -15,7 +15,7 @@ def recent_domains_with_times(user):
 
 
 def frequent_domains(user):
-    domains = map (lambda b: b.text.url.domain_name(), user.bookmarks_chronologically())
+    domains = [b.text.url.domain_name() for b in user.bookmarks_chronologically()]
     from collections import Counter
     counter = Counter(domains)
     return counter.most_common()

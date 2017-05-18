@@ -3,14 +3,14 @@
 from unittest import TestCase
 
 import zeeguu
-from model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 from zeeguu.model import RSSFeed
 from zeeguu.model import Url
 
 SIMPLE_TEXT = "Das ist "
-COMPLEX_TEXT = u"Alle hatten in sein Lachen eingestimmt, hauptsächlich aus Ehrerbietung " \
-               u"gegen das Familienoberhaupt"
+COMPLEX_TEXT = "Alle hatten in sein Lachen eingestimmt, hauptsächlich aus Ehrerbietung " \
+               "gegen das Familienoberhaupt"
 
 
 class TextDifficultyTest(ModelTestMixIn, TestCase):
@@ -35,10 +35,10 @@ class TextDifficultyTest(ModelTestMixIn, TestCase):
         zeeguu.db.session.add(url)
         zeeguu.db.session.commit()
 
-        print url.as_string()
-        print url.id
+        print(url.as_string())
+        print(url.id)
 
         feed = RSSFeed(url, "Bild.de Home", "build", image_url=None, language=None)
         first_item = feed.feed_items()[0]
-        print first_item['url']
+        print(first_item['url'])
 

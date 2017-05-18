@@ -69,7 +69,7 @@ class RSSFeed(db.Model):
             result = (cls.query.filter(cls.id == i).one())
             return result
         except Exception as e:
-            print e
+            print(e)
             return None
 
 
@@ -99,9 +99,9 @@ class RSSFeed(db.Model):
                                                              self.language,
                                                              user,
                                                              timeout)
-        filtered_feed_items = [dict(each.items() + {"metrics":urls_and_metrics.get(each['url'])}.items())
+        filtered_feed_items = [dict(list(each.items()) + list({"metrics":urls_and_metrics.get(each['url'])}.items()))
                                for each in feed_items
-                               if each["url"] in urls_and_metrics.keys()]
+                               if each["url"] in list(urls_and_metrics.keys())]
 
         return filtered_feed_items
 

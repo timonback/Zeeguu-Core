@@ -5,14 +5,17 @@ before_install:
   - mysql -e "create database IF NOT EXISTS zeeguu_test;" -uroot
   - mysql -e "grant all on zeeguu_test.* to 'zeeguu_test'@'localhost' identified by 'zeeguu_test';" -uroot
   - mkdir -p ~/.config/zeeguu/ && cp testing_default.cfg ~/.config/zeeguu/core_test.cfg
-  - pip install readability
-  - pip install readability_lxml
-  - python -c "from readability.readability import Document"
+  - pip3 install jieba3k
+  - pip install coveralls
 
 language: python
 python:
-  - "2.7"
+  - "3.4"
 
-install: "python setup.py install"
+install: "python3 setup.py install"
 
-script: "./run_tests.sh"
+script: coverage3 run --source zeeguu -m unittest discover
+
+after_success:
+  coveralls
+
