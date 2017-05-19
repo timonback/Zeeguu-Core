@@ -55,7 +55,8 @@ class Bookmark(db.Model):
         self.text = text
 
     def __repr__(self):
-        return "Bookmark[{3}: {0}->{1} in '{2}...']".format(self.origin, self.translation(), self.text.content[0:10], self.id)
+        return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n".\
+            format(self.origin.word, self.translation().word, self.text.content[0:10], self.id, self.user_id)
 
     def add_new_exercise(self, exercise):
         self.exercise_log.append(exercise)

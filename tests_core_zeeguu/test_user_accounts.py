@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import zeeguu
 from zeeguu import util
-from model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from zeeguu.model import Session, User
 
 WANNABE_UUID = '2b4a7c0d1e8f'
@@ -10,6 +10,11 @@ TEST_PASS = 'cherrypie'
 
 
 class UserPreferenceTest(ModelTestMixIn, TestCase):
+
+
+    def setUp(self):
+        self.maximal_populate = True
+        super(UserPreferenceTest, self).setUp()
 
     #
     def test_password_hash(self):
@@ -37,9 +42,8 @@ class UserPreferenceTest(ModelTestMixIn, TestCase):
         # s3 = Session.find_for_id(3)
         # assert not s3
 
-    @classmethod
     def test_create_anonymous_user_and_get_sessions(self):
-        u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS)
+        u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS, 'de')
         zeeguu.db.session.add_all([u1])
         zeeguu.db.session.commit()
         assert u1.name == WANNABE_UUID

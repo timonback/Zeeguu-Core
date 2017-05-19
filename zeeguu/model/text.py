@@ -33,7 +33,7 @@ class Text(db.Model):
         return '<Text %r>' % (self.content)
 
     def words(self):
-        for word in re.split(re.compile(u"[^\\w]+", re.U), self.content):
+        for word in re.split(re.compile("[^\\w]+", re.U), self.content):
             yield UserWord.find(word, self.language)
 
     def shorten_word_context(self, given_word, max_word_count):

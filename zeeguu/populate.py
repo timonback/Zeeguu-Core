@@ -1,14 +1,15 @@
 # -*- coding: utf8 -*-
-import datetime
+import os
 import re
 
 import flask_sqlalchemy
-import os
 import zeeguu
+import datetime
+
 from flask import Flask
 
+
 # zeeguu.db must be setup before we load the model classes the first time
-from zeeguu.algos.algo_service import AlgoService
 
 if __name__ == "__main__":
 
@@ -16,23 +17,22 @@ if __name__ == "__main__":
     zeeguu.app = Flask("Zeeguu-Core-Test")
 
     config_file = os.path.expanduser('~/.config/zeeguu/core.cfg')
-    if os.environ.has_key("CONFIG_FILE"):
+    if "CONFIG_FILE" in os.environ:
         config_file = os.environ["CONFIG_FILE"]
     zeeguu.app.config.from_pyfile(config_file, silent=False)  # config.cfg is in the instance folder
 
     zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
-    print ("running with DB: " + zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI"))
+    print(("running with DB: " + zeeguu.app.config.get("SQLALCHEMY_DATABASE_URI")))
 
 from zeeguu.model.url import Url
 from zeeguu.model.text import Text
 from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.exercise_source import ExerciseSource
 from zeeguu.model.user_word import UserWord
-from zeeguu.model.exercise import Exercise
 from zeeguu.model.bookmark import Bookmark
-from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 from zeeguu.model.language import Language
 from zeeguu.model.user import User
+from zeeguu.model.unique_code import UniqueCode
 
 WORD_PATTERN = re.compile("\[?([^{\[]+)\]?( {[^}]+})?( \[[^\]]\])?")
 
@@ -65,15 +65,6 @@ def add_bookmark(db, user, original_language, original_word, translation_languag
     db.session.add_all([url,text,origin,translation,b1])
     db.session.commit()
 
-    add_bookmark_priority_arts(db, b1, 1)
-
-    return b1
-
-
-def add_bookmark_priority_arts(db, bookmark, priority):
-    bp = BookmarkPriorityARTS(bookmark, priority)
-    db.session.add(bp)
-    db.session.commit()
 
 #
 def create_minimal_test_db(db):
@@ -92,12 +83,12 @@ def create_minimal_test_db(db):
 
     db.session.add(mir)
 
-    show_solution = ExerciseOutcome("Show solution", False)
-    retry = ExerciseOutcome("Retry", False)
-    correct = ExerciseOutcome("Correct", True)
-    wrong = ExerciseOutcome("Wrong", False)
-    typo = ExerciseOutcome("Typo", False)
-    too_easy = ExerciseOutcome("Too easy", True)
+    show_solution = ExerciseOutcome("Show solution")
+    retry = ExerciseOutcome("Retry")
+    correct = ExerciseOutcome("Correct")
+    wrong = ExerciseOutcome("Wrong")
+    typo = ExerciseOutcome("Typo")
+    too_easy = ExerciseOutcome("Too easy")
 
     db.session.add_all([show_solution, retry,
                         correct, wrong, typo,
@@ -108,33 +99,17 @@ def create_minimal_test_db(db):
 
     db.session.add_all([recognize, translate])
 
-    b1 = add_bookmark(db, mir, de, "Schaf", en, "sheep",
-                      datetime.datetime(2011, 01, 01, 01, 01, 01),
+    add_bookmark(db, mir, de, "Schaf", en, "sheep",
+                    datetime.datetime(2011, 1, 1, 1, 1, 1),
                     "Bitte... zeichne mir ein Schaf!",
                     "http://www.derkleineprinz-online.de/text/2-kapitel/",
                     "Der Kleine Prinz - Kapitel 2")
 
-    b2 = add_bookmark(db, mir, de, "sprang", en, "jumped",
-                      datetime.datetime(2011, 01, 01, 01, 01, 01),
+    add_bookmark(db, mir, de, "sprang", en, "jumped",
+                    datetime.datetime(2011, 1, 1, 1, 1, 1),
                     "Ich sprang auf die Fusse.",
                     "http://www.derkleineprinz-online.de/text/2-kapitel/",
                     "Der Kleine Prinz - Kapitel 2")
-
-    # create exercises
-    e1 = Exercise(wrong, recognize, 1500, datetime.datetime(2011, 01, 02, 01, 01, 01))
-    e2 = Exercise(correct, recognize, 1000, datetime.datetime(2011, 01, 03, 01, 01, 01))
-    e3 = Exercise(typo, recognize, 1800, datetime.datetime(2011, 01, 04, 01, 01, 01))
-    db.session.add(e1)
-    db.session.add(e2)
-    db.session.add(e3)
-
-    b1.add_new_exercise(e1)
-    b1.add_new_exercise(e2)
-    b2.add_new_exercise(e3)
-
-    db.session.commit()
-
-
 
     global TEST_BOOKMARKS_COUNT
     TEST_BOOKMARKS_COUNT = 2
@@ -239,12 +214,12 @@ def create_test_db(db):
     db.session.add(ro)
     db.session.commit()
 
-    show_solution = ExerciseOutcome("Show solution", False)
-    retry = ExerciseOutcome("Retry", False)
-    correct = ExerciseOutcome("Correct", True)
-    wrong = ExerciseOutcome("Wrong", False)
-    typo = ExerciseOutcome("Typo", False)
-    too_easy = ExerciseOutcome("Too easy", True)
+    show_solution = ExerciseOutcome("Show solution")
+    retry = ExerciseOutcome("Retry")
+    correct = ExerciseOutcome("Correct")
+    wrong = ExerciseOutcome("Wrong")
+    typo = ExerciseOutcome("Typo")
+    too_easy = ExerciseOutcome("Too easy")
 
     recognize = ExerciseSource("Recognize")
     translate = ExerciseSource("Translate")
@@ -267,33 +242,9 @@ def create_test_db(db):
     db.session.add(user)
     db.session.add(user2)
 
-    jan111 = datetime.datetime(2011,01,01,01,01,01)
-    ian101 = datetime.datetime(2001,01,01,01,01,01)
-    jan14 = datetime.datetime(2014,1,14,01,01,01)
-
-    b1 = add_bookmark(db, user, de, "Schaf", en, "sheep",
-                      datetime.datetime(2011, 01, 01, 01, 01, 01),
-                      "Bitte... zeichne mir ein Schaf!",
-                      "http://www.derkleineprinz-online.de/text/2-kapitel/",
-                      "Der Kleine Prinz - Kapitel 2")
-
-    b2 = add_bookmark(db, user, de, "sprang", en, "jumped",
-                      datetime.datetime(2011, 01, 01, 01, 01, 01),
-                      "Ich sprang auf die Fusse.",
-                      "http://www.derkleineprinz-online.de/text/2-kapitel/",
-                      "Der Kleine Prinz - Kapitel 2")
-
-    # create exercises
-    e1 = Exercise(wrong, recognize, 1500, datetime.datetime(2011, 01, 02, 01, 01, 01))
-    e2 = Exercise(correct, recognize, 1000, datetime.datetime(2011, 01, 03, 01, 01, 01))
-    e3 = Exercise(typo, recognize, 1800, datetime.datetime(2011, 01, 04, 01, 01, 01))
-    db.session.add(e1)
-    db.session.add(e2)
-    db.session.add(e3)
-
-    b1.add_new_exercise(e1)
-    b1.add_new_exercise(e2)
-    b2.add_new_exercise(e3)
+    jan111 = datetime.datetime(2011,0o1,0o1,0o1,0o1,0o1)
+    ian101 = datetime.datetime(2001,0o1,0o1,0o1,0o1,0o1)
+    jan14 = datetime.datetime(2014,1,14,0o1,0o1,0o1)
 
     today_dict = {
         'sogar':'actually',
@@ -309,12 +260,12 @@ def create_test_db(db):
     }
 
     dict = {
-            u'Spaß': 'fun',
+            'Spaß': 'fun',
             'solche': 'suchlike',
             'ehemaliger': 'ex',
             'betroffen': 'affected',
             'Ufer':'shore',
-            u'höchstens':'at most'
+            'höchstens':'at most'
             }
 
     french_dict = {
@@ -329,11 +280,11 @@ def create_test_db(db):
             ['Holzhauer', 'wood choppers', 'Da waren einmal zwei Holzhauer können', story_url],
             ['Da', 'there', 'Da waren einmal zwei Holzhauer können', story_url],
             ['zwei', 'two', 'Da waren einmal zwei Holzhauer können', story_url],
-            [u'Wald','to arrive', u'Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren. Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren. Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren. Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren', story_url],
-            ['eingerichtet','established',u'Um in den Wald zu gelangen, mußten sie einen großen Fluß passieren, über den eine Fähre eingerichtet war', story_url],
-            [u'vorläufig','temporary',u'von der er des rasenden Sturmes wegen vorläufig nicht zurück konnte', story_url],
-            [u'werfen', 'to throw',u'Im Hause angekommen, warfen sie sich zur Erde,', story_url],
-            ['Tosen','roar',u'sie Tür und Fenster wohl verwahrt hatten und lauschten dem Tosen des Sturmes.sie Tür und Fenster wohl verwahrt hatten und lauschten dem Tosen des Sturmes.sie Tür und Fenster wohl verwahrt hatten und lauschten dem Tosen des Sturmes',story_url],
+            ['Wald','to arrive', 'Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren. Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren. Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren. Um in den Walden zu gelangen, mußten sie einen großen Fluß passieren', story_url],
+            ['eingerichtet','established','Um in den Wald zu gelangen, mußten sie einen großen Fluß passieren, über den eine Fähre eingerichtet war', story_url],
+            ['vorläufig','temporary','von der er des rasenden Sturmes wegen vorläufig nicht zurück konnte', story_url],
+            ['werfen', 'to throw','Im Hause angekommen, warfen sie sich zur Erde,', story_url],
+            ['Tosen','roar','sie Tür und Fenster wohl verwahrt hatten und lauschten dem Tosen des Sturmes.sie Tür und Fenster wohl verwahrt hatten und lauschten dem Tosen des Sturmes.sie Tür und Fenster wohl verwahrt hatten und lauschten dem Tosen des Sturmes',story_url],
             ['Entsetzen','horror','Entsetzt starrte Teramichi auf die Wolke',story_url]
         ]
 
@@ -352,8 +303,6 @@ def create_test_db(db):
         add_bookmark(db, user, de, w[0], en, w[1],jan14, w[2],w[3], "japanese story")
 
     db.session.commit()
-
-    AlgoService.update_exercise_source_stats()
 
 
 if __name__ == "__main__":

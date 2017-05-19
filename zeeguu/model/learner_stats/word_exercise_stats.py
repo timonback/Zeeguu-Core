@@ -110,11 +110,11 @@ class ExerciseBasedProbability(db.Model):
             db.session.add(ex_prob)
             db.session.commit()
             return ex_prob
-            print "!exercise based probability for word with id {1}: {0}".format(ex_prob.probability, word.id)
+            print("!exercise based probability for word with id {1}: {0}".format(ex_prob.probability, word.id))
 
         except Exception as e:
-            print "failed to update probabilities for word with id: " + str(word.id)
-            print (e.message)
+            print("failed to update probabilities for word with id: " + str(word.id))
+            print((e.message))
 
     # calculates the probability of knowing a certain bookmark after a exercise_outcome.
     def calculate_known_bookmark_probability(self, bookmark):

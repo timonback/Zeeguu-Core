@@ -1,7 +1,7 @@
-import zeeguu
 from unittest import TestCase
 
-from model_test_mixin import ModelTestMixIn
+import zeeguu
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 db = zeeguu.db
 from zeeguu.model.domain_name import DomainName
@@ -30,8 +30,7 @@ class DomainTest(ModelTestMixIn, TestCase):
         assert url.domain.domain_name == ""
 
     def test_user_recently_visited_domains(self):
-        assert len(recent_domains_with_times(self.mir)) == 4, str(
-            len(recent_domains_with_times(self.mir))) + ' should be == to ' + str(4)
+        assert len(recent_domains_with_times(self.mir)) == 3
 
     def test_user_recently_visited_domains_does_not_include_android(self):
         assert not(any("android" in dom[0] for dom in recent_domains_with_times(self.mir)))
