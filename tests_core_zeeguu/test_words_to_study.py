@@ -3,6 +3,7 @@ from datetime import datetime
 import zeeguu
 from unittest import TestCase
 from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
+from zeeguu.algos.algo_service import AlgoService
 
 from model_test_mixin import ModelTestMixIn
 
@@ -32,9 +33,11 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
         zeeguu.db.session.add(exercise)
         zeeguu.db.session.commit()
 
+        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
+
         # now let's get a new recommendation and make sure that the
         # exercise we just did is not in there again
-        bookmarks_to_study = self.mir.bookmarks_to_study()
+        bookmarks_to_study = self.mir.bookmarks_to_study(bookmark_count=1)
 
         assert first_bookmark_to_study not in bookmarks_to_study
 
@@ -57,6 +60,8 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
             # save the thing to the db
             zeeguu.db.session.add(exercise)
             zeeguu.db.session.commit()
+
+        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
 
         # now let's get a new recommendation and make sure that the
         # exercise we just did is not in there again

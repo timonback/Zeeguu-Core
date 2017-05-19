@@ -8,6 +8,7 @@ import zeeguu
 from flask import Flask
 
 # zeeguu.db must be setup before we load the model classes the first time
+from zeeguu.algos.algo_service import AlgoService
 
 if __name__ == "__main__":
 
@@ -351,6 +352,8 @@ def create_test_db(db):
         add_bookmark(db, user, de, w[0], en, w[1],jan14, w[2],w[3], "japanese story")
 
     db.session.commit()
+
+    AlgoService.update_exercise_source_stats()
 
 
 if __name__ == "__main__":

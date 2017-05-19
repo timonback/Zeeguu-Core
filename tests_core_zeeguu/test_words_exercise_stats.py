@@ -4,7 +4,7 @@ from unittest import TestCase
 from model_test_mixin import ModelTestMixIn
 from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
-from zeeguu.model.learner_stats.word_exercise_stats import ExerciseBasedProbability
+from zeeguu.model.learner_stats.word_exercise_stats import AlgoService
 
 
 class WordsExerciseStatsTest(ModelTestMixIn, TestCase):
@@ -31,7 +31,7 @@ class WordsExerciseStatsTest(ModelTestMixIn, TestCase):
         bookmark_count_user = self._count_table(Bookmark, Bookmark.user == self.user)
 
         # WHEN
-        ExerciseBasedProbability._update_bookmark_priority(self.db, self.user)
+        AlgoService.update_bookmark_priority(self.db, self.user)
         count = self._count_table(BookmarkPriorityARTS)
 
         # THEN

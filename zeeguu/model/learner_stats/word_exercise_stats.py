@@ -2,6 +2,7 @@ import decimal
 
 import sqlalchemy.orm
 import zeeguu
+from zeeguu.algos.algo_service import AlgoService
 
 db = zeeguu.db
 from zeeguu.model.bookmark import Bookmark
@@ -90,42 +91,8 @@ class ExerciseBasedProbability(db.Model):
     # TODO: Think whether it's not much simpler to work with bookmarks
     # TODO: rather than words...
     def update_after_exercise(cls, db, user, word):
-        cls._update_bookmark_priority(db, user)
+        AlgoService.update_bookmark_priority(db, user)
         cls._update_bookmark_probability(db, user, word)
-
-    @classmethod
-    def _update_bookmark_priority(cls, db, user):
-        try:
-            bookmarks_for_user = Bookmark.find_by_specific_user(user)
-            # tuple(0=bookmark, 1=exercise)
-            bookmark_exercise_of_user = map(ExerciseBasedProbability._get_exercise_of_bookmarks, bookmarks_for_user)
-            max_iterations = max(pair[1].id for pair in bookmark_exercise_of_user)
-            algorithm = ARTS()
-            exercises_and_priorities = map(
-                (lambda x: (
-                    x[0],
-                    algorithm.calculate(
-                        max_iterations - x[1].id,
-                        int(x[1].outcome.correct),
-                        x[1].solving_speed))
-                # in case the item has not been studied before
-                if x[1] is not None else algorithm.MAX_PRIORITY
-                 )
-                , bookmark_exercise_of_user)
-
-            for pair in exercises_and_priorities:
-                bpa = BookmarkPriorityARTS(pair[0], pair[1])
-                db.session.add(bpa)
-
-            db.session.commit()
-        except Exception as e:
-            print e.message
-
-    @staticmethod
-    def _get_exercise_of_bookmarks(bookmark):
-        if 0 < len(bookmark.exercise_log):
-            return (bookmark, bookmark.exercise_log[-1])
-        return (bookmark, None)
 
     @classmethod
     def _update_bookmark_probability(cls, db, user, word):

@@ -1,7 +1,7 @@
 import math
 
 
-class ARTS:
+class ArtsDiffSlow:
     """
     ARTS algorithm with default values as described in:
     Adaptive response-time-based category sequencing in perceptual learning
@@ -21,7 +21,7 @@ class ARTS:
     b = 1.1
 
     """ Constant: weight for the response time (inside log) """
-    r = 1.7
+    d = 1.7
 
     """ Constant: priority increment for an error 
     Higher values let incorrect items appear quicker again
@@ -36,10 +36,10 @@ class ARTS:
      RT: response time on most recent presentation
     """
 
-    def calculate(self, N, alpha, RT):
+    def calculate(self, N, alpha, sd):
         return self.a \
                * (N - self.D) \
                * (
-                   (1 - alpha) * self.b * math.log(RT / self.r)
+                   (1 - alpha) * self.b / (math.e ** (self.d * sd))
                    + (alpha * self.w)
                )
