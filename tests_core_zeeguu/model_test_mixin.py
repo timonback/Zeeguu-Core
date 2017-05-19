@@ -43,7 +43,7 @@ class ModelTestMixIn(TestCase):
         self.de = zeeguu.model.Language.find("de")
         self.en = zeeguu.model.Language.find("en")
 
-        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
+
 
     def tearDown(self):
         super(ModelTestMixIn, self).tearDown()

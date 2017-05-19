@@ -36,10 +36,12 @@ class ArtsRT:
      RT: response time on most recent presentation
     """
 
-    def calculate(self, N, alpha, RT):
-        return self.a \
-               * (N - self.D) \
+    @classmethod
+    def calculate(cls, args):
+        N, alpha, RT = args
+        return cls.a \
+               * (N - cls.D) \
                * (
-                   (1 - alpha) * self.b * math.log(RT / self.r)
-                   + (alpha * self.w)
+                   (1 - alpha) * cls.b * math.log(RT / cls.r)
+                   + (alpha * cls.w)
                )

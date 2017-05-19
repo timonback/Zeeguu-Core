@@ -1,3 +1,4 @@
+import itertools
 import traceback
 
 import zeeguu
@@ -12,7 +13,7 @@ db = zeeguu.db
 
 
 class AlgoService:
-    algorithm_wrapper = AlgorithmWrapper(ArtsRT())
+    algorithm_wrapper = AlgorithmWrapper(ArtsRT)
     MAX_PRIORITY = 1000
 
     @classmethod
@@ -35,27 +36,27 @@ class AlgoService:
             # tuple(0=bookmark, 1=exercise)
             bookmark_exercise_of_user = map(cls._get_exercise_of_bookmarks,
                                             bookmarks_for_user)
-            max_iterations = max(pair[1].id if pair[1] is not None else 0 for
-                                 pair in bookmark_exercise_of_user)
-            exercises_and_priorities = map(
-                (lambda x: (
-                    x[0],
-                    cls.algorithm_wrapper.calculate(x[1], max_iterations))
-                # in case the item has not been studied before
-                if x[1] is not None else cls.MAX_PRIORITY
-                 )
-                , bookmark_exercise_of_user)
+            b1, b2 = itertools.tee(bookmark_exercise_of_user, 2)
+            max_iterations = max(pair[1].id for pair in b1)
+            exercises_and_priorities = map(lambda x: (x[0],
+                                                      cls.algorithm_wrapper.calculate(
+                                                          x[1],
+                                                          max_iterations)), b2)
 
             with db.session.no_autoflush:
                 for pair in exercises_and_priorities:
-                    bpa = BookmarkPriorityARTS(pair[0], pair[1])
-                    db.session.merge(bpa)
+                    entry = BookmarkPriorityARTS.query.filter_by(
+                        bookmark_id=pair[0].id)
+                    if entry.first() is not None:
+                        entry.first().priority = pair[1]
+                    else:
+                        db.session.add(BookmarkPriorityARTS(pair[0], pair[1]))
 
             db.session.commit()
         except Exception as e:
             db.session.rollback()
             print('Error during updating bookmark priority')
-            print(e.message)
+            print(e)
             print(traceback.format_exc())
 
     @staticmethod

@@ -9,6 +9,7 @@ from flask import Flask
 
 import zeeguu
 # zeeguu.db must be setup before we load the model classes the first time
+from zeeguu.algos.algo_service import AlgoService
 from zeeguu.model import Exercise
 
 if __name__ == "__main__":
@@ -118,7 +119,7 @@ def create_minimal_test_db(db):
 
     bookmarks = [b1, b2]
 
-    for i in range(0, 100):
+    for i in range(0, 5):
         random_source = sources[random.randint(0, len(sources) - 1)]
         random_outcome = outcomes[random.randint(0, len(outcomes) - 1)]
         random_solving_speed = random.randint(500, 5000)
