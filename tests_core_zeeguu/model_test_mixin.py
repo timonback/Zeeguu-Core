@@ -2,6 +2,8 @@ import os
 
 # Before we load the zeeguu module
 # If the configuration file path is not set, try to load it from the default location
+from zeeguu.algos.algo_service import AlgoService
+
 if "ZEEGUU_CORE_CONFIG" not in os.environ:
     os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
 import zeeguu.model
@@ -40,6 +42,8 @@ class ModelTestMixIn(TestCase):
         self.mir = zeeguu.model.User.find("i@mir.lu")
         self.de = zeeguu.model.Language.find("de")
         self.en = zeeguu.model.Language.find("en")
+
+        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
 
     def tearDown(self):
         super(ModelTestMixIn, self).tearDown()

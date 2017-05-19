@@ -176,7 +176,7 @@ class User(db.Model):
             dates.append(date_entry)
         return dates
 
-    def bookmarks_to_study(self, bookmark_count = 10):
+    def bookmarks_to_study(self, bookmark_count=10):
         """
         :param bookmark_count: by default we recommend 10 words 
         :return: 
