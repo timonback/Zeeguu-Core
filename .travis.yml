@@ -11,8 +11,8 @@ before_install:
 
 language: python
 python:
-  - "2.7"
+  - "3.6"
 
-install: "python setup.py install"
+install: "python3 setup.py install"
 
 script: "./run_tests.sh"
