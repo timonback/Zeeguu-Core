@@ -7,8 +7,6 @@ from zeeguu.algos.algo_service import AlgoService
 db = zeeguu.db
 from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.exercise_outcome import ExerciseOutcome
-from zeeguu.algos.arts import ARTS
-from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 
 
 class ExerciseBasedProbability(db.Model):
