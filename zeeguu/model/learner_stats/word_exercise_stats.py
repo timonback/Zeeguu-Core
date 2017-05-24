@@ -22,7 +22,7 @@ class ExerciseBasedProbability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User")
+    user = db.relationship("User", backref="user")
 
     user_word_id = db.Column(db.Integer, db.ForeignKey('user_word.id'), nullable=False)
     user_word = db.relationship("UserWord")
