@@ -12,6 +12,9 @@ language: python
 python:
   - "3.4"
 
+env:
+  - ZEEGUU_CORE_CONFIG=~/.config/zeeguu/core_test.cfg
+
 install: "python3 setup.py install"
 
 script: coverage3 run --source zeeguu -m unittest discover
