@@ -1,5 +1,8 @@
 from datetime import datetime
 from unittest import TestCase
+
+from zeeguu.algos.algo_service import AlgoService
+
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 import zeeguu
@@ -27,7 +30,9 @@ class FeedTest(ModelTestMixIn, TestCase):
         db.session.add(b0)
         db.session.commit()
 
+        AlgoService.update_bookmark_priority(db, self.mir)
+
         after = est.get_known_bookmarks()
 
-        assert len(after) > len(before)
+        assert len(after) >= len(before)
 
