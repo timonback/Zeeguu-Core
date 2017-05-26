@@ -1,3 +1,5 @@
+import datetime
+
 import zeeguu
 from sqlalchemy.sql import func
 
@@ -17,7 +19,7 @@ class ExerciseStats(db.Model):
     mean = db.Column(db.DECIMAL(10, 3), nullable=False)
     sd = db.Column(db.DECIMAL(10, 3), nullable=False)
 
-    updated = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+    updated = db.Column(db.DateTime, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
 
     db.CheckConstraint('mean>=0', 'sd>=0')
 
