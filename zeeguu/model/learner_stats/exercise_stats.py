@@ -16,7 +16,7 @@ class ExerciseStats(db.Model):
     mean = db.Column(db.DECIMAL(10, 3), nullable=False)
     sd = db.Column(db.DECIMAL(10, 3), nullable=False)
 
-    updated = db.Column(db.DateTime, default=func.now, onupdate=func.now)
+    updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     db.CheckConstraint('mean>=0', 'sd>=0')
 
