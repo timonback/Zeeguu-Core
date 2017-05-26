@@ -9,11 +9,10 @@ from zeeguu.model.learner_stats.word_exercise_stats import AlgoService
 
 class WordsExerciseStatsTest(ModelTestMixIn, TestCase):
     db = zeeguu.db
-    user = -1
 
     def setUp(self):
         super(WordsExerciseStatsTest, self).setUp()
-        self.user = self.mir
+        self.user = self.user
 
     def test_bookmark_priority_arts_table(self):
         # GIVEN

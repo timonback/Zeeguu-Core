@@ -21,8 +21,8 @@ class TextDifficultyTest(ModelTestMixIn, TestCase):
 
     def very_simple_test(self):
 
-        d1 = self.mir.text_difficulty(SIMPLE_TEXT, self.de)
-        d2 = self.mir.text_difficulty(COMPLEX_TEXT, self.de)
+        d1 = self.user.text_difficulty(SIMPLE_TEXT, self.de)
+        d2 = self.user.text_difficulty(COMPLEX_TEXT, self.de)
 
         assert d1['estimated_difficulty'] == 'EASY'
         assert d1['score_average'] < 0.1

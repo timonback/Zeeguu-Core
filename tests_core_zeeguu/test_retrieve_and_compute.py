@@ -22,7 +22,7 @@ class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
 
         difficulties = retrieve_urls_and_compute_metrics(urls,
                                                          self.de,
-                                                         self.mir)
+                                                         self.user)
 
         difficulty_for_easiest = difficulties[EASIEST_STORY_URL]['difficulty']
         difficulty_for_very_easy = difficulties[VERY_EASY_STORY_URL]['difficulty']
@@ -41,7 +41,7 @@ class TestRetrieveAndCompute(ModelTestMixIn, TestCase):
         url = Url(DE_SAMPLE_FEED_1_URL, DE_SAMPLE_FEED_1_URL)
         feed = RSSFeed(url, DE_SAMPLE_FEED_1_TITLE, "blabla", image_url = None, language = self.de)
 
-        items_with_metrics = feed.feed_items_with_metrics(self.mir, 20)
+        items_with_metrics = feed.feed_items_with_metrics(self.user, 20)
 
         assert len(items_with_metrics) > 0
         assert items_with_metrics[0]["title"]

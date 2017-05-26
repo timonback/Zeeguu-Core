@@ -13,8 +13,8 @@ class LanguageTest(ModelTestMixIn, TestCase):
         assert 'German' in [lan.name for lan in Language.all()]
 
     def test_user_set_language(self):
-        self.mir.set_learned_language("en")
-        assert self.mir.learned_language.id == "en"
+        self.user.set_learned_language("en")
+        assert self.user.learned_language.id == "en"
 
     def test_native_language(self):
-        assert self.mir.native_language.id == "en"
+        assert self.user.native_language.id == "en"

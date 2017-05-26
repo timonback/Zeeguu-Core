@@ -1,5 +1,7 @@
 import re
 
+from sqlalchemy.orm.exc import NoResultFound
+
 import zeeguu
 from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
@@ -114,6 +116,14 @@ class Bookmark(db.Model):
         return result
 
     def json_serializable_dict(self, with_context=True):
+        try:
+            importance = Word.stats(self.origin.word,
+                           self.origin.language_id).importance
+        except FileNotFoundError as e:
+            zeeguu.log("Could not find language hermit for language "
+                       "code {0}".format(self.origin.language_id))
+            importance = 0
+
         result = dict(
                     id=self.id,
                     to=self.translation_words_list(),
@@ -121,7 +131,7 @@ class Bookmark(db.Model):
                     to_lang=self.translation().language.id,
                     title=self.text.url.title,
                     url=self.text.url.as_string(),
-                    origin_importance=Word.stats(self.origin.word, self.origin.language_id).importance
+                    origin_importance=importance
                 )
         result["from"] = self.origin.word
         if with_context:
@@ -163,6 +173,17 @@ class Bookmark(db.Model):
             origin = word,
             text = text
         ).all()
+
+    @classmethod
+    def exists(cls, bookmark):
+        try:
+            cls.query.filter_by(
+                id=bookmark.id,
+                origin_id=bookmark.origin.id
+            ).one()
+            return True
+        except NoResultFound:
+            return False
 
     def check_is_latest_outcome_too_easy(self, add_to_result_time=False):
         sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)

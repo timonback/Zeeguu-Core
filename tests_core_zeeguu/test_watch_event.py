@@ -31,7 +31,7 @@ class WatchEventTest(ModelTestMixIn, TestCase):
         assert len(WatchInteractionEvent.events_for_bookmark(a_bookmark)) == 1
 
     def test_user_activity_data(self):
-        uad = UserActivityData(self.mir,
+        uad = UserActivityData(self.user,
                                datetime.now(),
                                "reading",
                                "1200",
@@ -41,8 +41,8 @@ class WatchEventTest(ModelTestMixIn, TestCase):
         db.session.commit()
 
     def test_get_user_activity_data(self):
-        events = WatchInteractionEvent.events_for_user(self.mir)
+        events = WatchInteractionEvent.events_for_user(self.user)
         assert len(events) == 0
         self.test_watch_event()
-        events = WatchInteractionEvent.events_for_user(self.mir)
+        events = WatchInteractionEvent.events_for_user(self.user)
         assert len(events) == 1

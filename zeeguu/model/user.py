@@ -266,3 +266,14 @@ class User(db.Model):
                 return user
         except sqlalchemy.orm.exc.NoResultFound:
             return None
+
+    @classmethod
+    def exists(cls, user):
+        try:
+            cls.query.filter_by(
+                email=user.email,
+                id=user.id
+            ).one()
+            return True
+        except NoResultFound:
+            return False

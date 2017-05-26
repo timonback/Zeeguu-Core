@@ -30,10 +30,10 @@ class DomainTest(ModelTestMixIn, TestCase):
         assert url.domain.domain_name == ""
 
     def test_user_recently_visited_domains(self):
-        assert len(recent_domains_with_times(self.mir)) == 3
+        assert len(recent_domains_with_times(self.user)) == 3
 
     def test_user_recently_visited_domains_does_not_include_android(self):
-        assert not(any("android" in dom[0] for dom in recent_domains_with_times(self.mir)))
+        assert not(any("android" in dom[0] for dom in recent_domains_with_times(self.user)))
 
     def test_one_domain_multiple_urls(self):
         # Funny thing: you have to make sure to commit ASAP

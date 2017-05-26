@@ -22,7 +22,6 @@ class Text(db.Model):
     url_id = db.Column(db.Integer, db.ForeignKey('url.id'))
     url = db.relationship("Url", backref="texts")
 
-
     def __init__(self, content, language, url):
         self.content = content
         self.language = language
