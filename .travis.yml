@@ -1,6 +1,3 @@
-services:
-  - mysql
-
 before_install:
   - mysql -e "create database IF NOT EXISTS zeeguu_test;" -uroot
   - mysql -e "grant all on zeeguu_test.* to 'zeeguu_test'@'localhost' identified by 'zeeguu_test';" -uroot
@@ -11,10 +8,13 @@ before_install:
 language: python
 python:
   - "3.4"
-cache: pip
+cache:
+  pip: true
+  directories:
+   - $HOME/virtualenv
 
 env:
-  - ZEEGUU_CORE_CONFIG=~/.config/zeeguu/core_test.cfg
+  - ZEEGUU_CORE_CONFIG=$HOME/.config/zeeguu/core_test.cfg
 
 install: "python3 setup.py install"
 
