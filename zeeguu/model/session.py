@@ -3,6 +3,9 @@ import datetime
 from sqlalchemy import desc
 
 import zeeguu
+
+from zeeguu.model.user import User
+
 db = zeeguu.db
 
 
@@ -11,7 +14,7 @@ class Session(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    user = db.relationship("User")
+    user = db.relationship(User)
     last_use = db.Column(db.DateTime)
 
     def __init__(self, user, id_):

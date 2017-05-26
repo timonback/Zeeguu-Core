@@ -3,7 +3,8 @@ import re
 import sqlalchemy.orm
 
 from zeeguu import util
-from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.language import Language
+from zeeguu.model.url import Url
 from zeeguu.model.user_word import UserWord
 import zeeguu
 db = zeeguu.db
@@ -17,10 +18,10 @@ class Text(db.Model):
 
     content_hash = db.Column(db.LargeBinary(32))
     language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
-    language = db.relationship("Language")
+    language = db.relationship(Language)
 
     url_id = db.Column(db.Integer, db.ForeignKey('url.id'))
-    url = db.relationship("Url", backref="texts")
+    url = db.relationship(Url)
 
 
     def __init__(self, content, language, url):
@@ -63,9 +64,6 @@ class Text(db.Model):
         shorter_text = ' '.join(limited_words)
 
         return shorter_text
-
-    def all_bookmarks(self):
-        return Bookmark.find_all_for_text(self)
 
     @classmethod
     def find_or_create(cls, text, language, url):

@@ -3,7 +3,8 @@ import decimal
 import sqlalchemy.orm
 import zeeguu
 from zeeguu.algos.algo_service import AlgoService
-from zeeguu.model import User, UserWord
+from zeeguu.model.user import User
+from zeeguu.model.user_word import UserWord
 
 db = zeeguu.db
 from zeeguu.model.bookmark import Bookmark

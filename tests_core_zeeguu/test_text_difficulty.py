@@ -5,8 +5,8 @@ from unittest import TestCase
 import zeeguu
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
-from zeeguu.model import RSSFeed
-from zeeguu.model import Url
+from zeeguu.model.feeds import RSSFeed
+from zeeguu.model.url import Url
 
 SIMPLE_TEXT = "Das ist "
 COMPLEX_TEXT = "Alle hatten in sein Lachen eingestimmt, hauptsächlich aus Ehrerbietung " \

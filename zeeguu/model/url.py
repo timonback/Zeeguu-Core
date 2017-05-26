@@ -18,7 +18,7 @@ class Url(db.Model):
     url = db.Column(db.String(2083))
 
     domain_name_id = db.Column(db.Integer, db.ForeignKey("domain_name.id"))
-    domain = db.relationship("DomainName")
+    domain = db.relationship(DomainName)
 
     def __init__(self, url, title):
         self.path = Url.get_path(url)

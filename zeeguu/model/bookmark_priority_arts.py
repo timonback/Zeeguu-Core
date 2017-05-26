@@ -1,5 +1,6 @@
 import zeeguu
 from sqlalchemy.sql import func
+from zeeguu.model.bookmark import Bookmark
 
 db = zeeguu.db
 
@@ -9,7 +10,7 @@ class BookmarkPriorityARTS(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     bookmark_id = db.Column(db.Integer, db.ForeignKey('bookmark.id'), primary_key=True)
-    bookmark = db.relationship("Bookmark", backref="bookmark")
+    bookmark = db.relationship(Bookmark)
 
     priority = db.Column(db.Float)
 

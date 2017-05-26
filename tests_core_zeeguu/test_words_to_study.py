@@ -5,7 +5,9 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from unittest import TestCase
 
 from zeeguu.algos.algo_service import AlgoService
-from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
+from zeeguu.model.exercise import Exercise
+from zeeguu.model.exercise_outcome import ExerciseOutcome
+from zeeguu.model.exercise_source import ExerciseSource
 
 
 class WordsToStudyTest(ModelTestMixIn, TestCase):

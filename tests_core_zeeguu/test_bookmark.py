@@ -5,7 +5,7 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from datetime import datetime
 from unittest import TestCase
 
-from zeeguu.model import UserWord
+from zeeguu.model.user_word import UserWord
 
 
 class BookmarkTest(ModelTestMixIn, TestCase):

@@ -1,4 +1,6 @@
-from zeeguu.model import Bookmark, UserWord, BookmarkPriorityARTS
+from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
+from zeeguu.model.user_word import UserWord
 
 
 def bookmarks_to_study(user, desired_bookmarks_count=-1):

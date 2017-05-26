@@ -5,6 +5,9 @@ import feedparser
 import time
 import zeeguu
 from sqlalchemy.orm import relationship
+
+from zeeguu.model.language import Language
+from zeeguu.model.url import Url
 from zeeguu.model.user import User
 
 db = zeeguu.db
@@ -20,13 +23,13 @@ class RSSFeed(db.Model):
     description = db.Column(db.String(2083))
 
     language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
-    language = relationship("Language")
+    language = relationship(Language)
 
     url_id = db.Column(db.Integer, db.ForeignKey("url.id"))
-    url = relationship("Url", foreign_keys='RSSFeed.url_id')
+    url = relationship(Url, foreign_keys='RSSFeed.url_id')
 
     image_url_id = db.Column(db.Integer, db.ForeignKey("url.id"))
-    image_url = relationship("Url", foreign_keys='RSSFeed.image_url_id')
+    image_url = relationship(Url, foreign_keys='RSSFeed.image_url_id')
 
     def __init__(self, url, title, description, image_url=None, language=None):
         self.url = url
@@ -124,7 +127,7 @@ class RSSFeed(db.Model):
     def find_for_language_id(cls, language_id):
         return cls.query.filter(cls.language_id == language_id).group_by(cls.title).all()
 
-
+#TODO move to new file
 class RSSFeedRegistration(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
     __tablename__ = 'rss_feed_registration'
@@ -132,10 +135,10 @@ class RSSFeedRegistration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    user = relationship("User")
+    user = relationship(User)
 
     rss_feed_id = db.Column(db.Integer, db.ForeignKey("rss_feed.id"))
-    rss_feed = relationship("RSSFeed")
+    rss_feed = relationship(RSSFeed)
 
     def __init__(self, user, feed):
         self.user = user

@@ -22,27 +22,6 @@ zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
 # Note, that if we pass the app here, then we don't need later
 # to push the app context
 
-
-from .bookmark import Bookmark
-from .bookmark_priority_arts import BookmarkPriorityARTS
-from .domain_name import DomainName
-from .user import User
-from .exercise import Exercise
-from .exercise_outcome import ExerciseOutcome
-from .exercise_source import ExerciseSource
-from .feeds import RSSFeed, RSSFeedRegistration
-from .knowledge_estimator import SimpleKnowledgeEstimator
-from .language import Language
-from .session import Session
-from .text import Text
-from .url import Url
-from .user import User
-from .user_activitiy_data import UserActivityData
-from .user_word import UserWord
-from .smartwatch.watch_event_type import WatchEventType
-from .smartwatch.watch_interaction_event import WatchInteractionEvent
-
-
 # Creating the DB tables if needed
 zeeguu.db.init_app(zeeguu.app)
 zeeguu.db.create_all(app=zeeguu.app)

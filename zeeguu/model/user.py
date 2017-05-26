@@ -6,7 +6,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from zeeguu import util
-from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.language import Language
 import datetime
 import json
@@ -36,14 +35,14 @@ class User(db.Model):
         db.String(2),
         db.ForeignKey("language.id")
     )
-    learned_language = sqlalchemy.orm.relationship("Language", foreign_keys=[learned_language_id])
-    starred_words = relationship("UserWord", secondary="starred_words_association")
+    learned_language = relationship(Language, foreign_keys=[learned_language_id])
+    starred_words = relationship(UserWord, secondary="starred_words_association")
 
     native_language_id = db.Column(
         db.String (2),
         db.ForeignKey("language.id")
     )
-    native_language = sqlalchemy.orm.relationship("Language", foreign_keys=[native_language_id])
+    native_language = relationship(Language, foreign_keys=[native_language_id])
 
     def __init__(self, email, name, password, learned_language=None, native_language = None):
         self.email = email
