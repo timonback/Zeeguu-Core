@@ -33,6 +33,9 @@ class AlgoService:
     def update_bookmark_priority(cls, db, user):
         try:
             bookmarks_for_user = Bookmark.find_by_specific_user(user)
+            if len(bookmarks_for_user) == 0:
+                return
+
             # tuple(0=bookmark, 1=exercise)
             bookmark_exercise_of_user = map(cls._get_exercise_of_bookmarks,
                                             bookmarks_for_user)
