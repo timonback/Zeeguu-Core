@@ -1,7 +1,6 @@
 import datetime
 
 import zeeguu
-from sqlalchemy.sql import func
 
 from zeeguu.model.exercise_source import ExerciseSource
 

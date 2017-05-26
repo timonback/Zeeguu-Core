@@ -1,7 +1,7 @@
-from datetime import datetime
+import datetime
 
 import zeeguu
-from sqlalchemy.sql import func
+
 from zeeguu.model.bookmark import Bookmark
 
 db = zeeguu.db
