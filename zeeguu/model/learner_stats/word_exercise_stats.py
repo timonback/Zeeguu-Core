@@ -25,7 +25,7 @@ class ExerciseBasedProbability(db.Model):
     user = db.relationship("User", backref="user")
 
     user_word_id = db.Column(db.Integer, db.ForeignKey('user_word.id'), nullable=False)
-    user_word = db.relationship("UserWord")
+    user_word = db.relationship("UserWord", backref="user_word")
 
     probability = db.Column(db.DECIMAL(10, 9), nullable=False)
 
