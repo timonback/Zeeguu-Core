@@ -1,8 +1,8 @@
 import re
 
 import sqlalchemy.orm
-
 import zeeguu
+
 db = zeeguu.db
 
 from zeeguu.model.domain_name import DomainName
@@ -17,7 +17,7 @@ class Url(db.Model):
 
     url = db.Column(db.String(2083))
 
-    domain_name_id = db.Column(db.Integer, db.ForeignKey("domain_name.id"))
+    domain_name_id = db.Column(db.Integer, db.ForeignKey(DomainName.id))
     domain = db.relationship(DomainName)
 
     def __init__(self, url, title):

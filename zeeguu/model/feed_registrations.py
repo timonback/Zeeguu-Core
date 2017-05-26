@@ -10,10 +10,10 @@ class RSSFeedRegistration(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = relationship(User)
 
-    rss_feed_id = db.Column(db.Integer, db.ForeignKey("rss_feed.id"))
+    rss_feed_id = db.Column(db.Integer, db.ForeignKey(RSSFeed.id))
     rss_feed = relationship(RSSFeed)
 
     def __init__(self, user, feed):

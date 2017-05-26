@@ -1,8 +1,8 @@
-import random
 import datetime
-from sqlalchemy import desc
+import random
 
 import zeeguu
+from sqlalchemy import desc
 
 from zeeguu.model.user import User
 
@@ -13,7 +13,7 @@ class Session(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User)
     last_use = db.Column(db.DateTime)
 

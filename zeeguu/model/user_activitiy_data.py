@@ -1,4 +1,5 @@
 import zeeguu
+
 from zeeguu.model.user import User
 
 db = zeeguu.db
@@ -10,7 +11,7 @@ class UserActivityData(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User)
 
     time = db.Column(db.DateTime)

@@ -9,7 +9,7 @@ class BookmarkPriorityARTS(db.Model):
     __tablename__ = 'bookmark_priority_arts'
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
-    bookmark_id = db.Column(db.Integer, db.ForeignKey('bookmark.id'), primary_key=True)
+    bookmark_id = db.Column(db.Integer, db.ForeignKey(Bookmark.id), primary_key=True)
     bookmark = db.relationship(Bookmark)
 
     priority = db.Column(db.Float)

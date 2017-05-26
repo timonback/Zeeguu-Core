@@ -24,7 +24,7 @@ zeeguu.db = flask_sqlalchemy.SQLAlchemy(zeeguu.app)
 
 # Creating the DB tables if needed
 zeeguu.db.init_app(zeeguu.app)
-zeeguu.db.create_all(app=zeeguu.app)
+zeeguu.db.create_all(app=zeeguu.app) 
 
 
 print(('ZEEGUU: Linked model with: ' + zeeguu.app.config["SQLALCHEMY_DATABASE_URI"]))

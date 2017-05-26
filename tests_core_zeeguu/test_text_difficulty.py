@@ -3,9 +3,9 @@
 from unittest import TestCase
 
 import zeeguu
-from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
-from zeeguu.model.feeds import RSSFeed
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from zeeguu.model.feed import RSSFeed
 from zeeguu.model.url import Url
 
 SIMPLE_TEXT = "Das ist "

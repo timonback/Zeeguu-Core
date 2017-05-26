@@ -1,12 +1,13 @@
 import re
 
 import sqlalchemy.orm
+import zeeguu
 
 from zeeguu import util
 from zeeguu.model.language import Language
 from zeeguu.model.url import Url
 from zeeguu.model.user_word import UserWord
-import zeeguu
+
 db = zeeguu.db
 
 
@@ -17,10 +18,10 @@ class Text(db.Model):
     content = db.Column(db.String(10000))
 
     content_hash = db.Column(db.LargeBinary(32))
-    language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
+    language_id = db.Column(db.String(2), db.ForeignKey(Language.id))
     language = db.relationship(Language)
 
-    url_id = db.Column(db.Integer, db.ForeignKey('url.id'))
+    url_id = db.Column(db.Integer, db.ForeignKey(Url.id))
     url = db.relationship(Url)
 
 

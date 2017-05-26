@@ -7,6 +7,7 @@ import sqlalchemy.orm.exc
 import zeeguu
 from sqlalchemy.orm import relationship
 
+from zeeguu.model import RSSFeed
 from zeeguu.model.language import Language
 from zeeguu.model.url import Url
 
@@ -22,14 +23,14 @@ class RSSFeed(db.Model):
     title = db.Column(db.String(2083))
     description = db.Column(db.String(2083))
 
-    language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
+    language_id = db.Column(db.String(2), db.ForeignKey(Language.id))
     language = relationship(Language)
 
-    url_id = db.Column(db.Integer, db.ForeignKey("url.id"))
-    url = relationship(Url, foreign_keys='RSSFeed.url_id')
+    url_id = db.Column(db.Integer, db.ForeignKey(Url.id))
+    url = relationship(Url, foreign_keys=RSSFeed.url_id)
 
-    image_url_id = db.Column(db.Integer, db.ForeignKey("url.id"))
-    image_url = relationship(Url, foreign_keys='RSSFeed.image_url_id')
+    image_url_id = db.Column(db.Integer, db.ForeignKey(Url.id))
+    image_url = relationship(Url, foreign_keys=RSSFeed.image_url_id)
 
     def __init__(self, url, title, description, image_url=None, language=None):
         self.url = url
