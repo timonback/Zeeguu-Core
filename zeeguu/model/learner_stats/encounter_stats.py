@@ -22,10 +22,10 @@ class EncounterStats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False)
-    user = db.relationship("User")
+    user = db.relationship(User)
 
     word_form_id = db.Column(db.Integer, db.ForeignKey("word_form.id"), nullable=False)
-    word_form = db.relationship("WordForm")
+    word_form = db.relationship(WordForm)
 
     not_looked_up_counter = db.Column(db.Integer,nullable = False)
 

@@ -1,9 +1,16 @@
 from datetime import datetime
 from unittest import TestCase
+
+
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
-from zeeguu.model import Bookmark, WatchEventType, WatchInteractionEvent, UserActivityData
 
 import zeeguu
+
+from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.smartwatch.watch_event_type import WatchEventType
+from zeeguu.model.smartwatch.watch_interaction_event import WatchInteractionEvent
+from zeeguu.model.user_activitiy_data import UserActivityData
+
 db = zeeguu.db
 
 

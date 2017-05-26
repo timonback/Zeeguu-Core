@@ -1,8 +1,9 @@
 import sqlalchemy.orm
+import zeeguu
 from wordstats import Word
 
 from zeeguu import util
-import zeeguu
+
 db = zeeguu.db
 
 from zeeguu.model.language import Language
@@ -14,8 +15,8 @@ class UserWord(db.Model, util.JSONSerializable):
 
     id = db.Column(db.Integer, primary_key=True)
     word = db.Column(db.String(255), nullable =False, unique = True)
-    language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
-    language = db.relationship("Language")
+    language_id = db.Column(db.String(2), db.ForeignKey(Language.id))
+    language = db.relationship(Language)
     db.UniqueConstraint(word, language_id)
 
     IMPORTANCE_LEVEL_STEP = 1000

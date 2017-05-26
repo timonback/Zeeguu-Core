@@ -7,10 +7,10 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 import zeeguu
 db = zeeguu.db
-from zeeguu.model import Exercise
-from zeeguu.model import ExerciseOutcome
-from zeeguu.model import ExerciseSource
-from zeeguu.model import SimpleKnowledgeEstimator
+from zeeguu.model.exercise import Exercise
+from zeeguu.model.exercise_outcome import ExerciseOutcome
+from zeeguu.model.exercise_source import ExerciseSource
+from zeeguu.model.knowledge_estimator import SimpleKnowledgeEstimator
 
 
 class FeedTest(ModelTestMixIn, TestCase):

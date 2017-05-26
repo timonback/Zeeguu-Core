@@ -1,5 +1,5 @@
-from zeeguu.model import Bookmark, BookmarkPriorityARTS
-
+from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 
 def bookmarks_to_study(user, desired_bookmarks_count=-1):
     bookmarks = Bookmark.query. \

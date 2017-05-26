@@ -10,7 +10,7 @@ from flask import Flask
 import zeeguu
 # zeeguu.db must be setup before we load the model classes the first time
 from zeeguu.algos.algo_service import AlgoService
-from zeeguu.model import Exercise
+from zeeguu.model.exercise import Exercise
 
 if __name__ == "__main__":
 
