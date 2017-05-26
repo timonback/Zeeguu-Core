@@ -1,11 +1,11 @@
 from datetime import datetime
 from unittest import TestCase
 
-from zeeguu.algos.algo_service import AlgoService
+import zeeguu
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from zeeguu.algos.algo_service import AlgoService
 
-import zeeguu
 db = zeeguu.db
 from zeeguu.model.exercise import Exercise
 from zeeguu.model.exercise_outcome import ExerciseOutcome
