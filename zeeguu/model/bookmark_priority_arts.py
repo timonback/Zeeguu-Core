@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import zeeguu
 from sqlalchemy.sql import func
 from zeeguu.model.bookmark import Bookmark
@@ -14,7 +16,7 @@ class BookmarkPriorityARTS(db.Model):
 
     priority = db.Column(db.Float)
 
-    updated = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
+    updated = db.Column(db.DateTime, server_default=datetime.datetime.now(), onupdate=datetime.datetime.now())
 
     def __init__(self, bookmark, priority):
         self.bookmark = bookmark
