@@ -1,6 +1,8 @@
 from unittest import TestCase
+
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
-from zeeguu.model import RSSFeed, Url
+from zeeguu.model.feed import RSSFeed
+from zeeguu.model.url import Url
 
 
 class FeedTest(ModelTestMixIn, TestCase):

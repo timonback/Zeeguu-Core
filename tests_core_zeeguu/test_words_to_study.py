@@ -5,7 +5,9 @@ import zeeguu
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from zeeguu.algos.algo_service import AlgoService
-from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
+from zeeguu.model.exercise import Exercise
+from zeeguu.model.exercise_outcome import ExerciseOutcome
+from zeeguu.model.exercise_source import ExerciseSource
 
 
 class WordsToStudyTest(ModelTestMixIn, TestCase):
@@ -70,5 +72,5 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
         #     there is currently a temporary trick which
         #     would recommend generic words so we assert
         #     that we *have* what to study
-        # TODO: fix test
-        # assert bookmarks_to_study
+        #TODO: fix test
+        #assert bookmarks_to_study

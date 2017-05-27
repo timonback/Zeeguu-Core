@@ -7,18 +7,18 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from zeeguu.algos.algo_service import AlgoService
 
 db = zeeguu.db
-from zeeguu.model import Exercise
-from zeeguu.model import ExerciseOutcome
-from zeeguu.model import ExerciseSource
-from zeeguu.model import SimpleKnowledgeEstimator
+from zeeguu.model.exercise import Exercise
+from zeeguu.model.exercise_outcome import ExerciseOutcome
+from zeeguu.model.exercise_source import ExerciseSource
+from zeeguu.model.knowledge_estimator import SimpleKnowledgeEstimator
 
 
 class FeedTest(ModelTestMixIn, TestCase):
 
     def test_words_being_learned(self):
         est = SimpleKnowledgeEstimator(self.mir)
-        # todo fix
-        # assert len(est.words_being_learned()) == 2
+        #TODO fix test
+        #assert len(est.words_being_learned()) == 2
 
     def test_get_known_bookmarks(self):
         est = SimpleKnowledgeEstimator(self.mir)

@@ -1,7 +1,12 @@
 import zeeguu
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+<<<<<<< HEAD
 from zeeguu import util
 from zeeguu.model import Session, User
+=======
+from zeeguu.model.session import Session
+from zeeguu.model.user import User
+>>>>>>> 1af5d97b68b07c80f15b05e7e5e975b4890e642d
 
 WANNABE_UUID = '2b4a7c0d1e8f'
 TEST_PASS = 'cherrypie'

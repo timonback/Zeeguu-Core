@@ -3,6 +3,8 @@ import decimal
 import sqlalchemy.orm
 import zeeguu
 from zeeguu.algos.algo_service import AlgoService
+from zeeguu.model.user import User
+from zeeguu.model.user_word import UserWord
 
 db = zeeguu.db
 from zeeguu.model.bookmark import Bookmark
@@ -22,10 +24,10 @@ class ExerciseBasedProbability(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User", backref="user")
+    user = db.relationship(User)
 
     user_word_id = db.Column(db.Integer, db.ForeignKey('user_word.id'), nullable=False)
-    user_word = db.relationship("UserWord")
+    user_word = db.relationship(UserWord)
 
     probability = db.Column(db.DECIMAL(10, 9), nullable=False)
 

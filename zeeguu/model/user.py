@@ -1,28 +1,22 @@
 #
+import datetime
+import json
 import random
-from sqlalchemy import Column, Table, ForeignKey, Integer
+
 import sqlalchemy.orm
+import zeeguu
+from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from zeeguu import util
-from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.language import Language
-import datetime
-import json
-
-import zeeguu
 
 db = zeeguu.db
 
 from zeeguu.model.user_word import UserWord
 
 ANONYMOUS_EMAIL_DOMAIN = '@anon.zeeguu'
-
-starred_words_association_table = Table('starred_words_association', db.Model.metadata,
-    Column('user_id', Integer, ForeignKey('user.id')),
-    Column('starred_word_id', Integer, ForeignKey('user_word.id'))
-)
 
 class User(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
@@ -34,16 +28,16 @@ class User(db.Model):
     password_salt = db.Column(db.LargeBinary(255))
     learned_language_id = db.Column(
         db.String(2),
-        db.ForeignKey("language.id")
+        db.ForeignKey(Language.id)
     )
-    learned_language = sqlalchemy.orm.relationship("Language", foreign_keys=[learned_language_id])
-    starred_words = relationship("UserWord", secondary="starred_words_association")
+    learned_language = relationship(Language, foreign_keys=[learned_language_id])
+    starred_words = relationship(UserWord, secondary="starred_words_association")
 
     native_language_id = db.Column(
         db.String (2),
-        db.ForeignKey("language.id")
+        db.ForeignKey(Language.id)
     )
-    native_language = sqlalchemy.orm.relationship("Language", foreign_keys=[native_language_id])
+    native_language = relationship(Language, foreign_keys=[native_language_id])
 
     def __init__(self, email, name, password, learned_language=None, native_language = None):
         self.email = email
@@ -267,13 +261,8 @@ class User(db.Model):
         except sqlalchemy.orm.exc.NoResultFound:
             return None
 
-    @classmethod
-    def exists(cls, user):
-        try:
-            cls.query.filter_by(
-                email=user.email,
-                id=user.id
-            ).one()
-            return True
-        except NoResultFound:
-            return False
+
+starred_words_association_table = Table('starred_words_association', db.Model.metadata,
+                                        Column('user_id', Integer, ForeignKey(User.id)),
+                                        Column('starred_word_id', Integer, ForeignKey(UserWord.id))
+                                        )

@@ -1,11 +1,12 @@
 import sqlalchemy.orm
-from sqlalchemy.orm.exc import NoResultFound
+import zeeguu
 from wordstats import Word
 
-import zeeguu
 from zeeguu import util
 
 db = zeeguu.db
+
+from zeeguu.model.language import Language
 
 
 class UserWord(db.Model, util.JSONSerializable):
@@ -13,9 +14,9 @@ class UserWord(db.Model, util.JSONSerializable):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
-    word = db.Column(db.String(255), nullable=False)
-    language_id = db.Column(db.String(2), db.ForeignKey("language.id"))
-    language = db.relationship("Language")
+    word = db.Column(db.String(255), nullable =False, unique = True)
+    language_id = db.Column(db.String(2), db.ForeignKey(Language.id))
+    language = db.relationship(Language)
     db.UniqueConstraint(word, language_id)
 
     IMPORTANCE_LEVEL_STEP = 1000
@@ -49,27 +50,29 @@ class UserWord(db.Model, util.JSONSerializable):
     def find(cls, word, language):
         try:
             return (cls.query.filter(cls.word == word)
-                    .filter(cls.language == language)
-                    .one())
+                             .filter(cls.language == language)
+                             .one())
         except sqlalchemy.orm.exc.NoResultFound as e:
             return cls(word, language)
+
 
     @classmethod
     def find_all(cls):
         return cls.query.all()
 
+
     @classmethod
     def find_by_language(cls, language):
         return (cls.query.filter(cls.language == language)
-                .all())
+                         .all())
 
     @classmethod
     def exists(cls, word, language):
-        try:
+         try:
             cls.query.filter_by(
-                language=language,
-                word=word
+                language = language,
+                word = word
             ).one()
             return True
-        except NoResultFound:
+         except  sqlalchemy.orm.exc.NoResultFound:
             return False

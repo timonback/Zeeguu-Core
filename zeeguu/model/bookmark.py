@@ -1,55 +1,51 @@
 import re
 from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, Integer, Table
+import zeeguu
+from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm.exc import NoResultFound
 from wordstats import Word
 
-import zeeguu
-from zeeguu.model.user_word import UserWord
 from zeeguu.model.exercise import Exercise
 from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.exercise_source import ExerciseSource
+from zeeguu.model.text import Text
+from zeeguu.model.user import User
+from zeeguu.model.user_word import UserWord
 
 db = zeeguu.db
 
-bookmark_translation_mapping = Table('bookmark_translation_mapping',
-                                     db.Model.metadata,
-                                     Column('bookmark_id', Integer, ForeignKey('bookmark.id')),
-                                     Column('translation_id', Integer, ForeignKey('user_word.id'))
-                                     )
 
-bookmark_exercise_mapping = Table('bookmark_exercise_mapping',
-                                  db.Model.metadata,
-                                  Column('bookmark_id', Integer, ForeignKey('bookmark.id')),
-                                  Column('exercise_id', Integer, ForeignKey('exercise.id'))
-                                  )
+bookmark_translation_mapping = Table('bookmark_translation_mapping', db.Model.metadata,
+    Column('bookmark_id', Integer, ForeignKey('bookmark.id')),
+    Column('translation_id', Integer, ForeignKey('user_word.id'))
+)
 
-# WordAlias = db.aliased(UserWord, name="translated_word")
+bookmark_exercise_mapping = Table('bookmark_exercise_mapping', db.Model.metadata,
+    Column('bookmark_id', Integer, ForeignKey('bookmark.id')),
+    Column('exercise_id', Integer, ForeignKey('exercise.id'))
+)
+
+WordAlias = db.aliased(UserWord, name="translated_word")
 
 
 class Bookmark(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
-    origin_id = db.Column(db.Integer, db.ForeignKey('user_word.id'))
-    origin = db.relationship("UserWord", primaryjoin=origin_id == UserWord.id,
-                             backref="translations")
-    translations_list = relationship("UserWord",
-                                     secondary="bookmark_translation_mapping")
+    origin_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
+    origin = db.relationship(UserWord, primaryjoin=origin_id == UserWord.id)
+    translations_list = relationship(UserWord, secondary="bookmark_translation_mapping")
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("User", backref="bookmarks")
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user = db.relationship(User)
 
-    text_id = db.Column(db.Integer, db.ForeignKey('text.id'))
-    text = db.relationship("Text", backref="bookmarks")
+    text_id = db.Column(db.Integer, db.ForeignKey(Text.id))
+    text = db.relationship(Text)
 
     time = db.Column(db.DateTime)
 
-    exercise_log = relationship("Exercise",
-                                secondary="bookmark_exercise_mapping",
-                                order_by="Exercise.id")
+    exercise_log = relationship(Exercise, secondary="bookmark_exercise_mapping", order_by="Exercise.id")
 
     def __init__(self, origin, translation, user, text, time):
         self.origin = origin
@@ -59,9 +55,8 @@ class Bookmark(db.Model):
         self.text = text
 
     def __repr__(self):
-        return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n". \
-            format(self.origin.word, self.translation().word,
-                   self.text.content[0:10], self.id, self.user_id)
+        return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n".\
+            format(self.origin.word, self.translation().word, self.text.content[0:10], self.id, self.user_id)
 
     def add_new_exercise(self, exercise):
         self.exercise_log.append(exercise)
@@ -73,7 +68,10 @@ class Bookmark(db.Model):
         return ", ".join(self.translation_words_list())
 
     def translation_words_list(self):
-        return [x.word for x in self.translations_list]
+        translation_words=[]
+        for translation in self.translations_list:
+            translation_words.append(translation.word)
+        return translation_words
 
     def add_new_translation(self, translation):
         self.translations_list.append(translation)
@@ -82,8 +80,7 @@ class Bookmark(db.Model):
         return len(self.text.content) < 60
 
     def events_prevent_further_study(self):
-        from zeeguu.model.smartwatch.watch_interaction_event import \
-            WatchInteractionEvent
+        from zeeguu.model.smartwatch.watch_interaction_event import WatchInteractionEvent
         events_for_self = WatchInteractionEvent.events_for_bookmark(self)
         return any([x.prevents_further_study() for x in events_for_self])
 
@@ -91,20 +88,18 @@ class Bookmark(db.Model):
         # ML TODO: Must replace call to check_is_latest_outcome... with has_been_learned!
         return not self.check_is_latest_outcome_too_easy() and not self.events_prevent_further_study()
 
-    def remove_translation(self, translation):
+    def remove_translation(self,translation):
         if translation in self.translations_list:
             self.translations_list.remove(translation)
 
-    def add_exercise_outcome(self, exercise_source, exercise_outcome,
-                             exercise_solving_speed):
+    def add_exercise_outcome(self, exercise_source, exercise_outcome, exercise_solving_speed):
         new_source = ExerciseSource.query.filter_by(
-            source=exercise_source
-        ).first()
-        new_outcome = ExerciseOutcome.query.filter_by(
-            outcome=exercise_outcome
-        ).first()
-        exercise = Exercise(new_outcome, new_source, exercise_solving_speed,
-                            datetime.now())
+        source = exercise_source
+    ).first()
+        new_outcome=ExerciseOutcome.query.filter_by(
+        outcome=exercise_outcome
+    ).first()
+        exercise = Exercise(new_outcome,new_source,exercise_solving_speed, datetime.now())
         self.add_new_exercise(exercise)
         db.session.add(exercise)
 
@@ -119,32 +114,25 @@ class Bookmark(db.Model):
         return result
 
     def json_serializable_dict(self, with_context=True):
-        try:
-            importance = Word.stats(self.origin.word,
-                                    self.origin.language_id).importance
-        except FileNotFoundError as e:
-            zeeguu.log("Could not find language hermit for language "
-                       "code {0}".format(self.origin.language_id))
-            importance = 0
-
         result = dict(
-            id=self.id,
-            to=self.translation_words_list(),
-            from_lang=self.origin.language_id,
-            to_lang=self.translation().language.id,
-            title=self.text.url.title,
-            url=self.text.url.as_string(),
-            origin_importance=importance
-        )
+                    id=self.id,
+                    to=self.translation_words_list(),
+                    from_lang=self.origin.language_id,
+                    to_lang=self.translation().language.id,
+                    title=self.text.url.title,
+                    url=self.text.url.as_string(),
+                    origin_importance=Word.stats(self.origin.word, self.origin.language_id).importance
+                )
         result["from"] = self.origin.word
         if with_context:
             result['context'] = self.text.content
         return result
 
+
     @classmethod
     def find_by_specific_user(cls, user):
         return cls.query.filter_by(
-            user=user
+            user= user
         ).all()
 
     @classmethod
@@ -152,45 +140,32 @@ class Bookmark(db.Model):
         return cls.query.filter().all()
 
     @classmethod
-    def find_all_for_text(cls, text):
+    def find_all_for_text(cls,text):
         return cls.query.filter(cls.text == text).all()
 
     @classmethod
     def find(cls, b_id):
         return cls.query.filter_by(
-            id=b_id
+            id= b_id
         ).first()
 
     @classmethod
     def find_all_by_user_and_word(cls, user, word):
         return cls.query.filter_by(
-            user=user,
-            origin=word
+            user = user,
+            origin = word
         ).all()
 
     @classmethod
     def find_all_by_user_word_and_text(cls, user, word, text):
         return cls.query.filter_by(
-            user=user,
-            origin=word,
-            text=text
+            user = user,
+            origin = word,
+            text = text
         ).all()
 
-    @classmethod
-    def exists(cls, bookmark):
-        try:
-            cls.query.filter_by(
-                id=bookmark.id,
-                origin_id=bookmark.origin.id
-            ).one()
-            return True
-        except NoResultFound:
-            return False
-
     def check_is_latest_outcome_too_easy(self, add_to_result_time=False):
-        sorted_exercise_log_by_latest = sorted(self.exercise_log,
-                                               key=lambda x: x.time,
-                                               reverse=True)
+        sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)
         for exercise in sorted_exercise_log_by_latest:
             if exercise.outcome.outcome == ExerciseOutcome.TOO_EASY:
                 if add_to_result_time:
@@ -205,9 +180,7 @@ class Bookmark(db.Model):
         return False
 
     def already_seen_today(self, add_to_result_time=False):
-        sorted_exercise_log_by_latest = sorted(self.exercise_log,
-                                               key=lambda x: x.time,
-                                               reverse=True)
+        sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)
 
         if not sorted_exercise_log_by_latest:
             # no exercise log => clearly not seen today
@@ -219,17 +192,15 @@ class Bookmark(db.Model):
 
         return False
 
-    def check_if_learned_based_on_exercise_outcomes(self,
-                                                    add_to_result_time=False):
+
+    def check_if_learned_based_on_exercise_outcomes (self, add_to_result_time=False):
         """
         TODO: This should replace check_is_latest_outcome in the future...
 
         :param add_to_result_time:
         :return:
         """
-        sorted_exercise_log_by_latest = sorted(self.exercise_log,
-                                               key=lambda x: x.time,
-                                               reverse=True)
+        sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)
 
         if sorted_exercise_log_by_latest:
             last_exercise = sorted_exercise_log_by_latest[0]
@@ -244,9 +215,7 @@ class Bookmark(db.Model):
             if len(sorted_exercise_log_by_latest) > CORRECTS_IN_A_ROW:
 
                 # If we got it right for the last CORRECTS_IN_A_ROW times, we know it
-                if all(exercise.outcome.outcome == ExerciseOutcome.CORRECT for
-                       exercise in
-                       sorted_exercise_log_by_latest[0:CORRECTS_IN_A_ROW - 1]):
+                if all(exercise.outcome.outcome == ExerciseOutcome.CORRECT for exercise in sorted_exercise_log_by_latest[0:CORRECTS_IN_A_ROW-1]):
                     return True, last_exercise.time
 
         if add_to_result_time:
@@ -254,8 +223,7 @@ class Bookmark(db.Model):
         return False
 
     def events_indicate_its_learned(self):
-        from zeeguu.model.smartwatch.watch_interaction_event import \
-            WatchInteractionEvent
+        from zeeguu.model.smartwatch.watch_interaction_event import WatchInteractionEvent
         events_for_self = WatchInteractionEvent.events_for_bookmark(self)
 
         for event in events_for_self:
@@ -295,3 +263,4 @@ class Bookmark(db.Model):
             return False, None
 
         return False
+
