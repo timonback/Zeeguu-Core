@@ -1,4 +1,5 @@
 import sqlalchemy.orm
+from sqlalchemy.orm.exc import NoResultFound
 from wordstats import Word
 
 import zeeguu
@@ -70,5 +71,5 @@ class UserWord(db.Model, util.JSONSerializable):
                 word=word
             ).one()
             return True
-        except sqlalchemy.orm.exc.NoResultFound:
+        except NoResultFound:
             return False

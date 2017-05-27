@@ -18,7 +18,7 @@ class UserWordRule(BaseRule):
 
     def _create_model_object(self):
         random_word = self.faker.word()
-        random_language = LanguageRule.random
+        random_language = LanguageRule().random
 
         user_word = UserWord(random_word, random_language)
 

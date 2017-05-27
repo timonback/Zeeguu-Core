@@ -25,7 +25,7 @@ class FeedTest(ModelTestMixIn, TestCase):
         before = est.get_known_bookmarks()
 
         b0 = self.user.all_bookmarks()[0]
-        ex = Exercise(ExerciseOutcome.find(ExerciseOutcome.TOO_EASY), ExerciseSource.find_by_source("Recognize"), 100, datetime.now())
+        ex = Exercise(ExerciseOutcome.find(ExerciseOutcome.TOO_EASY), ExerciseSource.find("Recognize"), 100, datetime.now())
         b0.add_new_exercise(ex)
 
         db.session.add(b0)
