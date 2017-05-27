@@ -1,9 +1,9 @@
 from datetime import datetime
-
-import zeeguu
-from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from unittest import TestCase
 
+import zeeguu
+
+from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from zeeguu.algos.algo_service import AlgoService
 from zeeguu.model import Exercise, ExerciseOutcome, ExerciseSource
 
@@ -20,9 +20,9 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
             recommended for study again
               
         """
-        AlgoService.update_bookmark_priority(zeeguu.db, self.user)
+        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
 
-        original_bookmarks_to_study = self.user.bookmarks_to_study()
+        original_bookmarks_to_study = self.mir.bookmarks_to_study()
         first_bookmark_to_study = original_bookmarks_to_study[0]
 
         # solve one exercise
@@ -35,11 +35,11 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
         zeeguu.db.session.add(exercise)
         zeeguu.db.session.commit()
 
-        AlgoService.update_bookmark_priority(zeeguu.db, self.user)
+        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
 
         # now let's get a new recommendation and make sure that the
         # exercise we just did is not in there again
-        bookmarks_to_study = self.user.bookmarks_to_study()
+        bookmarks_to_study = self.mir.bookmarks_to_study()
 
         assert first_bookmark_to_study != bookmarks_to_study[0]
 
@@ -50,7 +50,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
             we don't have anything else
 
         """
-        bookmarks_to_study = self.user.bookmarks_to_study()
+        bookmarks_to_study = self.mir.bookmarks_to_study()
 
         # solve one exercise
         for bookmark in bookmarks_to_study:
@@ -70,11 +70,5 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
         #     there is currently a temporary trick which
         #     would recommend generic words so we assert
         #     that we *have* what to study
-        #TODO: fix test
-        #assert bookmarks_to_study
-
-
-
-
-
-
+        # TODO: fix test
+        # assert bookmarks_to_study
