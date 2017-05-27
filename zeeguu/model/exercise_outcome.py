@@ -7,7 +7,8 @@ class ExerciseOutcome(db.Model):
     __tablename__ = 'exercise_outcome'
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
-    outcome = db.Column(db.String(255), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    outcome = db.Column(db.String(255), nullable=False)
     correct = db.Column(db.Boolean, nullable=False)
 
     CORRECT = 'Correct'
@@ -23,4 +24,4 @@ class ExerciseOutcome(db.Model):
 
     @classmethod
     def find(cls, outcome):
-        return cls.query.filter_by(outcome=outcome).first()
+        return cls.query.filter_by(outcome=outcome).one()

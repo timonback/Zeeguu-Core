@@ -1,8 +1,8 @@
 from tests_core_zeeguu.rules.language_rule import LanguageRule
 from tests_core_zeeguu.rules.url_rule import UrlRule
-from zeeguu.model import Text
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
+from zeeguu.model.text import Text
 
 
 class TextRule(BaseRule):

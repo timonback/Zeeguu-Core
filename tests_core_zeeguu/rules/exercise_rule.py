@@ -3,7 +3,7 @@ import random
 from tests_core_zeeguu.rules.base_rule import BaseRule
 from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
 from tests_core_zeeguu.rules.source_rule import SourceRule
-from zeeguu.model import Exercise
+from zeeguu.model.exercise import Exercise
 
 
 class ExerciseRule(BaseRule):

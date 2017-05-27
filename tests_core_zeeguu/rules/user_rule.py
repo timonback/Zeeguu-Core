@@ -1,7 +1,7 @@
 from tests_core_zeeguu.rules.base_rule import BaseRule
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
 from tests_core_zeeguu.rules.language_rule import LanguageRule
-from zeeguu.model import User
+from zeeguu.model.user import User
 
 
 class UserRule(BaseRule):

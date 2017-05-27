@@ -3,7 +3,7 @@ import zeeguu
 db = zeeguu.db
 
 
-class Language(db.model):
+class Language(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
     __tablename__ = 'language'
 
@@ -38,7 +38,7 @@ class Language(db.model):
 
     @classmethod
     def find(cls, id_):
-        return cls.query.filter(Language.id == id_).first()
+        return cls.query.filter(Language.id == id_).one()
 
     @classmethod
     def all(cls):

@@ -1,7 +1,7 @@
 from tests_core_zeeguu.rules.language_rule import LanguageRule
-from zeeguu.model import UserWord
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
+from zeeguu.model.user_word import UserWord
 
 
 class UserWordRule(BaseRule):

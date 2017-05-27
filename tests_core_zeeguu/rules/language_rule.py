@@ -3,7 +3,7 @@ import random
 from sqlalchemy.orm.exc import NoResultFound
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
-from zeeguu.model import Language
+from zeeguu.model.language import Language
 
 
 class LanguageRule(BaseRule):

@@ -6,7 +6,8 @@ from tests_core_zeeguu.rules.language_rule import LanguageRule
 from tests_core_zeeguu.rules.text_rule import TextRule
 from tests_core_zeeguu.rules.url_rule import UrlRule
 from tests_core_zeeguu.rules.user_word_rule import UserWordRule
-from zeeguu.model import Bookmark, UserWord
+from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.user_word import UserWord
 
 
 class BookmarkRule(BaseRule):

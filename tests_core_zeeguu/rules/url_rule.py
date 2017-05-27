@@ -1,6 +1,6 @@
-from zeeguu.model import Url
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
+from zeeguu.model.url import Url
 
 
 class UrlRule(BaseRule):

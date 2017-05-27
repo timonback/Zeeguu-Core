@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import zeeguu
 from tests_core_zeeguu.rules.base_rule import BaseRule
-from zeeguu.model import ExerciseSource
+from zeeguu.model.exercise_source import ExerciseSource
 
 
 class SourceRule(BaseRule):

@@ -241,6 +241,17 @@ class User(db.Model):
         return User.query.filter(User.id == id).one()
 
     @classmethod
+    def exists(cls, user):
+        try:
+            cls.query.filter_by(
+                email=user.email,
+                id=user.id
+            ).one()
+            return True
+        except NoResultFound:
+            return False
+
+    @classmethod
     def authorize(cls, email, password):
         try:
             user = cls.query.filter(cls.email == email).one()

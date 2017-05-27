@@ -3,7 +3,7 @@ import random
 from sqlalchemy.orm.exc import NoResultFound
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
-from zeeguu.model import ExerciseOutcome
+from zeeguu.model.exercise_outcome import ExerciseOutcome
 
 
 class OutcomeRule(BaseRule):

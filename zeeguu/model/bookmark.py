@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 
+from sqlalchemy.orm.exc import NoResultFound
+
 import zeeguu
 from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
@@ -147,7 +149,7 @@ class Bookmark(db.Model):
     def find(cls, b_id):
         return cls.query.filter_by(
             id= b_id
-        ).first()
+        ).one()
 
     @classmethod
     def find_all_by_user_and_word(cls, user, word):
@@ -163,6 +165,17 @@ class Bookmark(db.Model):
             origin = word,
             text = text
         ).all()
+
+    @classmethod
+    def exists(cls, bookmark):
+        try:
+            cls.query.filter_by(
+                origin_id=bookmark.origin.id,
+                id=bookmark.id
+            ).one()
+            return True
+        except NoResultFound:
+            return False
 
     def check_is_latest_outcome_too_easy(self, add_to_result_time=False):
         sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)
