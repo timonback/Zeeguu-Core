@@ -7,6 +7,9 @@ class AlgorithmWrapper:
         self.algorithm = algorithm
 
     def calculate(self, exercise, max_iterations):
+        if exercise is None:
+            raise ValueError("Exercise must not be None")
+
         args = self._args_prepare(exercise, max_iterations)
         return self.algorithm.calculate(args)
 
