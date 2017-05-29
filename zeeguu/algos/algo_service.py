@@ -36,19 +36,16 @@ class AlgoService:
     @classmethod
     def update_bookmark_priority(cls, db, user):
         try:
-            bookmarks_for_user = Bookmark.find_by_specific_user(user)
+            bookmarks_for_user = user.all_bookmarks()
             if len(bookmarks_for_user) == 0:
                 return
 
             # tuple(0=bookmark, 1=exercise)
-            bookmark_exercise_of_user = map(cls._get_exercise_of_bookmarks,
-                                            bookmarks_for_user)
+            bookmark_exercise_of_user = map(cls._get_exercise_of_bookmark, bookmarks_for_user)
             b1, b2 = itertools.tee(bookmark_exercise_of_user, 2)
-            max_iterations = max(pair[1].id for pair in b1)
-            exercises_and_priorities = map(lambda x: (x[0],
-                                                      cls.algorithm_wrapper.calculate(
-                                                          x[1],
-                                                          max_iterations)), b2)
+
+            max_iterations = max(pair[1].id if pair[1] else 0 for pair in b1)
+            exercises_and_priorities = map(lambda x: (x[0], cls.algorithm_wrapper.calculate(x[1], max_iterations) if x[1] else cls.MAX_PRIORITY), b2)
 
             with db.session.no_autoflush:
                 for pair in exercises_and_priorities:
@@ -67,7 +64,7 @@ class AlgoService:
             print(traceback.format_exc())
 
     @staticmethod
-    def _get_exercise_of_bookmarks(bookmark):
+    def _get_exercise_of_bookmark(bookmark):
         if 0 < len(bookmark.exercise_log):
             return bookmark, bookmark.exercise_log[-1]
 
