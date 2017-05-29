@@ -17,17 +17,15 @@ class DomainTest(ModelTestMixIn, TestCase):
         super(DomainTest, self).setUp()
 
     def test_url_domain(self):
-        url = Url("http://news.mir.com/page1", "Mir News")
-        assert url.domain.domain_name == "http://news.mir.com"
 
-        url = Url("news.mir.com/page1", "Mir News")
-        assert url.domain.domain_name == "news.mir.com"
+        url = Url.find_or_create("http://news.mir.com/page1", "Mir News")
+        assert url.domain_name() == "http://news.mir.com"
 
-        url = Url("https://news.mir.com/page1", "Mir News")
-        assert url.domain.domain_name == "https://news.mir.com"
+        url = Url.find_or_create("news.mir.com/page1", "Mir News")
+        assert url.domain_name() == "news.mir.com"
 
-        url = Url("", "Mir News")
-        assert url.domain.domain_name == ""
+        url = Url.find_or_create("", "Mir News")
+        assert url.domain_name() == ""
 
     def test_user_recently_visited_domains(self):
         assert len(recent_domains_with_times(self.mir)) == 3

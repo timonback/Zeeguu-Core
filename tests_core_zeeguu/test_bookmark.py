@@ -6,6 +6,7 @@ from datetime import datetime
 from unittest import TestCase
 
 from zeeguu.model.user_word import UserWord
+import zeeguu
 
 
 class BookmarkTest(ModelTestMixIn, TestCase):
@@ -41,12 +42,10 @@ class BookmarkTest(ModelTestMixIn, TestCase):
         assert reg.importance_level() == 8
 
     def test_default_bookmarks(self):
-        from zeeguu.temporary.default_words import default_bookmarks
-        b = default_bookmarks(self.mir, "es")
+        from zeeguu.temporary.default_words import create_default_bookmarks
 
-        import zeeguu
-        db = zeeguu.db
-        db.session.add_all(b)
-        db.session.commit()
+        b = create_default_bookmarks(zeeguu.db.session, self.mir, "es")
+        zeeguu.db.session.add_all(b)
+        zeeguu.db.session.commit()
 
 
