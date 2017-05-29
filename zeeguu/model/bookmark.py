@@ -2,6 +2,7 @@ import re
 from datetime import datetime
 
 import zeeguu
+import sqlalchemy
 from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from wordstats import Word
@@ -9,7 +10,9 @@ from wordstats import Word
 from zeeguu.model.exercise import Exercise
 from zeeguu.model.exercise_outcome import ExerciseOutcome
 from zeeguu.model.exercise_source import ExerciseSource
+from zeeguu.model.language import Language
 from zeeguu.model.text import Text
+from zeeguu.model.url import Url
 from zeeguu.model.user import User
 from zeeguu.model.user_word import UserWord
 
@@ -47,7 +50,7 @@ class Bookmark(db.Model):
 
     exercise_log = relationship(Exercise, secondary="bookmark_exercise_mapping", order_by="Exercise.id")
 
-    def __init__(self, origin, translation, user, text, time):
+    def __init__(self, origin:UserWord, translation:UserWord, user:'User', text:str, time:datetime):
         self.origin = origin
         self.translations_list.append(translation)
         self.user = user
@@ -128,6 +131,55 @@ class Bookmark(db.Model):
             result['context'] = self.text.content
         return result
 
+    @classmethod
+    def find_or_create(cls, session,
+                       user,
+                       _origin: str, _origin_lang: str,
+                       _translation: str, _translation_lang: str,
+                       _context: str, _url: str, _url_title: str):
+        """
+            if the bookmark does not exist, it creates it and returns it
+            if it exists, it ** updates the translation** and returns the bookmark object 
+            
+        :param _origin: 
+        :param _context: 
+        :param _url: 
+        :return: 
+        """
+
+        origin_lang = Language.find(_origin_lang)
+        translation_lang = Language.find(_translation_lang)
+
+        origin = UserWord.find(_origin, origin_lang)
+        session.add(origin)
+
+        url = Url.find_or_create(_url, _url_title)
+        session.add(url)
+
+        context = Text.find_or_create(_context, origin_lang, url)
+        session.add(context)
+
+        translation = UserWord.find(_translation, translation_lang)
+        session.add(translation)
+
+        now = datetime.now()
+
+        try:
+            # try to find this bookmark
+            bookmark = Bookmark.find_by_user_word_and_text(user, origin, context)
+
+            # update the translation
+            bookmark.translations_list = [translation]
+
+            print (bookmark)
+        except sqlalchemy.orm.exc.NoResultFound as e:
+            bookmark = cls(origin, translation, user, context, now)
+        except Exception as e:
+            raise e
+
+        session.add(bookmark)
+
+        return bookmark
 
     @classmethod
     def find_by_specific_user(cls, user):
@@ -157,12 +209,12 @@ class Bookmark(db.Model):
         ).all()
 
     @classmethod
-    def find_all_by_user_word_and_text(cls, user, word, text):
+    def find_by_user_word_and_text(cls, user, word, text):
         return cls.query.filter_by(
             user = user,
             origin = word,
             text = text
-        ).all()
+        ).one()
 
     def check_is_latest_outcome_too_easy(self, add_to_result_time=False):
         sorted_exercise_log_by_latest=sorted(self.exercise_log, key=lambda x: x.time, reverse=True)

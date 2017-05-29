@@ -56,7 +56,7 @@ class WordsToStudyTest(ModelTestMixIn, TestCase):
 
         # solve one exercise
         for bookmark in bookmarks_to_study:
-            correct = ExerciseOutcome(ExerciseOutcome.CORRECT)
+            correct = ExerciseOutcome(ExerciseOutcome.CORRECT, True)
             recognize = ExerciseSource("Recognize")
             exercise = Exercise(correct, recognize, 100, datetime.now())
             bookmark.exercise_log.append(exercise)

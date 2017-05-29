@@ -189,7 +189,26 @@ class User(db.Model):
         :return: 
         """
         from zeeguu.algos import words_to_study
-        return words_to_study.bookmarks_to_study(self, bookmark_count)
+
+        bookmarks = words_to_study.bookmarks_to_study(self, bookmark_count)
+
+        if len(bookmarks) < bookmark_count:
+            # we still don't have enough bookmarks.
+            # in this case, we add some new ones to the user's account
+            from zeeguu.temporary.default_words import create_default_bookmarks
+            new_bookmarks = create_default_bookmarks(zeeguu.db.session, self, self.learned_language_id)
+
+            for each_new in new_bookmarks:
+                # try to find if the user has seen this in the past
+                bookmarks.add(each_new)
+                zeeguu.db.session.add(each_new)
+
+                if len(bookmarks) == bookmark_count:
+                    break
+
+            zeeguu.db.session.commit()
+
+        return bookmarks
 
     # returns array with added bookmark amount per each date for the last year
     # this function is for the activity_graph, generates data
