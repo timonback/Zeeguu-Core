@@ -200,7 +200,7 @@ class User(db.Model):
 
             for each_new in new_bookmarks:
                 # try to find if the user has seen this in the past
-                bookmarks.add(each_new)
+                bookmarks.append(each_new)
                 zeeguu.db.session.add(each_new)
 
                 if len(bookmarks) == bookmark_count:
