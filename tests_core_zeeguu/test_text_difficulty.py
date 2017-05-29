@@ -5,6 +5,8 @@ from unittest import TestCase
 import zeeguu
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.rules.language_rule import LanguageRule
+from tests_core_zeeguu.rules.user_rule import UserRule
 from zeeguu.model.feed import RSSFeed
 from zeeguu.model.url import Url
 
@@ -16,29 +18,25 @@ COMPLEX_TEXT = "Alle hatten in sein Lachen eingestimmt, hauptsächlich aus Ehrer
 class TextDifficultyTest(ModelTestMixIn, TestCase):
 
     def setUp(self):
-        self.maximal_populate = True
-        super(TextDifficultyTest, self).setUp()
+        super().setUp()
+        self.user = UserRule().user
+        self.lan = LanguageRule().de
 
-    def very_simple_test(self):
+    def test_compute_very_simple_text_difficulty(self):
 
-        d1 = self.user.text_difficulty(SIMPLE_TEXT, self.de)
-        d2 = self.user.text_difficulty(COMPLEX_TEXT, self.de)
+        d1 = self.user.text_difficulty(SIMPLE_TEXT, self.lan)
+        d2 = self.user.text_difficulty(COMPLEX_TEXT, self.lan)
 
         assert d1['estimated_difficulty'] == 'EASY'
         assert d1['score_average'] < 0.1
         assert d1['score_median'] < 0.1
 
-        assert d2 > d1
-
-    def test_difficulty_of_text_at_url(self):
-        url = Url("http://www.bild.de/rss-feeds/rss-16725492,feed=home.bild.html", "Build")
-        zeeguu.db.session.add(url)
-        zeeguu.db.session.commit()
-
-        print(url.as_string())
-        print(url.id)
-
-        feed = RSSFeed(url, "Bild.de Home", "build", image_url=None, language=None)
-        first_item = feed.feed_items()[0]
-        print(first_item['url'])
+    # TODO: What does the following test do?
+    # def test_difficulty_of_text_at_url(self):
+    #     url = Url("http://www.bild.de/rss-feeds/rss-16725492,feed=home.bild.html", "Build")
+    #     zeeguu.db.session.add(url)
+    #     zeeguu.db.session.commit()
+    #
+    #     feed = RSSFeed(url, "Bild.de Home", "build", image_url=None, language=None)
+    #     first_item = feed.feed_items()[0]
 

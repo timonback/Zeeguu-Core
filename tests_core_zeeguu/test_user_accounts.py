@@ -1,12 +1,5 @@
-import zeeguu
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
-<<<<<<< HEAD
-from zeeguu import util
-from zeeguu.model import Session, User
-=======
-from zeeguu.model.session import Session
-from zeeguu.model.user import User
->>>>>>> 1af5d97b68b07c80f15b05e7e5e975b4890e642d
+from tests_core_zeeguu.rules.user_rule import UserRule
 
 WANNABE_UUID = '2b4a7c0d1e8f'
 TEST_PASS = 'cherrypie'
@@ -14,43 +7,35 @@ TEST_PASS = 'cherrypie'
 
 class UserPreferenceTest(ModelTestMixIn):
     def setUp(self):
-        self.maximal_populate = True
-        super(UserPreferenceTest, self).setUp()
+        super().setUp()
+        self.user = UserRule().user
 
+    # TODO: Discuss why they implement their own hashing algorithm
     def test_password_hash(self):
-        user = User.find("i@mir.lu")
-        hash1 = util.password_hash("test", user.password_salt)
-        hash2 = util.password_hash("wrong", user.password_salt)
-
-        assert hash1 != hash2
-        assert user.authorize("i@mir.lu", "test") != None
-
-    # TODO: must commit the first session first.
-    def test_user_session(self):
-        user = User.find("i@mir.lu")
-        s = Session.find_for_user(user)
-        # print s.id
-        zeeguu.db.session.add(s)
-        zeeguu.db.session.commit()
-
-        # print s.id
-        # #
-        # s2 = Session.find_for_id(s.id)
-        # print s2
-        # assert (s2.user == user)
+        assert False
+        # hash1 = util.password_hash("test", user.password_salt)
+        # hash2 = util.password_hash("wrong", user.password_salt)
         #
-        # s3 = Session.find_for_id(3)
-        # assert not s3
+        # assert hash1 != hash2
+        # assert user.authorize("i@mir.lu", "test") != None
+
+    # TODO: What is the meaning of the following tests?
+    def test_user_session(self):
+        assert False
+        # s = Session.find_for_user(self.user)
+
 
     @staticmethod
     def test_create_anonymous_user_and_get_sessions():
-        u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS, 'de')
-        zeeguu.db.session.add_all([u1])
-        zeeguu.db.session.commit()
-        assert u1.name == WANNABE_UUID
+        assert False
+        # u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS, 'de')
+        # zeeguu.db.session.add_all([u1])
+        # zeeguu.db.session.commit()
+        # assert u1.name == WANNABE_UUID
 
     @classmethod
     def test_get_session_for_anonymous_user(cls):
-        cls.test_create_anonymous_user_and_get_sessions()
-        user = User.authorize(WANNABE_UUID + '@mir.lu', TEST_PASS)
-        assert Session.find_for_user(user).id > 0
+        assert False
+        # cls.test_create_anonymous_user_and_get_sessions()
+        # user = User.authorize(WANNABE_UUID + '@mir.lu', TEST_PASS)
+        # assert Session.find_for_user(user).id > 0

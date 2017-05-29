@@ -28,7 +28,7 @@ class LanguageRule(BaseRule):
     }
 
     @classmethod
-    def __get_or_create_language(cls, language_id):
+    def get_or_create_language(cls, language_id):
         try:
             return Language.find(language_id)
         except (NoResultFound, OperationalError, ObjectDeletedError):
@@ -49,45 +49,45 @@ class LanguageRule(BaseRule):
 
     @property
     def da(self):
-        return self.__get_or_create_language("da")
+        return self.get_or_create_language("da")
 
     @property
     def de(self):
-        return self.__get_or_create_language("de")
+        return self.get_or_create_language("de")
 
     @property
     def en(self):
-        return self.__get_or_create_language("en")
+        return self.get_or_create_language("en")
 
     @property
     def es(self):
-        return self.__get_or_create_language("es")
+        return self.get_or_create_language("es")
 
     @property
     def fr(self):
-        return self.__get_or_create_language("fr")
+        return self.get_or_create_language("fr")
 
     @property
     def it(self):
-        return self.__get_or_create_language("it")
+        return self.get_or_create_language("it")
 
     @property
     def nl(self):
-        return self.__get_or_create_language("nl")
+        return self.get_or_create_language("nl")
 
     @property
     def no(self):
-        return self.__get_or_create_language("no")
+        return self.get_or_create_language("no")
 
     @property
     def pt(self):
-        return self.__get_or_create_language("pt")
+        return self.get_or_create_language("pt")
 
     @property
     def ro(self):
-        return self.__get_or_create_language("ro")
+        return self.get_or_create_language("ro")
 
     @property
     def random(self):
         random_id, __ = random.choice(list(self.languages.items()))
-        return self.__get_or_create_language(random_id)
+        return self.get_or_create_language(random_id)

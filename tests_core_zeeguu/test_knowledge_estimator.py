@@ -51,12 +51,13 @@ class FeedTest(ModelTestMixIn):
         self.user_rule.add_bookmarks(count_bookmarks, origin=origin_word)
         est = SimpleKnowledgeEstimator(self.user)
 
-        # Get how many bookmarks are 'known'. Should be 0.
+        # Get how many bookmarks are 'known'.
         before = est.get_known_bookmarks()
+        assert len(before) == 0, "No Bookmark should be known at this point"
 
         # Add an exercise with Outcome TOO_EASY to random number of bookmarks
         user_bookmarks = self.user.all_bookmarks()
-        for i in range(1, random.randint(1, count_bookmarks)):
+        for i in range(0, random.randint(1, count_bookmarks)):
             bookmark = user_bookmarks[i]
             random_exercise = ExerciseRule().exercise
             random_exercise.outcome = OutcomeRule().too_easy
