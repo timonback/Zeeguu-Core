@@ -4,7 +4,6 @@ import time
 from zeeguu.content_retriever.content_extractor import ArticleContentExtractor
 import queue
 
-
 def get_content_for_urls(urls, lang_code, timeout = 10):
     """
     :param data: an array of tuples (url, url_id)

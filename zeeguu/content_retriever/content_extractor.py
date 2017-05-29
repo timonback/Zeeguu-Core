@@ -1,4 +1,4 @@
-from newspaper import Article
+import watchmen
 
 
 class ArticleContentExtractor:
@@ -9,14 +9,11 @@ class ArticleContentExtractor:
     """
 
     def __init__(self, url, lang_code):
-        self.article = Article(url=url, language=lang_code)
-        self.article.download()
-        self.article.parse()
-
-    def get_content(self):
-        return self.article.text
+        self.url = url
 
     @classmethod
     def worker(cls, url, lang_code, result):
-        extractor = cls(url, lang_code)
-        result.put(dict(content=extractor.get_content(), image="", url=url))
+        print ("Worker getting the content for " + url)
+        article = watchmen.article_parser.get_article(url)
+        print("SUCCESS: worker got content for " + url)
+        result.put(dict(content=article.text, image="", url=url))
