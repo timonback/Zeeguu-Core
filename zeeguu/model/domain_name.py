@@ -1,8 +1,9 @@
 import re
 
-import sqlalchemy.orm
+from sqlalchemy.orm.exc import NoResultFound
 
 import zeeguu
+
 db = zeeguu.db
 
 
@@ -25,9 +26,11 @@ class DomainName(db.Model):
 
     @classmethod
     def find(cls, domain_url):
+        return cls.query.filter(DomainName.domain_name == domain_url).one()
+
+    @classmethod
+    def find_or_create(cls, domain_url):
         try:
-            return (cls.query.filter(cls.domain_name == domain_url)
-                             .one())
-        except sqlalchemy.orm.exc.NoResultFound:
-            # print "tried, but didn't find " + domain_url
+            return cls.find(domain_url)
+        except NoResultFound:
             return cls(domain_url)

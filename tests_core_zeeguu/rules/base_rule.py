@@ -1,4 +1,5 @@
 from faker import Faker
+from sqlalchemy.exc import InvalidRequestError
 
 import zeeguu.model
 
@@ -10,8 +11,12 @@ class BaseRule:
 
     @classmethod
     def save(cls, obj):
-        cls.db.session.add(obj)
-        cls.db.session.commit()
+        try:
+            cls.db.session.add(obj)
+            cls.db.session.commit()
+        except InvalidRequestError:
+            cls.db.session.rollback()
+            cls.save(obj)
 
     def _create_model_object(self):
         raise NotImplementedError

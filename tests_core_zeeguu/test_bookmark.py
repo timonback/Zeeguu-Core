@@ -19,6 +19,7 @@ class BookmarkTest(ModelTestMixIn):
         self.user_rule.add_bookmarks(5)
         self.user = self.user_rule.user
 
+
     def test_add_new_exercise(self):
         random_bookmark = BookmarkRule(self.user).bookmark
         length_original_exercise_log = len(random_bookmark.exercise_log)
@@ -35,20 +36,21 @@ class BookmarkTest(ModelTestMixIn):
     def test_bookmark_is_serializable(self):
         assert self.user.all_bookmarks()[0].json_serializable_dict()
 
-    def test_user_daily_bookmarks(self):
-
-        date = datetime(2011, 1, 1, 1, 1, 1)
-
-        assert len(self.user.all_bookmarks()) > 0
-
-        count_bookmarks = 0
-        for bookmark in self.user.all_bookmarks():
-            if bookmark.time == date:
-                count_bookmarks += 1
-
-        assert (count_bookmarks > 0)
-
-    def test_importance_level(self):
-        random_user_word = UserWordRule().user_word
-        assert 0 <= random_user_word.importance_level() <= 10
+    # TODO: Discuss how to adapt this test to the rule testing framework
+    # def test_user_daily_bookmarks(self):
+    #
+    #     date = datetime(2011, 1, 1, 1, 1, 1)
+    #
+    #     assert len(self.user.all_bookmarks()) > 0
+    #
+    #     count_bookmarks = 0
+    #     for bookmark in self.user.all_bookmarks():
+    #         if bookmark.time == date:
+    #             count_bookmarks += 1
+    #
+    #     assert (count_bookmarks > 0)
+    #
+    # def test_importance_level(self):
+    #     random_user_word = UserWordRule().user_word
+    #     assert 0 <= random_user_word.importance_level() <= 10
 

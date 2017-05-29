@@ -1,51 +1,65 @@
+import random
 from unittest import TestCase
+
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 import zeeguu
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
-
-db = zeeguu.db
+from tests_core_zeeguu.rules.url_rule import UrlRule
+from tests_core_zeeguu.rules.user_rule import UserRule
 from zeeguu.model.domain_name import DomainName
 from zeeguu.model.url import Url
-
 from zeeguu.the_librarian.website_recommender import recent_domains_with_times
+
+db = zeeguu.db
 
 
 class DomainTest(ModelTestMixIn, TestCase):
 
     def setUp(self):
-        self.maximal_populate = True
         super(DomainTest, self).setUp()
+        self.user_rule = UserRule()
+        self.user_rule.add_bookmarks(5)
+        self.user = self.user_rule.user
 
     def test_url_domain(self):
-        url = Url("http://news.mir.com/page1", "Mir News")
-        assert url.domain.domain_name == "http://news.mir.com"
+        url_random = UrlRule().url.url
 
-        url = Url("news.mir.com/page1", "Mir News")
-        assert url.domain.domain_name == "news.mir.com"
+        url_parts = url_random.split('//', 1)
+        domain_should_be = url_parts[0] + '//' + url_parts[1].split('/', 1)[0]
 
-        url = Url("https://news.mir.com/page1", "Mir News")
-        assert url.domain.domain_name == "https://news.mir.com"
+        domain_to_check = Url(url_random, self.faker.word()).domain_name()
 
-        url = Url("", "Mir News")
-        assert url.domain.domain_name == ""
+        assert (domain_to_check == domain_should_be), (
+            domain_should_be + " should be " + domain_to_check
+        )
 
     def test_user_recently_visited_domains(self):
-        assert len(recent_domains_with_times(self.user)) == 3
+        assert len(recent_domains_with_times(self.user)) != 0
 
+    # TODO: Discuss the necessity of this test
     def test_user_recently_visited_domains_does_not_include_android(self):
         assert not(any("android" in dom[0] for dom in recent_domains_with_times(self.user)))
 
     def test_one_domain_multiple_urls(self):
-        # Funny thing: you have to make sure to commit ASAP
-        # otherwise, you end up having two domain name objects
-        # because each Url creates one...
-        u1 = Url("https://mir.lu/tralala/trilili", "")
-        db.session.add(u1)
-        db.session.commit()
+        """Tests that if multiple URLs are added to the database that their
+        DomainName is not added to the database more than once
+        """
+        # Create an 'original' URL, which is saved to the Database
+        url_random_obj_origin = UrlRule().url
 
-        u2 = Url("https://mir.lu/tralala/trilili2", "")
-        db.session.add(u2)
-        db.session.commit()
+        # Create a random number of URLs, each with the same DomainName
+        random_num = random.randint(0, 10)
+        for _ in range(0, random_num):
+            url_random_extended = url_random_obj_origin.url + self.faker.word()
+            _ = Url(url_random_extended, self.faker.word())
 
-        d = DomainName.find("https://mir.lu")
-        assert str(d)
+        domain_for_query = url_random_obj_origin.domain_name()
+
+        try:
+            assert DomainName.find(domain_for_query)
+        except NoResultFound:
+            assert False, "No domains found in database"
+        except MultipleResultsFound:
+            assert False, "There were multiple DomainNames in the database"
+

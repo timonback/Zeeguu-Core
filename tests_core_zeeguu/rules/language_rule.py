@@ -1,6 +1,7 @@
 import random
 
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm.exc import NoResultFound, ObjectDeletedError
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
 from zeeguu.model.language import Language
@@ -30,7 +31,7 @@ class LanguageRule(BaseRule):
     def __get_or_create_language(cls, language_id):
         try:
             return Language.find(language_id)
-        except NoResultFound:
+        except (NoResultFound, OperationalError, ObjectDeletedError):
             return cls.__create_new_language(language_id)
 
     @classmethod
