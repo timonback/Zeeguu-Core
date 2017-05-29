@@ -17,12 +17,17 @@ db = zeeguu.db
 class DomainTest(ModelTestMixIn, TestCase):
 
     def setUp(self):
-        super(DomainTest, self).setUp()
+        super().setUp()
         self.user_rule = UserRule()
-        self.user_rule.add_bookmarks(5)
+        self.user_rule.add_bookmarks(random.randint(1, 5))
         self.user = self.user_rule.user
 
     def test_url_domain(self):
+        """Tests the correct retrieval of a domain from a random url
+
+        e.g. 'https://google.com' should be retrieved from
+        e.g. 'https://google.com/search'
+        """
         url_random = UrlRule().url.url
 
         url_parts = url_random.split('//', 1)
@@ -42,7 +47,8 @@ class DomainTest(ModelTestMixIn, TestCase):
         assert not(any("android" in dom[0] for dom in recent_domains_with_times(self.user)))
 
     def test_one_domain_multiple_urls(self):
-        """Tests that if multiple URLs are added to the database that their
+        """
+        Tests that if multiple URLs are added to the database that their
         DomainName is not added to the database more than once
         """
         # Create an 'original' URL, which is saved to the Database

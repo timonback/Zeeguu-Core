@@ -13,14 +13,14 @@ class OutcomeRule(BaseRule):
     saved to the database if they don't yet exist in the database.
     """
 
-    outcomes = {
-        "Show Solution": False,
-        "Retry": False,
-        "Correct": True,
-        "Wrong": False,
-        "Typo": False,
-        "Too easy": True
-    }
+    outcomes = [
+        ExerciseOutcome.CORRECT,
+        ExerciseOutcome.TOO_EASY,
+        ExerciseOutcome.WRONG,
+        ExerciseOutcome.SHOW_SOLUTION,
+        ExerciseOutcome.RETRY,
+        ExerciseOutcome.TYPO
+    ]
 
     @classmethod
     def __get_or_create_outcome(cls, outcome):
@@ -31,12 +31,7 @@ class OutcomeRule(BaseRule):
 
     @classmethod
     def __create_new_outcome(cls, outcome):
-        correct = cls.outcomes.get(outcome)
-
-        if correct is None:
-            raise KeyError
-
-        new_outcome = ExerciseOutcome(outcome, correct)
+        new_outcome = ExerciseOutcome(outcome)
 
         cls.save(new_outcome)
 
@@ -44,29 +39,29 @@ class OutcomeRule(BaseRule):
 
     @property
     def show_solution(self):
-        return self.__get_or_create_outcome("Show Solution")
+        return self.__get_or_create_outcome(ExerciseOutcome.SHOW_SOLUTION)
 
     @property
     def retry(self):
-        return self.__get_or_create_outcome("Retry")
+        return self.__get_or_create_outcome(ExerciseOutcome.RETRY)
 
     @property
     def correct(self):
-        return self.__get_or_create_outcome("Correct")
+        return self.__get_or_create_outcome(ExerciseOutcome.CORRECT)
 
     @property
     def wrong(self):
-        return self.__get_or_create_outcome("Wrong")
+        return self.__get_or_create_outcome(ExerciseOutcome.WRONG)
 
     @property
     def typo(self):
-        return self.__get_or_create_outcome("Typo")
+        return self.__get_or_create_outcome(ExerciseOutcome.TYPO)
 
     @property
     def too_easy(self):
-        return self.__get_or_create_outcome("Too Easy")
+        return self.__get_or_create_outcome(ExerciseOutcome.TOO_EASY)
 
     @property
     def random(self):
-        random_outcome, __ = random.choice(list(self.outcomes.items()))
+        random_outcome = random.choice(self.outcomes)
         return self.__get_or_create_outcome(random_outcome)

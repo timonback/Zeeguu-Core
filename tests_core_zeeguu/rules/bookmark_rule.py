@@ -11,13 +11,15 @@ from zeeguu.model.user_word import UserWord
 
 
 class BookmarkRule(BaseRule):
-    def __init__(self, user):
+    props = ['origin', 'translation', 'text', 'date']
+
+    def __init__(self, user, **kwargs):
         super().__init__()
-        self.bookmark = self._create_model_object(user)
+        self.bookmark = self._create_model_object(user, **kwargs)
 
         self.save(self.bookmark)
 
-    def _create_model_object(self, user):
+    def _create_model_object(self, user, **kwargs):
         random_url = UrlRule().url
 
         random_text = TextRule().text
@@ -29,8 +31,7 @@ class BookmarkRule(BaseRule):
         random_translation_language = LanguageRule().random
 
         if UserWord.exists(random_origin_word, random_origin_language) \
-                or UserWord.exists(random_translation_word,
-                                   random_translation_language):
+                or UserWord.exists(random_translation_word, random_translation_language):
             return self._create_model_object(user)
 
         random_origin = UserWordRule(random_origin_word,
@@ -41,6 +42,10 @@ class BookmarkRule(BaseRule):
 
         bookmark = Bookmark(random_origin, random_translation, user,
                             random_text, random_date)
+
+        for k in kwargs:
+            if k in self.props:
+                setattr(bookmark, k, kwargs.get(k))
 
         if self._exists_in_db(bookmark):
             return self._create_model_object(user)

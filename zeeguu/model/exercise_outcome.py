@@ -18,9 +18,17 @@ class ExerciseOutcome(db.Model):
     WRONG = 'Wrong'
     TYPO = 'Typo'
 
-    def __init__(self, outcome, correct):
+    correct_outcomes = [
+        CORRECT,
+        TOO_EASY
+    ]
+
+    def __init__(self, outcome):
         self.outcome = outcome
-        self.correct = correct
+
+    @property
+    def correct(self):
+        return self.outcome in self.correct_outcomes
 
     @classmethod
     def find(cls, outcome):

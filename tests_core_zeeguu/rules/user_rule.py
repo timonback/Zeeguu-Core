@@ -35,6 +35,6 @@ class UserRule(BaseRule):
     def _exists_in_db(obj):
         return User.exists(obj)
 
-    def add_bookmarks(self, number):
+    def add_bookmarks(self, number, **kwargs):
         for _ in range(number):
-            BookmarkRule(self.user)
+            BookmarkRule(self.user, **kwargs)

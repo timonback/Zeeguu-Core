@@ -87,12 +87,12 @@ def create_minimal_test_db(db):
 
     db.session.add(mir)
 
-    show_solution = ExerciseOutcome("Show solution", False)
-    retry = ExerciseOutcome("Retry", False)
-    correct = ExerciseOutcome("Correct", True)
-    wrong = ExerciseOutcome("Wrong", False)
-    typo = ExerciseOutcome("Typo", False)
-    too_easy = ExerciseOutcome("Too easy", True)
+    show_solution = ExerciseOutcome("Show solution")
+    retry = ExerciseOutcome("Retry")
+    correct = ExerciseOutcome("Correct")
+    wrong = ExerciseOutcome("Wrong")
+    typo = ExerciseOutcome("Typo")
+    too_easy = ExerciseOutcome("Too easy")
 
     outcomes = [show_solution, retry, correct, wrong, typo, too_easy]
 
@@ -227,12 +227,12 @@ def create_test_db(db):
     db.session.add(ro)
     db.session.commit()
 
-    show_solution = ExerciseOutcome("Show solution", False)
-    retry = ExerciseOutcome("Retry", False)
-    correct = ExerciseOutcome("Correct", True)
-    wrong = ExerciseOutcome("Wrong", False)
-    typo = ExerciseOutcome("Typo", False)
-    too_easy = ExerciseOutcome("Too easy", True)
+    show_solution = ExerciseOutcome("Show solution")
+    retry = ExerciseOutcome("Retry")
+    correct = ExerciseOutcome("Correct")
+    wrong = ExerciseOutcome("Wrong")
+    typo = ExerciseOutcome("Typo")
+    too_easy = ExerciseOutcome("Too easy")
 
     recognize = ExerciseSource("Recognize")
     translate = ExerciseSource("Translate")
