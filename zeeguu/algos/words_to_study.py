@@ -47,8 +47,8 @@ def bookmarks_to_study(user, bookmark_count):
         # we still don't have enough bookmarks.
         # in this case, we add some new ones to the user's account
         needed = bookmark_count - size
-        from zeeguu.temporary.default_words import default_bookmarks
-        new_bookmarks = default_bookmarks(user, user.learned_language_id)
+        from zeeguu.temporary.default_words import create_default_bookmarks
+        new_bookmarks = create_default_bookmarks(zeeguu.db.session, user, user.learned_language_id)
 
         for each_new in new_bookmarks:
             # try to find if the user has seen this in the past
