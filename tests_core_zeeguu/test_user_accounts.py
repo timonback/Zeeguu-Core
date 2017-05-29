@@ -54,5 +54,7 @@ class UserPreferenceTest(ModelTestMixIn, TestCase):
         assert Session.find_for_user(user).id > 0
 
     def test_even_anonumous_users_have_to_study(self):
-        u1 = self.test_create_anonymous_user_and_get_sessions()
-        assert len(u1.bookmarks_to_study(4)) == 4
+        u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS, 'de')
+        zeeguu.db.session.add_all([u1])
+        zeeguu.db.session.commit()
+        self.assertIsNotNone(u1.bookmarks_to_study(4))

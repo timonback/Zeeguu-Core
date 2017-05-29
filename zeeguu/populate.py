@@ -10,6 +10,7 @@ from flask import Flask
 
 
 # zeeguu.db must be setup before we load the model classes the first time
+from zeeguu.model import DomainName
 
 if __name__ == "__main__":
 
@@ -55,15 +56,24 @@ def drop_current_tables(db):
 
 
 def add_bookmark(db, user, original_language, original_word, translation_language, translation_word,  date, the_context, the_url, the_url_title):
+    session = db.session
 
-    url = Url.find (the_url)
+    url = Url.find_or_create(the_url, the_url_title)
+    session.add(url)
+
     text = Text.find_or_create(the_context, translation_language, url)
-    origin = UserWord.find(original_word, original_language)
-    translation = UserWord.find(translation_word, translation_language)
+    session.add(text)
 
-    b1 = Bookmark(origin, translation, user, text, date)
-    db.session.add_all([url,text,origin,translation,b1])
-    db.session.commit()
+    origin = UserWord.find(original_word, original_language)
+    session.add(origin)
+
+    translation = UserWord.find(translation_word, translation_language)
+    session.add(translation)
+
+    b = Bookmark(origin, translation, user, text, date)
+    session.add(b)
+
+    session.commit()
 
 
 #
