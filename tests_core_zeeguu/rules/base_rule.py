@@ -1,7 +1,6 @@
+import zeeguu.model
 from faker import Faker
 from sqlalchemy.exc import InvalidRequestError
-
-import zeeguu.model
 
 
 class BaseRule:
@@ -18,7 +17,7 @@ class BaseRule:
             cls.db.session.rollback()
             cls.save(obj)
 
-    def _create_model_object(self):
+    def _create_model_object(self, *args):
         raise NotImplementedError
 
     @staticmethod
