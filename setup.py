@@ -24,6 +24,7 @@ setuptools.setup(
                       "feedparser",
                       "wordstats",
                       "requests",
-                      "newspaper3k"
+                      "newspaper3k",
+                      "Faker"
                       )
 )
