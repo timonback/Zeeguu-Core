@@ -70,7 +70,7 @@ bookmark_data['fr'] = [
     ["Combien", "how much", "Combien cela coûte?", lingnaut_fr],
     ["Viens", "come", "Viens avec moi!", lingnaut_fr],
     ["Où", "where", "Où vis-tu?", lingnaut_fr],
-    ["wonderful", "merveilleux", "La France est un pays merveilleux", lingnaut_fr],
+    ["merveilleux", "wonderful", "La France est un pays merveilleux", lingnaut_fr],
     ["Il faut que je", "I have to", "Il faut que je parte.", lingnaut_fr],
     ["nuit", "night", "Bonne nuit et fais de beaux rêves!", lingnaut_fr],
     ["rêves", "dreams", "Bonne nuit et fais de beaux rêves!", lingnaut_fr]
