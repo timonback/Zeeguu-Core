@@ -9,14 +9,14 @@ if "ZEEGUU_CORE_CONFIG" not in os.environ:
 import zeeguu.model
 
 from unittest import TestCase
-db = zeeguu.db
 
 
 class ModelTestMixIn(TestCase):
+    db = zeeguu.db
 
     def setUp(self):
         self.faker = Faker()
-        db.create_all()
+        self.db.create_all()
 
     def tearDown(self):
-        db.drop_all()
+        self.db.drop_all()
