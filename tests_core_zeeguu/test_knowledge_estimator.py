@@ -1,12 +1,12 @@
 import random
 
 import zeeguu
+
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
 from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
 from tests_core_zeeguu.rules.user_rule import UserRule
 from tests_core_zeeguu.rules.user_word_rule import UserWordRule
-from zeeguu.algos.algo_service import AlgoService
 
 db = zeeguu.db
 from zeeguu.model.knowledge_estimator import SimpleKnowledgeEstimator
@@ -23,14 +23,8 @@ class FeedTest(ModelTestMixIn):
         flagged as 'learned'
         """
         length_should_be = random.randint(2, 5)
-        self.user_rule.add_bookmarks(length_should_be)
-
-        # Add a random number of exercises to all bookmarks
-        user_bookmarks = self.user.all_bookmarks()
-        for b in user_bookmarks:
-            for _ in range(1, random.randint(2, 5)):
-                random_exercise = ExerciseRule().exercise
-                b.add_new_exercise(random_exercise)
+        exercises_amount = random.randint(2, 5)
+        self.user_rule.add_bookmarks(length_should_be, exercises_count=exercises_amount)
 
         # Check whether exercises are flagged as 'learned'
         est = SimpleKnowledgeEstimator(self.user)

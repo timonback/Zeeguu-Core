@@ -1,5 +1,6 @@
 from tests_core_zeeguu.rules.base_rule import BaseRule
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
+from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
 from tests_core_zeeguu.rules.language_rule import LanguageRule
 from zeeguu.model.user import User
 
@@ -35,6 +36,16 @@ class UserRule(BaseRule):
     def _exists_in_db(obj):
         return User.exists(obj)
 
-    def add_bookmarks(self, number, **kwargs):
+    def add_bookmarks(self, number, exercises_count=0, **kwargs):
+        bookmark_rules = []
+
         for _ in range(number):
-            BookmarkRule(self.user, **kwargs)
+            bookmark_rule = BookmarkRule(self.user, **kwargs)
+            bookmark = bookmark_rule.bookmark
+
+            for i in range(0, exercises_count):
+                random_exercise = ExerciseRule().exercise
+                bookmark.add_new_exercise(random_exercise)
+
+            bookmark_rules.append(bookmark_rule)
+        return bookmark_rules
