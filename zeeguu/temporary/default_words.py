@@ -66,6 +66,21 @@ bookmark_data['es'] = [
     ["tomar", "drink", "Qué le gustaría tomar?", lingnaut_es]
 ]
 
+lingnaut_fr = 'http://www.linguanaut.com/english_french.htm'
+bookmark_data['fr'] = [
+    ["perdu", "lost", "Je suis perdu", lingnaut_fr],
+    ["toalettes", "toilet", "	Où sont les toilettes?", lingnaut_fr],
+    ["Allez", "go", "Allez tout droit!", lingnaut_fr],
+    ["cherche", "looking for", "Je cherche Jean", lingnaut_fr],
+    ["Combien", "how much", "Combien cela coûte?", lingnaut_fr],
+    ["Viens", "come", "Viens avec moi!", lingnaut_fr],
+    ["Où", "where", "Où vis-tu?", lingnaut_fr],
+    ["wonderful", "merveilleux", "La France est un pays merveilleux", lingnaut_fr],
+    ["Il faut que je", "I have to", "Il faut que je parte.", lingnaut_fr],
+    ["nuit", "night", "Bonne nuit et fais de beaux rêves!", lingnaut_fr],
+    ["rêves", "dreams", "Bonne nuit et fais de beaux rêves!", lingnaut_fr]
+]
+
 
 def create_default_bookmarks(session, user, language_code):
 
