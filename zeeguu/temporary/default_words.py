@@ -69,7 +69,7 @@ bookmark_data['es'] = [
 lingnaut_fr = 'http://www.linguanaut.com/english_french.htm'
 bookmark_data['fr'] = [
     ["perdu", "lost", "Je suis perdu", lingnaut_fr],
-    ["toalettes", "toilet", "	Où sont les toilettes?", lingnaut_fr],
+    ["toilettes", "toilet", "	Où sont les toilettes?", lingnaut_fr],
     ["Allez", "go", "Allez tout droit!", lingnaut_fr],
     ["cherche", "looking for", "Je cherche Jean", lingnaut_fr],
     ["Combien", "how much", "Combien cela coûte?", lingnaut_fr],
