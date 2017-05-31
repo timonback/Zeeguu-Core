@@ -1,5 +1,6 @@
 import re
 
+import sqlalchemy
 from sqlalchemy.orm.exc import NoResultFound
 
 import zeeguu
@@ -23,6 +24,25 @@ class DomainName(db.Model):
 
         domain = re.findall(protocol_re + domain_re, url)[0]
         return domain[0] + domain[1]
+
+    @classmethod
+    def get_domain(self, url):
+        protocol_re = '(.*://)?'
+        domain_re = '([^/?]*)'
+        path_re = '(.*)'
+
+        domain = re.findall(protocol_re + domain_re, url)[0]
+        return domain[0] + domain[1]
+
+    @classmethod
+    def for_url_string(cls, url_string):
+        only_domain_str = DomainName.get_domain(url_string)
+        try:
+            return (cls.query.filter(cls.domain_name == only_domain_str)
+                             .one())
+        except sqlalchemy.orm.exc.NoResultFound:
+            # print "tried, but didn't find " + domain_url
+            return cls(only_domain_str)
 
     @classmethod
     def find(cls, domain_url):

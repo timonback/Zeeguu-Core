@@ -11,6 +11,7 @@ import zeeguu
 # zeeguu.db must be setup before we load the model classes the first time
 from zeeguu.algos.algo_service import AlgoService
 from zeeguu.model.exercise import Exercise
+from zeeguu.model.domain_name import DomainName
 
 if __name__ == "__main__":
 
@@ -56,13 +57,20 @@ def drop_current_tables(db):
     db.create_all()
 
 
-def add_bookmark(db, user, original_language, original_word,
-                 translation_language, translation_word, date, the_context,
-                 the_url, the_url_title):
-    url = Url.find(the_url)
+def add_bookmark(db, user, original_language, original_word, translation_language, translation_word,  date, the_context, the_url, the_url_title):
+    session = db.session
+
+    url = Url.find_or_create(the_url, the_url_title)
+    session.add(url)
+
     text = Text.find_or_create(the_context, translation_language, url)
+    session.add(text)
+
     origin = UserWord.find(original_word, original_language)
+    session.add(origin)
+
     translation = UserWord.find(translation_word, translation_language)
+    session.add(translation)
 
     b1 = Bookmark(origin, translation, user, text, date)
     db.session.add_all([url, text, origin, translation, b1])

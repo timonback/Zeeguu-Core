@@ -4,9 +4,6 @@ from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
 from tests_core_zeeguu.rules.user_rule import UserRule
 
-print('__file__={0:<35} | __name__={1:<20} | __package__={2:<20}'.format(
-    __file__, __name__, str(__package__)))
-
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 
 

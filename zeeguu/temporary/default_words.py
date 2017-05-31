@@ -67,25 +67,22 @@ bookmark_data['es'] = [
 ]
 
 
-def default_bookmarks(user, language_code):
+def create_default_bookmarks(session, user, language_code):
 
     bookmarks = []
 
     try:
-        origin_language = Language.find(language_code)
-        english = Language.find("en")
 
         for data_point in bookmark_data[language_code]:
-            origin_word = UserWord.find(data_point[0], origin_language)
-            translation = UserWord.find(data_point[1], english)
-            url = Url.find(data_point[3], "Zeeguu Exercises")
-            text = Text.find_or_create(data_point[2], origin_language, url)
+            bookmark = Bookmark.find_or_create(session,
+                                               user,
+                                               data_point[0], language_code,
+                                               data_point[1], "en",
+                                               data_point[2], data_point[3],  "Zeeguu Exercises")
+            bookmarks.append(bookmark)
 
-            # we don't create a new bookmark if the user already had it before
-            if not Bookmark.find_all_by_user_word_and_text(user, origin_word, text):
-                b = Bookmark(origin_word, translation, user, text, datetime.now())
-                bookmarks.append(b)
     except Exception as e:
         zeeguu.log("could not load default bookmarks for {0}".format(language_code))
+        raise e
 
     return bookmarks

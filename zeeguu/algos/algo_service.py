@@ -69,3 +69,4 @@ class AlgoService:
             return bookmark, bookmark.exercise_log[-1]
 
         return bookmark, None
+

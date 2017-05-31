@@ -21,8 +21,10 @@ class Url(db.Model):
     domain_name_id = db.Column(db.Integer, db.ForeignKey(DomainName.id))
     domain = db.relationship(DomainName)
 
-    def __init__(self, url, title):
+    def __init__(self, url: str, title: str):
         self.url = url
+        self.path = Url.get_path(url)
+        self.domain = DomainName.for_url_string(url)
         self.title = title
         self.path = Url.get_path(url)
         self.domain = DomainName.find_or_create(Url.get_domain(url))
@@ -34,6 +36,12 @@ class Url(db.Model):
 
     def as_string(self):
         return self.domain.domain_name + self.path
+
+    def render_link(self, link_text):
+        if self.url != "":
+            return '<a href="'+self.url+'">'+link_text+'</a>'
+        else:
+            return ""
 
     def domain_name(self):
         return self.domain.domain_name
@@ -55,6 +63,14 @@ class Url(db.Model):
 
         domain = re.findall(protocol_re + domain_re + path_re, url)[0]
         return domain[2]
+
+    @classmethod
+    def find_or_create(cls, _url:str, title:str = ""):
+
+        domain = DomainName.for_url_string(_url)
+        # if we didn't find the domain in the DB, it's impossible that we will find the url
+        if not domain.id:
+            return cls(_url, title)
 
     @classmethod
     def find(cls, url, title=""):

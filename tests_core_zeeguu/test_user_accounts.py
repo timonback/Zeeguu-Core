@@ -39,3 +39,24 @@ class UserPreferenceTest(ModelTestMixIn):
         # cls.test_create_anonymous_user_and_get_sessions()
         # user = User.authorize(WANNABE_UUID + '@mir.lu', TEST_PASS)
         # assert Session.find_for_user(user).id > 0
+        # s3 = Session.find_for_id(3)
+    #   # assert not s3
+    #
+    # @staticmethod
+    # def test_create_anonymous_user_and_get_sessions():
+    #     u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS, 'de')
+    #     zeeguu.db.session.add_all([u1])
+    #     zeeguu.db.session.commit()
+    #     assert u1.name == WANNABE_UUID
+    #
+    # @classmethod
+    # def test_get_session_for_anonymous_user(cls):
+    #     cls.test_create_anonymous_user_and_get_sessions()
+    #     user = User.authorize(WANNABE_UUID+'@mir.lu',TEST_PASS)
+    #     assert Session.find_for_user(user).id > 0
+    #
+    # def test_even_anonumous_users_have_to_study(self):
+    #     u1 = User.create_anonymous(WANNABE_UUID, TEST_PASS, 'de')
+    #     zeeguu.db.session.add_all([u1])
+    #     zeeguu.db.session.commit()
+    #     self.assertIsNotNone(u1.bookmarks_to_study(4))
