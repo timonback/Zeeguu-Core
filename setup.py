@@ -14,7 +14,8 @@ setuptools.setup(
     description="API for Zeeguu",
     keywords="second language acquisition api",
     dependency_links=[
-        "git+https://github.com/mircealungu/python-wordstats.git#egg=wordstats"
+        "git+https://github.com/mircealungu/python-wordstats.git#egg=wordstats",
+        "git+https://github.com/mircealungu/watchmen.git#egg=watchmen"
     ],
     install_requires=(
                       "flask>=0.10.1",
@@ -24,6 +25,7 @@ setuptools.setup(
                       "feedparser",
                       "wordstats",
                       "requests",
-                      "newspaper3k"
+                      "newspaper3k",
+                      "watchmen"
                       )
 )
