@@ -26,7 +26,7 @@ class Language(db.Model):
 
     @classmethod
     def native_languages(cls):
-        return [cls.find("en")]
+        return [cls.find("en"), cls.find("nl")]
 
     @classmethod
     def available_languages(cls):
