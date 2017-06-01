@@ -19,3 +19,11 @@ class BookmarkPriorityARTS(db.Model):
     def __init__(self, bookmark, priority):
         self.bookmark = bookmark
         self.priority = priority
+
+    @classmethod
+    def find_or_create(cls, bookmark, priority):
+        entry = cls.query.filter(cls.bookmark_id==bookmark.id)
+        if entry.first() is not None:
+            return entry.first()
+        else:
+            return cls(bookmark, priority)
