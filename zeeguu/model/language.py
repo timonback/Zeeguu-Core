@@ -2,19 +2,23 @@ import zeeguu
 
 db = zeeguu.db
 
+
 class Language(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
+    __tablename__ = 'language'
 
     id = db.Column(db.String(2), primary_key=True)
     name = db.Column(db.String(255), unique=True)
 
-
     def __init__(self, id, name):
-        self.name = name
         self.id = id
+        self.name = name
 
     def __repr__(self):
         return '<Language %r>' % (self.id)
+
+    def __eq__(self, other):
+        return self.id == other.id or self.name == other.name
 
     @classmethod
     def default_learned(cls):

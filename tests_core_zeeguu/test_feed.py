@@ -6,10 +6,12 @@ from zeeguu.model.url import Url
 
 
 class FeedTest(ModelTestMixIn, TestCase):
-
     def test_feed_items(self):
-        url = Url("http://www.bild.de/rss-feeds/rss-16725492,feed=home.bild.html", "Build")
-        feed = RSSFeed(url, "Bild.de Home", "build", image_url = None, language = None)
+        url = Url(
+            "http://www.bild.de/rss-feeds/rss-16725492,feed=home.bild.html",
+            "Build")
+        feed = RSSFeed(url, "Bild.de Home", "build", image_url=None,
+                       language=None)
         items = feed.feed_items()
 
         first_item_date = items[0]["published"]

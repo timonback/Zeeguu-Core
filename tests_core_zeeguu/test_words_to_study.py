@@ -1,76 +1,58 @@
 from datetime import datetime
-from unittest import TestCase
 
 import zeeguu
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
+from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
+from tests_core_zeeguu.rules.user_rule import UserRule
 from zeeguu.algos.algo_service import AlgoService
-from zeeguu.model.exercise import Exercise
-from zeeguu.model.exercise_outcome import ExerciseOutcome
-from zeeguu.model.exercise_source import ExerciseSource
 
 
-class WordsToStudyTest(ModelTestMixIn, TestCase):
-
+class WordsToStudyTest(ModelTestMixIn):
     def setUp(self):
-        super(WordsToStudyTest, self).setUp()
+        super().setUp()
 
-    def test_bookmarks_to_study(self):
-        """
-            
-            Make sure that once an exercise has been done, it is not
-            recommended for study again
-              
-        """
-        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
+        BOOKMARK_COUNT = 10
 
-        original_bookmarks_to_study = self.mir.bookmarks_to_study()
-        first_bookmark_to_study = original_bookmarks_to_study[0]
+        self.user_rule = UserRule()
+        self.user_rule.add_bookmarks(BOOKMARK_COUNT, exercises_count=1)
+        self.user = self.user_rule.user
 
-        # solve one exercise
-        correct = ExerciseOutcome(ExerciseOutcome.CORRECT, True)
-        recognize = ExerciseSource("Recognize")
-        exercise = Exercise(correct, recognize, 100, datetime.now())
-        first_bookmark_to_study.exercise_log.append(exercise)
+    def test_new_bookmark_has_the_highest_priority(self):
+        # GIVEN
+        new_bookmark = self.user_rule.add_bookmarks(1)[0].bookmark
 
-        # save the thing to the db
-        zeeguu.db.session.add(exercise)
-        zeeguu.db.session.commit()
+        # WHEN
+        AlgoService.update_bookmark_priority(zeeguu.db, self.user)
 
-        AlgoService.update_bookmark_priority(zeeguu.db, self.mir)
+        # THEN
+        bookmark = self.__get_bookmark_with_highest_priority()
+        assert new_bookmark == bookmark, "The newly added bookmark does not have the highest priority. Based on non existing exercise"
 
-        # now let's get a new recommendation and make sure that the
-        # exercise we just did is not in there again
-        bookmarks_to_study = self.mir.bookmarks_to_study()
+    def test_just_finished_bookmark_has_not_the_highest_priority(self):
+        # GIVEN
+        AlgoService.update_bookmark_priority(zeeguu.db, self.user)
+        first_bookmark_to_study = self.__get_bookmark_with_highest_priority()
 
-        assert first_bookmark_to_study != bookmarks_to_study[0]
+        # WHEN
+        # Add an exercise
+        exercise_rule = ExerciseRule()
+        exercise_rule.exercise.time = datetime.now()
+        exercise_rule.exercise.solving_speed = 100
+        exercise_rule.exercise.outcome = OutcomeRule().correct
+        first_bookmark_to_study.add_new_exercise(exercise_rule.exercise)
 
-    def test_possible_to_have_nothing_to_study(self):
-        """
+        AlgoService.update_bookmark_priority(zeeguu.db, self.user)
 
-            Once all the bookmarks have been studied
-            we don't have anything else
+        # THEN
+        bookmark = self.__get_bookmark_with_lowest_priority()
+        assert first_bookmark_to_study == bookmark
 
-        """
-        bookmarks_to_study = self.mir.bookmarks_to_study()
+    def __get_bookmark_with_highest_priority(self):
+        bookmarks_to_study = self.user.bookmarks_to_study()
+        return bookmarks_to_study[0]
 
-        # solve one exercise
-        for bookmark in bookmarks_to_study:
-            correct = ExerciseOutcome(ExerciseOutcome.CORRECT, True)
-            recognize = ExerciseSource("Recognize")
-            exercise = Exercise(correct, recognize, 100, datetime.now())
-            bookmark.exercise_log.append(exercise)
-
-            # save the thing to the db
-            zeeguu.db.session.add(exercise)
-        zeeguu.db.session.commit()
-
-        # now let's get a new recommendation and make sure that the
-        # exercise we just did is not in there again
-
-        # although...
-        #     there is currently a temporary trick which
-        #     would recommend generic words so we assert
-        #     that we *have* what to study
-        #TODO: fix test
-        #assert bookmarks_to_study
+    def __get_bookmark_with_lowest_priority(self):
+        bookmarks_to_study = self.user.bookmarks_to_study()
+        return bookmarks_to_study[-1]

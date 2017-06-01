@@ -1,55 +1,40 @@
 from datetime import datetime
-from unittest import TestCase
-
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
-
-import zeeguu
-
-from zeeguu.model.bookmark import Bookmark
+from tests_core_zeeguu.rules.user_rule import UserRule
+from tests_core_zeeguu.rules.watch_event_type_rule import WatchEventTypeRule
+from tests_core_zeeguu.rules.watch_interaction_event_rule import WatchInterationEventRule
 from zeeguu.model.smartwatch.watch_event_type import WatchEventType
 from zeeguu.model.smartwatch.watch_interaction_event import WatchInteractionEvent
 from zeeguu.model.user_activitiy_data import UserActivityData
 
-db = zeeguu.db
 
+class WatchEventTest(ModelTestMixIn):
+    def setUp(self):
+        super().setUp()
 
-class WatchEventTest(ModelTestMixIn, TestCase):
+        self.user_rule = UserRule()
+        self.user = self.user_rule.user
 
-    def test_watch_event_type(self):
-        retrieved = WatchEventType.find_by_name("glance")
-        if not retrieved:
-            retrieved = WatchEventType("glance")
-            db.session.add(retrieved)
-            db.session.commit()
+        self.wet = WatchEventTypeRule()
 
-        retrieved = WatchEventType.find_by_name("glance")
-        assert retrieved.name == "glance"   
-        return retrieved
+    def test_new_watch_event_type(self):
+        result = WatchEventType.find_by_name(self.wet.watch_event_type.name)
+        assert result is not None
+        assert result.name == self.wet.watch_event_type.name
 
     def test_watch_event(self):
-        glance = self.test_watch_event_type()
-        a_bookmark = Bookmark.find(1)
+        # GIVEN
+        bookmark_rules = self.user_rule.add_bookmarks(1)
+        bookmark = bookmark_rules[0].bookmark
+        assert len(WatchInteractionEvent.events_for_bookmark(bookmark)) == 0
 
-        new_glance = WatchInteractionEvent(glance, 1, datetime.now())
-        db.session.add(new_glance)
-        db.session.commit()
+        # WHEN
+        WatchInterationEventRule(bookmark)
 
-        assert len(WatchInteractionEvent.events_for_bookmark(a_bookmark)) == 1
+        # THEN
+        assert len(WatchInteractionEvent.events_for_bookmark(bookmark)) == 1
 
     def test_user_activity_data(self):
-        uad = UserActivityData(self.mir,
-                               datetime.now(),
-                               "reading",
-                               "1200",
-                               "")
+        uad = UserActivityData(self.user, datetime.now(), "reading", "1200", "")
         assert uad.event == "reading"
-        db.session.add(uad)
-        db.session.commit()
-
-    def test_get_user_activity_data(self):
-        events = WatchInteractionEvent.events_for_user(self.mir)
-        assert len(events) == 0
-        self.test_watch_event()
-        events = WatchInteractionEvent.events_for_user(self.mir)
-        assert len(events) == 1

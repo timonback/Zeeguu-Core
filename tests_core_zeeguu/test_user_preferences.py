@@ -1,23 +1,32 @@
-from unittest import TestCase
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.rules.language_rule import LanguageRule
+from tests_core_zeeguu.rules.user_rule import UserRule
+from tests_core_zeeguu.rules.user_word_rule import UserWordRule
 from zeeguu.model.user_word import UserWord
 
 
-class UserPreferenceTest(ModelTestMixIn, TestCase):
+class UserPreferenceTest(ModelTestMixIn):
+    def setUp(self):
+        super().setUp()
+
+        self.user_rule = UserRule()
+        self.user = self.user_rule.user
+
+        self.random_origin_word = self.faker.word()
+        self.random_origin_language = LanguageRule().random
+        self.user_word_rule = UserWordRule(self.random_origin_word, self.random_origin_language)
+
+    def test_user_word_count(self):
+        assert len(self.user.starred_words) == 0
 
     def test_preferred_word(self):
-        starred_words_count_before = len(self.mir.starred_words)
+        # GIVEN
 
-        hauen = UserWord.find("hauen", self.de)
-        self.mir.starred_words.append(hauen)
-        self.session.commit()
+        # WHEN
+        self.user.starred_words.append(self.user_word_rule.user_word)
 
-        starred_words_count_after = len(self.mir.starred_words)
-        assert starred_words_count_after == starred_words_count_before + 1
+        # THEN
+        assert len(self.user.starred_words) == 1
 
     def test_find_word(self):
-        word = "baum"
-        assert UserWord.find(word, self.de)
-
-    def test_user_word(self):
-        assert self.mir.user_words() == list(map((lambda x: x.origin.word), self.mir.all_bookmarks()))
+        assert UserWord.find(self.random_origin_word, self.random_origin_language)

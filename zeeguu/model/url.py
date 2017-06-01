@@ -1,6 +1,7 @@
 import re
 
 import sqlalchemy.orm
+
 import zeeguu
 
 db = zeeguu.db
@@ -21,12 +22,12 @@ class Url(db.Model):
     domain = db.relationship(DomainName)
 
     def __init__(self, url: str, title: str):
-
-        domain = DomainName.for_url_string(url)
-
+        self.url = url
         self.path = Url.get_path(url)
-        self.domain = domain
+        self.domain = DomainName.for_url_string(url)
         self.title = title
+        self.path = Url.get_path(url)
+        self.domain = DomainName.find_or_create(Url.get_domain(url))
 
     def title_if_available(self):
         if self.title != "":
@@ -46,6 +47,15 @@ class Url(db.Model):
         return self.domain.domain_name
 
     @classmethod
+    def get_domain(cls, url):
+        protocol_re = '(.*://)?'
+        domain_re = '([^/?]*)'
+        path_re = '(.*)'
+
+        domain = re.findall(protocol_re + domain_re, url)[0]
+        return domain[0] + domain[1]
+
+    @classmethod
     def get_path(cls, url):
         protocol_re = '(.*://)?'
         domain_re = '([^/?]*)'
@@ -62,10 +72,18 @@ class Url(db.Model):
         if not domain.id:
             return cls(_url, title)
 
-        path = Url.get_path(_url)
-
+    @classmethod
+    def find(cls, url, title=""):
         try:
-            return cls.query.filter(cls.path == path).filter(cls.domain == domain).one()
+            d = DomainName.find_or_create(Url.get_domain(url))
+            return (cls.query.filter(cls.path == Url.get_path(url))
+                    .filter(cls.domain == d)
+                    .one())
         except sqlalchemy.orm.exc.NoResultFound:
-            return cls(_url, title)
+            return cls(url, title)
 
+    def render_link(self, link_text):
+        if self.url != "":
+            return '<a href="' + self.url + '">' + link_text + '</a>'
+        else:
+            return ""

@@ -1,4 +1,5 @@
 import zeeguu
+
 db = zeeguu.db
 from zeeguu.model.bookmark import Bookmark
 
@@ -11,24 +12,23 @@ class WatchInteractionEvent(db.Model):
 
     time = db.Column(db.DateTime)
 
-    bookmark_id=db.Column(db.Integer,db.ForeignKey('bookmark.id'),nullable=False)
-    bookmark=db.relationship ("Bookmark")
+    bookmark_id = db.Column(db.Integer, db.ForeignKey('bookmark.id'), nullable=False)
+    bookmark = db.relationship("Bookmark")
 
-    event_type_id=db.Column(db.Integer,db.ForeignKey('watch_event_type.id'),nullable=False)
-    event_type=db.relationship ("WatchEventType")
+    event_type_id = db.Column(db.Integer, db.ForeignKey('watch_event_type.id'), nullable=False)
+    event_type = db.relationship("WatchEventType")
 
     def __init__(self, event_type, bookmark_id, time):
-
-        self.time = time
-        self.bookmark_id = bookmark_id
         self.event_type = event_type
+        self.bookmark_id = bookmark_id
+        self.time = time
 
     def data_as_dictionary(self):
         return dict(
-                user_id=self.bookmark.user_id,
-                bookmark_id= self.bookmark_id,
-                time= self.time.strftime("%Y-%m-%dT%H:%M:%S"),
-                event= self.event_type.name
+            user_id=self.bookmark.user_id,
+            bookmark_id=self.bookmark_id,
+            time=self.time.strftime("%Y-%m-%dT%H:%M:%S"),
+            event=self.event_type.name
         )
 
     def is_learned_event(self):
@@ -56,9 +56,3 @@ class WatchInteractionEvent(db.Model):
     @classmethod
     def events_for_user(cls, user):
         return cls.query.join(Bookmark).filter(Bookmark.user_id == user.id).all()
-
-
-
-
-
-

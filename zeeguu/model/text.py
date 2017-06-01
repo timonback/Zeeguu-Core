@@ -24,7 +24,6 @@ class Text(db.Model):
     url_id = db.Column(db.Integer, db.ForeignKey(Url.id))
     url = db.relationship(Url)
 
-
     def __init__(self, content, language, url):
         self.content = content
         self.language = language

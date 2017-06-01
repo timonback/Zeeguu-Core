@@ -26,6 +26,7 @@ setuptools.setup(
                       "wordstats",
                       "requests",
                       "newspaper3k",
+                      "Faker",
                       "watchmen"
                       )
 )

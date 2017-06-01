@@ -1,20 +1,44 @@
 from unittest import TestCase
+
+from sqlalchemy.orm.exc import NoResultFound
+
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.rules.language_rule import LanguageRule
+from tests_core_zeeguu.rules.user_rule import UserRule
 from zeeguu.model.language import Language
 
 
 class LanguageTest(ModelTestMixIn, TestCase):
 
+    def setUp(self):
+        super().setUp()
+        self.user = UserRule().user
+
     def test_languages_exists(self):
-        assert self.de.name == "German"
+        language_should_be = LanguageRule().random
+
+        try:
+            language_to_check = Language.find(language_should_be.id)
+        except NoResultFound:
+            assert False, "No Language found in database"
+
+        assert language_should_be.id == language_to_check.id \
+               and language_should_be.name == language_to_check.name
 
     def test_get_all_languages(self):
-        assert self.de.id in [lan.id for lan in Language.all()]
-        assert 'German' in [lan.name for lan in Language.all()]
+        languages = LanguageRule.languages
+
+        for lan in languages:
+            assert LanguageRule.get_or_create_language(lan)
 
     def test_user_set_language(self):
-        self.mir.set_learned_language("en")
-        assert self.mir.learned_language.id == "en"
+        language_should_be = LanguageRule().random
+
+        self.user.set_learned_language(language_should_be.id)
+        assert self.user.learned_language.id == language_should_be.id
 
     def test_native_language(self):
-        assert self.mir.native_language.id == "en"
+        language_should_be = LanguageRule().random
+
+        self.user.set_native_language(language_should_be.id)
+        assert self.user.native_language.id == language_should_be.id

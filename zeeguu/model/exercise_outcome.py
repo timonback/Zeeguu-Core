@@ -1,5 +1,3 @@
-import sqlalchemy.orm
-
 import zeeguu
 
 db = zeeguu.db
@@ -13,20 +11,28 @@ class ExerciseOutcome(db.Model):
     outcome = db.Column(db.String(255), nullable=False)
     correct = db.Column(db.Boolean, nullable=False)
 
+    CORRECT = 'Correct'
     TOO_EASY = 'Too easy'
     SHOW_SOLUTION = 'Show solution'
-    CORRECT = 'Correct'
+    RETRY = 'Retry'
     WRONG = 'Wrong'
+    TYPO = 'Typo'
 
-    def __init__(self, outcome, correct):
+    correct_outcomes = [
+        CORRECT,
+        TOO_EASY
+    ]
+
+    def __init__(self, outcome):
         self.outcome = outcome
-        self.correct = correct
+
+    def __eq__(self, other):
+        return self.outcome == other.outcome and self.correct == other.correct
+
+    @property
+    def correct(self):
+        return self.outcome in self.correct_outcomes
 
     @classmethod
     def find(cls, outcome):
-        try:
-            return cls.query.filter_by(
-                outcome=outcome
-            ).one()
-        except sqlalchemy.orm.exc.NoResultFound:
-            return cls(outcome)
+        return cls.query.filter_by(outcome=outcome).one()
