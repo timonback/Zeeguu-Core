@@ -1,17 +1,21 @@
 import sqlalchemy.orm
 import zeeguu
 
+from zeeguu.model.language import Language
 
-class WordForm(zeeguu.db.Model):
+db = zeeguu.db
+
+
+class WordForm(db.Model):
     __tablename__ = 'word_form'
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
-    id = zeeguu.db.Column(zeeguu.db.Integer, primary_key=True)
-    word = zeeguu.db.Column(zeeguu.db.String(255), nullable =False, index = True)
+    id = db.Column(db.Integer, primary_key=True)
+    word = db.Column(db.String(255), nullable =False, index = True)
 
-    language_id = zeeguu.db.Column(zeeguu.db.String(2), zeeguu.db.ForeignKey("language.id"))
-    language = zeeguu.db.relationship("Language")
-    zeeguu.db.UniqueConstraint(word, language_id)
+    language_id = db.Column(db.String(2), db.ForeignKey(Language.id))
+    language = db.relationship(Language)
+    db.UniqueConstraint(word, language_id)
 
     def __init__(self, word, language):
         self.word = word

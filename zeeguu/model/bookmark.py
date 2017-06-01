@@ -1,20 +1,22 @@
 import re
+from datetime import datetime
 
+import zeeguu
 import sqlalchemy
 from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
-
-import zeeguu
 from wordstats import Word
 
-db = zeeguu.db
-
-from zeeguu.model.exercise_source import ExerciseSource
 from zeeguu.model.exercise import Exercise
-
 from zeeguu.model.exercise_outcome import ExerciseOutcome
+from zeeguu.model.exercise_source import ExerciseSource
+from zeeguu.model.language import Language
+from zeeguu.model.text import Text
+from zeeguu.model.url import Url
+from zeeguu.model.user import User
 from zeeguu.model.user_word import UserWord
-from datetime import datetime
+
+db = zeeguu.db
 
 
 bookmark_translation_mapping = Table('bookmark_translation_mapping', db.Model.metadata,
@@ -34,20 +36,19 @@ class Bookmark(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
-    origin_id = db.Column(db.Integer, db.ForeignKey('user_word.id'))
-    origin = db.relationship("UserWord", primaryjoin=origin_id == UserWord.id,
-                             backref="translations")
-    translations_list = relationship("UserWord", secondary="bookmark_translation_mapping")
+    origin_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
+    origin = db.relationship(UserWord, primaryjoin=origin_id == UserWord.id)
+    translations_list = relationship(UserWord, secondary="bookmark_translation_mapping")
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("User", backref="bookmarks")
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user = db.relationship(User)
 
-    text_id = db.Column(db.Integer, db.ForeignKey('text.id'))
-    text = db.relationship("Text", backref="bookmarks")
+    text_id = db.Column(db.Integer, db.ForeignKey(Text.id))
+    text = db.relationship(Text)
 
     time = db.Column(db.DateTime)
 
-    exercise_log = relationship("Exercise", secondary="bookmark_exercise_mapping")
+    exercise_log = relationship(Exercise, secondary="bookmark_exercise_mapping", order_by="Exercise.id")
 
     def __init__(self, origin:UserWord, translation:UserWord, user:'User', text:str, time:datetime):
         self.origin = origin
@@ -145,8 +146,6 @@ class Bookmark(db.Model):
         :param _url: 
         :return: 
         """
-        from zeeguu.model import Language
-        from zeeguu.model import Url, Text
 
         origin_lang = Language.find(_origin_lang)
         translation_lang = Language.find(_translation_lang)

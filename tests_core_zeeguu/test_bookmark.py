@@ -5,7 +5,8 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from datetime import datetime
 from unittest import TestCase
 
-from zeeguu.model import UserWord
+from zeeguu.model.user_word import UserWord
+import zeeguu
 
 
 class BookmarkTest(ModelTestMixIn, TestCase):
@@ -43,7 +44,6 @@ class BookmarkTest(ModelTestMixIn, TestCase):
     def test_default_bookmarks(self):
         from zeeguu.temporary.default_words import create_default_bookmarks
 
-        import zeeguu
         b = create_default_bookmarks(zeeguu.db.session, self.mir, "es")
         zeeguu.db.session.add_all(b)
         zeeguu.db.session.commit()

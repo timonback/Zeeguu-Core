@@ -2,6 +2,10 @@ import os
 
 # Before we load the zeeguu module
 # If the configuration file path is not set, try to load it from the default location
+from zeeguu.algos.algo_service import AlgoService
+from zeeguu.model.language import Language
+from zeeguu.model.user import User
+
 if "ZEEGUU_CORE_CONFIG" not in os.environ:
     os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
 import zeeguu.model
@@ -9,7 +13,7 @@ import zeeguu.model
 from zeeguu.populate import create_test_db, create_minimal_test_db
 
 from unittest import TestCase
-
+db = zeeguu.db
 
 class ModelTestMixIn(TestCase):
 
@@ -30,16 +34,18 @@ class ModelTestMixIn(TestCase):
             # version of the test data. otherwise, only a minimal test
             # data is created.
             if hasattr(self, 'maximal_populate'):
-                create_test_db(zeeguu.db)
+                create_test_db(db)
             else:
-                create_minimal_test_db(zeeguu.db)
+                create_minimal_test_db(db)
 
-            self.session = zeeguu.db.session
+            self.session = db.session
 
         # Some common test fixtures
-        self.mir = zeeguu.model.User.find("i@mir.lu")
-        self.de = zeeguu.model.Language.find("de")
-        self.en = zeeguu.model.Language.find("en")
+        self.mir = User.find("i@mir.lu")
+        self.de = Language.find("de")
+        self.en = Language.find("en")
+
+
 
     def tearDown(self):
         super(ModelTestMixIn, self).tearDown()

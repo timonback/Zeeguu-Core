@@ -1,6 +1,6 @@
 from unittest import TestCase
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
-from zeeguu.model import Language
+from zeeguu.model.language import Language
 
 
 class LanguageTest(ModelTestMixIn, TestCase):

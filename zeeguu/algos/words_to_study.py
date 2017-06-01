@@ -1,65 +1,14 @@
-import zeeguu
-from zeeguu.model import Bookmark, UserWord
+from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 
+def bookmarks_to_study(user, desired_bookmarks_count=-1):
+    bookmarks = Bookmark.query. \
+        filter_by(user_id=user.id). \
+        join(BookmarkPriorityARTS). \
+        filter(BookmarkPriorityARTS.bookmark_id == Bookmark.id). \
+        order_by(BookmarkPriorityARTS.priority.desc()). \
+        limit(desired_bookmarks_count)\
+        .all()
 
-def bookmarks_to_study(user, bookmark_count):
-    """
-    
-    :param user: 
-    :param bookmark_count: 
-    :return: 
-        
-        list of bookmarks to study
-        the list is empty if there's nothing to study
-        
-    """
-    all_bookmarks = Bookmark.find_by_specific_user(user)
-
-    good_for_study = set()
-    size = 0
-    for b in all_bookmarks:
-        if b.good_for_study() and not b.already_seen_today():
-            good_for_study.add(b)
-            size += 1
-
-        if size == bookmark_count:
-            break
-
-    if size < bookmark_count:
-        # we did not find enough words to study which are ranked
-        # add all the non-ranked ones, in chronological order
-
-        all_bookmarks = Bookmark.query. \
-            filter_by(user_id=user.id). \
-            join(UserWord). \
-            filter(UserWord.id == Bookmark.origin_id). \
-            order_by(Bookmark.time.desc()).all()
-
-        for b in all_bookmarks:
-            if b.good_for_study() and not b.already_seen_today():
-                good_for_study.add(b)
-                size += 1
-
-            if size == bookmark_count:
-                break
-
-    if size < bookmark_count:
-        # we still don't have enough bookmarks.
-        # in this case, we add some new ones to the user's account
-        needed = bookmark_count - size
-        from zeeguu.temporary.default_words import create_default_bookmarks
-        new_bookmarks = create_default_bookmarks(zeeguu.db.session, user, user.learned_language_id)
-
-        for each_new in new_bookmarks:
-            # try to find if the user has seen this in the past
-            good_for_study.add(each_new)
-            zeeguu.db.session.add(each_new)
-            size += 1
-
-            if size == bookmark_count:
-                break
-
-    zeeguu.db.session.commit()
-
-
-    return list(good_for_study)
+    # TODO: Filter by Bookmark.already_seen_today()
+    return bookmarks

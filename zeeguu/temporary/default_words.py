@@ -11,7 +11,12 @@
 from datetime import datetime
 
 import zeeguu
-from zeeguu.model import Bookmark, Language, Text, Url, UserWord
+
+from zeeguu.model.bookmark import Bookmark
+from zeeguu.model.language import Language
+from zeeguu.model.text import Text
+from zeeguu.model.url import Url
+from zeeguu.model.user_word import UserWord
 
 bookmark_data = dict()
 
