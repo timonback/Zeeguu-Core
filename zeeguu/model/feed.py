@@ -68,7 +68,7 @@ class RSSFeed(db.Model):
     @classmethod
     def find_by_id(cls, i):
         try:
-            result = (cls.query.filter(cls.id == i).one())
+            result = cls.query.filter(cls.id == i).one()
             return result
         except Exception as e:
             print(e)
@@ -78,8 +78,7 @@ class RSSFeed(db.Model):
     @classmethod
     def find_by_url(cls, url):
         try:
-            result = (cls.query.filter(cls.url == url).one())
-            # print "found an existing RSSFeed object"
+            result = cls.query.filter(cls.url == url).one()
             return result
         except sqlalchemy.orm.exc.NoResultFound:
             return None
@@ -113,13 +112,10 @@ class RSSFeed(db.Model):
             result = (cls.query.filter(cls.url == url)
                       .filter(cls.title == title)
                       .filter(cls.language == language)
-                      # .filter(cls.image_url == image_url)
                       .filter(cls.description == description)
                       .one())
-            # print "found an existing RSSFeed object"
             return result
         except sqlalchemy.orm.exc.NoResultFound:
-            # print "creating new feed object for " + title
             return cls(url, title, description, image_url, language)
 
     @classmethod
