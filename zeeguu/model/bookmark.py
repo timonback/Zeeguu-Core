@@ -160,18 +160,24 @@ class Bookmark(db.Model):
         """
 
         origin_lang = Language.find(_origin_lang)
+        print(origin_lang)
         translation_lang = Language.find(_translation_lang)
+        print(translation_lang)
 
         origin = UserWord.find(_origin, origin_lang)
+        print(origin)
         session.add(origin)
 
         url = Url.find_or_create(_url, _url_title)
+        print(url)
         session.add(url)
 
         context = Text.find_or_create(_context, origin_lang, url)
+        print(context)
         session.add(context)
 
         translation = UserWord.find(_translation, translation_lang)
+        print(translation)
         session.add(translation)
 
         now = datetime.now()

@@ -88,6 +88,7 @@ def create_default_bookmarks(session, user, language_code):
 
     try:
 
+        print ("trying to load default bookmarks for " + str(user.name))
         for data_point in bookmark_data[language_code]:
             bookmark = Bookmark.find_or_create(session,
                                                user,

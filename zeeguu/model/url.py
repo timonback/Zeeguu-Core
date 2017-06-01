@@ -72,6 +72,14 @@ class Url(db.Model):
         if not domain.id:
             return cls(_url, title)
 
+        path = Url.get_path(_url)
+
+        try:
+            return cls.query.filter(cls.path == path).filter(cls.domain == domain).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return cls(_url, title)
+
+
     @classmethod
     def find(cls, url, title=""):
         try:

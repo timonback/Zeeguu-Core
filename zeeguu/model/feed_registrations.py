@@ -2,6 +2,7 @@ from sqlalchemy.orm import relationship
 
 from zeeguu.model.feed import db, RSSFeed
 from zeeguu.model.user import User
+import sqlalchemy
 
 
 class RSSFeedRegistration(db.Model):
