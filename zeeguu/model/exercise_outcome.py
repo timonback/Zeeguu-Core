@@ -26,6 +26,9 @@ class ExerciseOutcome(db.Model):
     def __init__(self, outcome):
         self.outcome = outcome
 
+    def __eq__(self, other):
+        return self.outcome == other.outcome and self.correct == other.correct
+
     @property
     def correct(self):
         return self.outcome in self.correct_outcomes

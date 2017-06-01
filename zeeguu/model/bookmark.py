@@ -59,7 +59,8 @@ class Bookmark(db.Model):
                                 secondary="bookmark_exercise_mapping",
                                 order_by="Exercise.id")
 
-    def __init__(self, origin:UserWord, translation:UserWord, user:'User', text:str, time:datetime):
+    def __init__(self, origin: UserWord, translation: UserWord, user: 'User',
+                 text: str, time: datetime):
         self.origin = origin
         self.translations_list.append(translation)
         self.user = user
@@ -77,19 +78,20 @@ class Bookmark(db.Model):
     def translation(self):
         return self.translations_list[0]
 
-    def translations_rendered_as_text(self):
-        return ", ".join(self.translation_words_list())
-
-    def translation_words_list(self):
-        translation_words = []
-        for translation in self.translations_list:
-            translation_words.append(translation.word)
-        return translation_words
-
     def add_new_translation(self, translation):
         self.translations_list.append(translation)
 
-    def context_is_not_too_long(self):
+    def remove_translation(self, translation):
+        if translation in self.translations_list:
+            self.translations_list.remove(translation)
+
+    def translation_words_list(self):
+        return [x.word for x in self.translations_list]
+
+    def translations_rendered_as_text(self):
+        return ", ".join(self.translation_words_list())
+
+    def content_is_not_too_long(self):
         return len(self.text.content) < 60
 
     def events_prevent_further_study(self):
@@ -102,17 +104,13 @@ class Bookmark(db.Model):
         # ML TODO: Must replace call to check_is_latest_outcome... with has_been_learned!
         return not self.check_is_latest_outcome_too_easy() and not self.events_prevent_further_study()
 
-    def remove_translation(self, translation):
-        if translation in self.translations_list:
-            self.translations_list.remove(translation)
-
-    def add_exercise_outcome(self, exercise_source, exercise_outcome,
-                             exercise_solving_speed):
+    def add_new_exercise_result(self, exercise_source, exercise_outcome,
+                                exercise_solving_speed):
         new_source = ExerciseSource.query.filter_by(
-            source=exercise_source
+                source=exercise_source.source
         ).first()
         new_outcome = ExerciseOutcome.query.filter_by(
-            outcome=exercise_outcome
+                outcome=exercise_outcome.outcome
         ).first()
         exercise = Exercise(new_outcome, new_source, exercise_solving_speed,
                             datetime.now())
@@ -131,14 +129,14 @@ class Bookmark(db.Model):
 
     def json_serializable_dict(self, with_context=True):
         result = dict(
-            id=self.id,
-            to=self.translation_words_list(),
-            from_lang=self.origin.language_id,
-            to_lang=self.translation().language.id,
-            title=self.text.url.title,
-            url=self.text.url.as_string(),
-            origin_importance=Word.stats(self.origin.word,
-                                         self.origin.language_id).importance
+                id=self.id,
+                to=self.translation_words_list(),
+                from_lang=self.origin.language_id,
+                to_lang=self.translation().language.id,
+                title=self.text.url.title,
+                url=self.text.url.as_string(),
+                origin_importance=Word.stats(self.origin.word,
+                                             self.origin.language_id).importance
         )
         result["from"] = self.origin.word
         if with_context:
@@ -180,12 +178,13 @@ class Bookmark(db.Model):
 
         try:
             # try to find this bookmark
-            bookmark = Bookmark.find_by_user_word_and_text(user, origin, context)
+            bookmark = Bookmark.find_by_user_word_and_text(user, origin,
+                                                           context)
 
             # update the translation
             bookmark.translations_list = [translation]
 
-            print (bookmark)
+            print(bookmark)
         except sqlalchemy.orm.exc.NoResultFound as e:
             bookmark = cls(origin, translation, user, context, now)
         except Exception as e:
@@ -198,7 +197,7 @@ class Bookmark(db.Model):
     @classmethod
     def find_by_specific_user(cls, user):
         return cls.query.filter_by(
-            user=user
+                user=user
         ).all()
 
     @classmethod
@@ -212,30 +211,30 @@ class Bookmark(db.Model):
     @classmethod
     def find(cls, b_id):
         return cls.query.filter_by(
-            id=b_id
+                id=b_id
         ).one()
 
     @classmethod
     def find_all_by_user_and_word(cls, user, word):
         return cls.query.filter_by(
-            user=user,
-            origin=word
+                user=user,
+                origin=word
         ).all()
 
     @classmethod
     def find_by_user_word_and_text(cls, user, word, text):
         return cls.query.filter_by(
-            user = user,
-            origin = word,
-            text = text
+                user=user,
+                origin=word,
+                text=text
         ).one()
 
     @classmethod
     def exists(cls, bookmark):
         try:
             cls.query.filter_by(
-                origin_id=bookmark.origin.id,
-                id=bookmark.id
+                    origin_id=bookmark.origin.id,
+                    id=bookmark.id
             ).one()
             return True
         except NoResultFound:

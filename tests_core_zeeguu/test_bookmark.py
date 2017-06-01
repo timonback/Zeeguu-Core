@@ -2,9 +2,12 @@ import random
 
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
+from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
+from tests_core_zeeguu.rules.text_rule import TextRule
 from tests_core_zeeguu.rules.user_rule import UserRule
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
+from tests_core_zeeguu.rules.user_word_rule import UserWordRule
 
 
 class BookmarkTest(ModelTestMixIn):
@@ -24,6 +27,56 @@ class BookmarkTest(ModelTestMixIn):
         length_new_exercise_log = len(random_bookmark.exercise_log)
 
         assert length_original_exercise_log < length_new_exercise_log
+        
+    def test_translation(self):
+        random_bookmark = BookmarkRule(self.user).bookmark
+        assert random_bookmark.translation() is not None
+
+    def test_remove_translation(self):
+        random_bookmark = BookmarkRule(self.user).bookmark
+        random_translation = UserWordRule().user_word
+
+        random_bookmark.add_new_translation(random_translation)
+        length_before = len(random_bookmark.translations_list)
+
+        random_bookmark.remove_translation(random_translation)
+        length_after = len(random_bookmark.translations_list)
+
+        assert length_before > length_after
+
+    def test_translation_words_list(self):
+        random_bookmark = BookmarkRule(self.user).bookmark
+        len_before = len(random_bookmark.translations_list)
+
+        random_translation = UserWordRule().user_word
+        random_bookmark.add_new_translation(random_translation)
+        len_after = len(random_bookmark.translations_list)
+
+        assert len_before < len_after
+
+    def test_text_is_not_too_long(self):
+        random_bookmark = BookmarkRule(self.user).bookmark
+        random_text_short = TextRule(length=10).text
+        random_bookmark.text = random_text_short
+
+        assert random_bookmark.content_is_not_too_long()
+
+        random_text_long = TextRule(length=200).text
+        random_bookmark.text = random_text_long
+
+        assert not random_bookmark.content_is_not_too_long()
+
+    def test_add_exercise_outcome(self):
+        random_bookmark = BookmarkRule(self.user).bookmark
+        random_exercise = ExerciseRule().exercise
+        random_bookmark.add_new_exercise_result(random_exercise.source,
+                                                random_exercise.outcome,
+                                                random_exercise.solving_speed)
+        latest_exercise = random_bookmark.exercise_log[-1]
+
+        assert latest_exercise.source == random_exercise.source
+        assert latest_exercise.outcome == random_exercise.outcome
+        assert latest_exercise.solving_speed == random_exercise.solving_speed
 
     def test_user_bookmark_count(self):
         assert len(self.user.all_bookmarks()) > 0

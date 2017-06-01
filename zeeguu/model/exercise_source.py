@@ -13,6 +13,9 @@ class ExerciseSource(db.Model):
     def __init__(self, source):
         self.source = source
 
+    def __eq__(self, other):
+        return self.id == other.id and self.source == other.source
+
     @classmethod
     def find(cls, source):
         return cls.query.filter_by(source=source).one()
