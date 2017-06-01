@@ -26,6 +26,11 @@ class PriorityInfo:
 
 
 class AlgoService:
+    """
+        
+        service calls the wrapper that calls the algorithm 
+        
+    """
     algorithm_wrapper = AlgorithmWrapper(ArtsRT)
 
     @classmethod
