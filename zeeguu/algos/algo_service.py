@@ -16,9 +16,17 @@ from zeeguu.model.learner_stats.exercise_stats import ExerciseStats
 db = zeeguu.db
 
 
+class PriorityInfo:
+    MAX_PRIORITY = 1000
+
+    def __init__(self, bookmark, exercise, priority = MAX_PRIORITY):
+        self.bookmark = bookmark
+        self.exercise = exercise
+        self.priority = priority
+
+
 class AlgoService:
     algorithm_wrapper = AlgorithmWrapper(ArtsRT)
-    MAX_PRIORITY = 1000
 
     @classmethod
     def update_exercise_source_stats(cls):
@@ -44,17 +52,14 @@ class AlgoService:
             bookmark_exercise_of_user = map(cls._get_exercise_of_bookmark, bookmarks_for_user)
             b1, b2 = itertools.tee(bookmark_exercise_of_user, 2)
 
-            max_iterations = max(pair[1].id if pair[1] else 0 for pair in b1)
-            exercises_and_priorities = map(lambda x: (x[0], cls.algorithm_wrapper.calculate(x[1], max_iterations) if x[1] else cls.MAX_PRIORITY), b2)
+            max_iterations = max(pair.exercise.id if pair.exercise is not None else 0 for pair in b1)
+            exercises_and_priorities = [cls._calculate_bookmark_priority(x, max_iterations) for x in b2]
 
-            with db.session.no_autoflush:
-                for pair in exercises_and_priorities:
-                    entry = BookmarkPriorityARTS.query.filter_by(
-                        bookmark_id=pair[0].id)
-                    if entry.first() is not None:
-                        entry.first().priority = pair[1]
-                    else:
-                        db.session.add(BookmarkPriorityARTS(pair[0], pair[1]))
+            with db.session.no_autoflush: # might not be needed, but just to be safe
+                for each in exercises_and_priorities:
+                    entry = BookmarkPriorityARTS.find_or_create(each.bookmark, each.priority)
+                    entry.priority = each.priority
+                    db.session.add(entry)
 
             db.session.commit()
         except Exception as e:
@@ -63,10 +68,18 @@ class AlgoService:
             print(e)
             print(traceback.format_exc())
 
+    @classmethod
+    def _calculate_bookmark_priority(cls, x, max_iterations):
+        if x.exercise is not None:
+            x.priority = cls.algorithm_wrapper.calculate(x.exercise, max_iterations)
+        else:
+            x.priority =PriorityInfo.MAX_PRIORITY
+        return x
+
     @staticmethod
     def _get_exercise_of_bookmark(bookmark):
         if 0 < len(bookmark.exercise_log):
-            return bookmark, bookmark.exercise_log[-1]
+            return PriorityInfo(bookmark=bookmark, exercise=bookmark.exercise_log[-1])
 
-        return bookmark, None
+        return PriorityInfo(bookmark=bookmark, exercise=None)
 

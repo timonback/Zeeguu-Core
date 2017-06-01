@@ -24,6 +24,7 @@ def load_configuration_or_abort(app, environ_variable, mandatory_config_keys=[])
     try:
         config_file = os.environ[environ_variable]
     except Exception as e:
+        print (str(e))
         print((
             "You must define a {0} environment var to be able to load the configuration. "
             .format(environ_variable)))
