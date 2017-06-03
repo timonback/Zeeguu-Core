@@ -60,8 +60,7 @@ def drop_current_tables(db):
 def add_bookmark(db, user, original_language, original_word, translation_language, translation_word,  date, the_context, the_url, the_url_title):
     session = db.session
 
-    url = Url.find_or_create(the_url, the_url_title)
-    session.add(url)
+    url = Url.find_or_create(session, the_url, the_url_title)
 
     text = Text.find_or_create(the_context, translation_language, url)
     session.add(text)
