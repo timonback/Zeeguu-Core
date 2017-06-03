@@ -5,13 +5,13 @@ from tests_core_zeeguu.rules.url_rule import UrlRule
 import zeeguu.model
 from zeeguu.model import Url, DomainName
 
-db = zeeguu.db
+session = zeeguu.db.session
+
 
 class UrlTest(ModelTestMixIn, TestCase):
     def setUp(self):
         super().setUp()
         self.url_rule = UrlRule()
-        self.session = zeeguu.db.session
 
     def test_domain_plus_path_must_be_unique(self):
 
@@ -22,8 +22,8 @@ class UrlTest(ModelTestMixIn, TestCase):
         with self.assertRaises(Exception) as context:
             domain = DomainName.find(_domain)
             url = Url(_url, _title, domain)
-            self.session.add(url)
-            self.session.commit()
+            session.add(url)
+            session.commit()
 
         self.assertTrue('Duplicate entry' in str(context.exception))
 
@@ -31,8 +31,6 @@ class UrlTest(ModelTestMixIn, TestCase):
 
         _url = self.url_rule.url.as_string()
         _title = self.url_rule.url.title
-
-        session = zeeguu.db.session
 
         url = Url.find_or_create(session, _url, _title)
 
@@ -44,11 +42,11 @@ class UrlTest(ModelTestMixIn, TestCase):
         _title = self.url_rule.url.title
 
         def threaded_create_url():
-            url = Url.find_or_create(self.session, _url, _title)
+            url = Url.find_or_create(session, _url, _title)
 
         threads = []
 
-        for i in range(0): # multithreaded connections freeze on mysqldb.
+        for i in range(0):  # multithreaded connections freeze on mysqldb.
             # so this is here to be tested manually and killed for now...
             t = Thread(target=threaded_create_url, args=())
             threads.append(t)
@@ -57,5 +55,5 @@ class UrlTest(ModelTestMixIn, TestCase):
         for t in threads:
             t.join()
 
-        url = Url.find_or_create(self.session, _url, _title)
+        url = Url.find_or_create(session, _url, _title)
         self.assertEqual(url.title, _title)
