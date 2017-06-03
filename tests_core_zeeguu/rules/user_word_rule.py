@@ -14,7 +14,9 @@ class UserWordRule(BaseRule):
         else:
             self.user_word = UserWord(word, language)
 
-        self.save(self.user_word)
+        if not self._exists_in_db(self.user_word):
+            self.save(self.user_word)
+
 
     def _create_model_object(self):
         random_word = self.faker.word()
