@@ -88,8 +88,9 @@ def create_minimal_test_db(db):
     en = Language("en", "English")
     nl = Language("nl", "Dutch")
     es = Language("es", "Spanish")
+    fr = Language("fr", "French")
 
-    db.session.add_all([en, de, nl, es]);
+    db.session.add_all([en, de, nl, es, fr]);
 
     mir = User(TEST_EMAIL, "Mircea", TEST_PASS, de, en)
 

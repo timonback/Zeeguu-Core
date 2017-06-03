@@ -2,7 +2,6 @@ import random
 
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
-from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
 from tests_core_zeeguu.rules.text_rule import TextRule
 from tests_core_zeeguu.rules.user_rule import UserRule
 

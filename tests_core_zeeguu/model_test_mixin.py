@@ -6,7 +6,7 @@ from faker import Faker
 
 if "ZEEGUU_CORE_CONFIG" not in os.environ:
     os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
-import zeeguu.model
+from zeeguu.model import *
 
 from unittest import TestCase
 
@@ -19,4 +19,5 @@ class ModelTestMixIn(TestCase):
         self.db.create_all()
 
     def tearDown(self):
-        self.db.drop_all()
+        super(ModelTestMixIn, self).tearDown()
+        # self.db.drop_all()

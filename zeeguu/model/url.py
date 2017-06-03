@@ -1,6 +1,7 @@
 import re
 
 import sqlalchemy.orm
+from sqlalchemy import UniqueConstraint
 
 import zeeguu
 
@@ -10,19 +11,20 @@ from zeeguu.model.domain_name import DomainName
 
 
 class Url(db.Model):
-    __table_args__ = {'mysql_collate': 'utf8_bin'}
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(2083))
 
-    path = db.Column(db.String(2083))
-
-    url = db.Column(db.String(2083))
+    path = db.Column(db.String(255))
 
     domain_name_id = db.Column(db.Integer, db.ForeignKey(DomainName.id))
     domain = db.relationship(DomainName)
 
+    __table_args__ = (
+        UniqueConstraint('path', 'domain_name_id', name='_path_domain_unique_constraint'),
+        {'mysql_collate': 'utf8_bin'}
+    )
+
     def __init__(self, url: str, title: str):
-        self.url = url
         self.path = Url.get_path(url)
         self.domain = DomainName.for_url_string(url)
         self.title = title
@@ -39,7 +41,7 @@ class Url(db.Model):
 
     def render_link(self, link_text):
         if self.url != "":
-            return '<a href="'+self.url+'">'+link_text+'</a>'
+            return '<a href="' + self.as_string() + '">' + link_text + '</a>'
         else:
             return ""
 
@@ -65,7 +67,7 @@ class Url(db.Model):
         return domain[2]
 
     @classmethod
-    def find_or_create(cls, _url:str, title:str = ""):
+    def find_or_create(cls, _url: str, title: str = ""):
 
         domain = DomainName.for_url_string(_url)
         # if we didn't find the domain in the DB, it's impossible that we will find the url
@@ -78,7 +80,6 @@ class Url(db.Model):
             return cls.query.filter(cls.path == path).filter(cls.domain == domain).one()
         except sqlalchemy.orm.exc.NoResultFound:
             return cls(_url, title)
-
 
     @classmethod
     def find(cls, url, title=""):
