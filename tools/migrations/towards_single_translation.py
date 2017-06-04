@@ -16,3 +16,4 @@ for b in all_bs:
         i = 0
         fixed = []
         session.commit()
+        input ("press enter to continue...")
