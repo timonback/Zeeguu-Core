@@ -19,14 +19,6 @@ from zeeguu.model.user_word import UserWord
 
 db = zeeguu.db
 
-bookmark_translation_mapping = Table('bookmark_translation_mapping',
-                                     db.Model.metadata,
-                                     Column('bookmark_id', Integer,
-                                            ForeignKey('bookmark.id')),
-                                     Column('translation_id', Integer,
-                                            ForeignKey('user_word.id'))
-                                     )
-
 bookmark_exercise_mapping = Table('bookmark_exercise_mapping',
                                   db.Model.metadata,
                                   Column('bookmark_id', Integer,
@@ -42,10 +34,12 @@ class Bookmark(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
+
     origin_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
     origin = db.relationship(UserWord, primaryjoin=origin_id == UserWord.id)
-    translations_list = relationship(UserWord,
-                                     secondary="bookmark_translation_mapping")
+
+    translation_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
+    translation = db.relationship(UserWord, primaryjoin=translation_id == UserWord.id)
 
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User)
@@ -62,7 +56,7 @@ class Bookmark(db.Model):
     def __init__(self, origin: UserWord, translation: UserWord, user: 'User',
                  text: str, time: datetime):
         self.origin = origin
-        self.translations_list.append(translation)
+        self.translation = translation
         self.user = user
         self.time = time
         self.text = text
@@ -75,21 +69,8 @@ class Bookmark(db.Model):
     def add_new_exercise(self, exercise):
         self.exercise_log.append(exercise)
 
-    def translation(self):
-        return self.translations_list[0]
-
-    def add_new_translation(self, translation):
-        self.translations_list.append(translation)
-
-    def remove_translation(self, translation):
-        if translation in self.translations_list:
-            self.translations_list.remove(translation)
-
-    def translation_words_list(self):
-        return [x.word for x in self.translations_list]
-
     def translations_rendered_as_text(self):
-        return ", ".join(self.translation_words_list())
+        return self.translation.word
 
     def content_is_not_too_long(self):
         return len(self.text.content) < 60
@@ -130,9 +111,9 @@ class Bookmark(db.Model):
     def json_serializable_dict(self, with_context=True):
         result = dict(
                 id=self.id,
-                to=self.translation_words_list(),
+                to=self.translation.word,
                 from_lang=self.origin.language_id,
-                to_lang=self.translation().language.id,
+                to_lang=self.translation.language.id,
                 title=self.text.url.title,
                 url=self.text.url.as_string(),
                 origin_importance=Word.stats(self.origin.word,
@@ -178,7 +159,7 @@ class Bookmark(db.Model):
                                                            context)
 
             # update the translation
-            bookmark.translations_list = [translation]
+            bookmark.translation = translation
 
         except sqlalchemy.orm.exc.NoResultFound as e:
             bookmark = cls(origin, translation, user, context, now)
