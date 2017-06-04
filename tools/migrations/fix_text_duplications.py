@@ -1,3 +1,6 @@
+# made sense at the time of: bf7edef8884d1a23bb485c2b45b1d4815c4c1297
+# there was no unique constraint on the text at the time
+# the db ended with quite a bit of duplicated texts
 from collections import defaultdict
 data = defaultdict(set)
 from zeeguu.model import Text, Bookmark
