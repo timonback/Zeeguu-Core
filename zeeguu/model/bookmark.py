@@ -27,6 +27,17 @@ bookmark_exercise_mapping = Table('bookmark_exercise_mapping',
                                          ForeignKey('exercise.id'))
                                   )
 
+bookmark_translation_mapping = Table('bookmark_translation_mapping',
+                                     db.Model.metadata,
+                                     Column('bookmark_id', Integer,
+                                            ForeignKey('bookmark.id')),
+                                     Column('translation_id', Integer,
+                                            ForeignKey('user_word.id'))
+
+                                     )
+
+
+
 WordAlias = db.aliased(UserWord, name="translated_word")
 
 
@@ -40,6 +51,9 @@ class Bookmark(db.Model):
 
     translation_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
     translation = db.relationship(UserWord, primaryjoin=translation_id == UserWord.id)
+
+    translations_list = relationship(UserWord,
+                                     secondary="bookmark_translation_mapping")
 
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     user = db.relationship(User)
@@ -60,6 +74,7 @@ class Bookmark(db.Model):
         self.user = user
         self.time = time
         self.text = text
+        self.translations_list = [translation]
 
     def __repr__(self):
         return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n". \
