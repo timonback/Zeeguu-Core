@@ -25,7 +25,7 @@ class UrlTest(ModelTestMixIn, TestCase):
             session.add(url)
             session.commit()
 
-        self.assertTrue('Duplicate entry' in str(context.exception))
+        self.assertTrue('Duplicate entry' or 'IntegrityError' in str(context.exception))
 
     def test_find_or_create_works(self):
 
