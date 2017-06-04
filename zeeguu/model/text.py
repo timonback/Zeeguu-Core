@@ -3,8 +3,7 @@ import re
 import sqlalchemy.orm
 import time
 import zeeguu
-
-from zeeguu import util
+from zeeguu.util import text_hash
 from zeeguu.model.language import Language
 from zeeguu.model.url import Url
 from zeeguu.model.user_word import UserWord
@@ -30,7 +29,7 @@ class Text(db.Model):
         self.content = content
         self.language = language
         self.url = url
-        self.content_hash = util.text_hash(content)
+        self.content_hash = text_hash(content)
 
     def __repr__(self):
         return '<Text %r>' % (self.content)
@@ -77,7 +76,7 @@ class Text(db.Model):
         """
 
         try:
-            return cls.query.filter(cls.content_hash == util.text_hash(text)).one()
+            return cls.query.filter(cls.content_hash == text_hash(text)).one()
         except sqlalchemy.orm.exc.NoResultFound or sqlalchemy.exc.InterfaceError:
             try:
                 new = cls(text, language, url)
@@ -88,7 +87,7 @@ class Text(db.Model):
                 for i in range(10):
                     try:
                         session.rollback()
-                        t = cls.query.filter(cls.content_hash == util.text_hash(text)).one()
+                        t = cls.query.filter(cls.content_hash == text_hash(text)).one()
                         print("found text after recovering from race")
                         return t
                     except:

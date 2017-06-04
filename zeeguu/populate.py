@@ -64,14 +64,12 @@ def add_bookmark(db, user, original_language, original_word, translation_languag
 
     text = Text.find_or_create(session, the_context, translation_language, url)
 
-    origin = UserWord.find(original_word, original_language)
-    session.add(origin)
+    origin = UserWord.find_or_create(session, original_word, original_language)
 
-    translation = UserWord.find(translation_word, translation_language)
-    session.add(translation)
+    translation = UserWord.find_or_create(session, translation_word, translation_language)
 
     b1 = Bookmark(origin, translation, user, text, date)
-    db.session.add_all([url, text, origin, translation, b1])
+    db.session.add(b1)
     db.session.commit()
 
     return b1
