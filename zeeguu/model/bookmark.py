@@ -167,8 +167,7 @@ class Bookmark(db.Model):
 
         url = Url.find_or_create(session, _url, _url_title)
 
-        context = Text.find_or_create(_context, origin_lang, url)
-        session.add(context)
+        context = Text.find_or_create(session, _context, origin_lang, url)
 
         translation = UserWord.find(_translation, translation_lang)
         session.add(translation)

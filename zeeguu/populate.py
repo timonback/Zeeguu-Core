@@ -62,8 +62,7 @@ def add_bookmark(db, user, original_language, original_word, translation_languag
 
     url = Url.find_or_create(session, the_url, the_url_title)
 
-    text = Text.find_or_create(the_context, translation_language, url)
-    session.add(text)
+    text = Text.find_or_create(session, the_context, translation_language, url)
 
     origin = UserWord.find(original_word, original_language)
     session.add(origin)
