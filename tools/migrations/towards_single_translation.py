@@ -10,9 +10,11 @@ for b in all_bs:
     fixed.append(b.id)
     b.translation = b.translations_list[0]
     session.add(b)
-    if i == 100:
+    if i == 1000:
         print ("fixed form: {0} to {1}".
         	format(fixed[0],fixed[-1])) 
         i = 0
         fixed = []
         session.commit()
+        #input("continue?")
+session.commit()
