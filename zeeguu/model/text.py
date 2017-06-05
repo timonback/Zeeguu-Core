@@ -3,6 +3,7 @@ import re
 import sqlalchemy.orm
 import time
 import zeeguu
+
 from zeeguu.util import text_hash
 from zeeguu.model.language import Language
 from zeeguu.model.url import Url
@@ -65,6 +66,10 @@ class Text(db.Model):
         shorter_text = ' '.join(limited_words)
 
         return shorter_text
+
+    def all_bookmarks(self):
+        from zeeguu.model import Bookmark
+        return Bookmark.find_all_for_text(self)
 
     @classmethod
     def find_or_create(cls, session, text, language, url):
