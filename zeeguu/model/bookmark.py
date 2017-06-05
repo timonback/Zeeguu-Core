@@ -166,6 +166,7 @@ class Bookmark(db.Model):
             raise e
 
         session.add(bookmark)
+        session.commit()
 
         return bookmark
 
