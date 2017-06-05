@@ -74,7 +74,9 @@ class UserWord(db.Model, util.JSONSerializable):
                 for _ in range(10):
                     try:
                         session.rollback()
-                        return cls.find(_word, language)
+                        w = cls.find(_word, language)
+                        print ("successfully avoided race condition. nice! ")
+                        return w
                     except sqlalchemy.orm.exc.NoResultFound:
                         time.sleep(0.3)
                         continue
