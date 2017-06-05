@@ -44,13 +44,13 @@ class Url(db.Model):
     def title_if_available(self):
         if self.title != "":
             return self.title
-        return self.url
+        return self.as_string()
 
     def as_string(self):
         return self.domain.domain_name + self.path
 
     def render_link(self, link_text):
-        if self.url != "":
+        if self.as_string() != "":
             return '<a href="' + self.as_string() + '">' + link_text + '</a>'
         else:
             return ""
@@ -84,14 +84,14 @@ class Url(db.Model):
 
         try:
             return cls.query.filter(cls.path == path).filter(cls.domain == domain).one()
-        #except sqlalchemy.orm.exc.NoResultFound or sqlalchemy.exc.InterfaceError:
+        # except sqlalchemy.orm.exc.NoResultFound or sqlalchemy.exc.InterfaceError:
         except:
             try:
                 new = cls(_url, title, domain)
                 session.add(new)
                 session.commit()
                 return new
-            #except sqlalchemy.exc.IntegrityError or sqlalchemy.exc.DatabaseError:
+            # except sqlalchemy.exc.IntegrityError or sqlalchemy.exc.DatabaseError:
             except:
 
                 for i in range(10):
@@ -106,16 +106,9 @@ class Url(db.Model):
                         continue
                     break
 
-
     @classmethod
     def find(cls, url, title=""):
         d = DomainName.find_or_create(Url.get_domain(url))
         return (cls.query.filter(cls.path == Url.get_path(url))
                 .filter(cls.domain == d)
                 .one())
-
-    def render_link(self, link_text):
-        if self.url != "":
-            return '<a href="' + self.url + '">' + link_text + '</a>'
-        else:
-            return ""
