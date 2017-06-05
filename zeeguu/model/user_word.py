@@ -73,6 +73,7 @@ class UserWord(db.Model, util.JSONSerializable):
 
                 for _ in range(10):
                     try:
+                        session.rollback()
                         return cls.find(_word, language)
                     except sqlalchemy.orm.exc.NoResultFound:
                         time.sleep(0.3)
