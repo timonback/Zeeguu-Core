@@ -34,10 +34,10 @@ class Bookmark(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    origin_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
+    origin_id = db.Column(db.Integer, db.ForeignKey(UserWord.id), nullable=False)
     origin = db.relationship(UserWord, primaryjoin=origin_id == UserWord.id)
 
-    translation_id = db.Column(db.Integer, db.ForeignKey(UserWord.id))
+    translation_id = db.Column(db.Integer, db.ForeignKey(UserWord.id), nullable=False)
     translation = db.relationship(UserWord, primaryjoin=translation_id == UserWord.id)
 
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
@@ -111,9 +111,16 @@ class Bookmark(db.Model):
         return result
 
     def json_serializable_dict(self, with_context=True):
+        try:
+            translation_word = self.translation.word
+        except AttributeError as e:
+            translation_word = ''
+            print (f"Exception caught: for some reason there was no translation for {self.id}")
+            print (str(e))
+
         result = dict(
                 id=self.id,
-                to=self.translation.word,
+                to=translation_word,
                 from_lang=self.origin.language_id,
                 to_lang=self.translation.language.id,
                 title=self.text.url.title,
