@@ -80,6 +80,9 @@ class Bookmark(db.Model):
         events_for_self = WatchInteractionEvent.events_for_bookmark(self)
         return any([x.prevents_further_study() for x in events_for_self])
 
+    def multiword_origin(self):
+        return len(self.origin.word.split(" "))
+
     def good_for_study(self):
         # ML TODO: Must replace call to check_is_latest_outcome... with has_been_learned!
         return not self.check_is_latest_outcome_too_easy() and not self.events_prevent_further_study()
