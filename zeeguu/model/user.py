@@ -10,6 +10,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from zeeguu import util
+from zeeguu.algos.algo_service import AlgoService
 from zeeguu.model.language import Language
 
 db = zeeguu.db
@@ -197,10 +198,13 @@ class User(db.Model):
         """
         from zeeguu.algos import words_to_study
 
+        AlgoService.update_bookmark_priority(zeeguu.db, self)
+
         bookmarks = words_to_study.bookmarks_to_study(self, bookmark_count)
 
-        if len(bookmarks) < bookmark_count:
-            # we still don't have enough bookmarks.
+        if len(bookmarks) == 0:
+            # we have zero bookmarks.
+            # we might be in a situation where we're on the watch for example...
             # in this case, we add some new ones to the user's account
             from zeeguu.temporary.default_words import create_default_bookmarks
             new_bookmarks = create_default_bookmarks(zeeguu.db.session, self, self.learned_language_id)
