@@ -10,7 +10,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 
 from zeeguu import util
-from zeeguu.algos.algo_service import AlgoService
 from zeeguu.model.language import Language
 
 db = zeeguu.db
@@ -197,6 +196,7 @@ class User(db.Model):
         :return: 
         """
         from zeeguu.algos import words_to_study
+        from zeeguu.algos.algo_service import AlgoService
 
         AlgoService.update_bookmark_priority(zeeguu.db, self)
 
