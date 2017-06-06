@@ -81,7 +81,7 @@ class Bookmark(db.Model):
         return any([x.prevents_further_study() for x in events_for_self])
 
     def multiword_origin(self):
-        return len(self.origin.word.split(" "))
+        return len(self.origin.word.split(" ")) > 1
 
     def good_for_study(self):
         # ML TODO: Must replace call to check_is_latest_outcome... with has_been_learned!
