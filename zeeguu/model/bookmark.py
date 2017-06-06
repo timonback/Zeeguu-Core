@@ -115,7 +115,7 @@ class Bookmark(db.Model):
             translation_word = self.translation.word
         except AttributeError as e:
             translation_word = ''
-            print (f"Exception caught: for some reason there was no translation for {self.id}")
+            zeeguu.log (f"Exception caught: for some reason there was no translation for {self.id}")
             print (str(e))
 
         result = dict(
