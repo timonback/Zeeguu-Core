@@ -14,5 +14,6 @@ def bookmarks_to_study(user, desired_bookmarks_count=-1):
 
     bookmarks = [each for each in bookmarks if not each.multiword_origin() ]
 
-    # TODO: Filter by Bookmark.already_seen_today()
     return bookmarks
+
+

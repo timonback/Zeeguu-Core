@@ -105,6 +105,21 @@ class User(db.Model):
     def set_native_language(self, code):
         self.native_language = Language.find(code)
 
+    def has_bookmarks(self):
+        return self.bookmark_count() > 0
+
+    def date_of_last_bookmark(self):
+        """
+            assumes that there are bookmarks
+        """
+        return self.bookmarks_chronologically()[0].time
+
+    def active_during_recent(self, days: int = 30):
+        import dateutil.relativedelta
+        now = datetime.datetime.now()
+        a_while_ago = now - dateutil.relativedelta.relativedelta(days=days)
+        return self.date_of_last_bookmark() > a_while_ago
+
     @sqlalchemy.orm.validates("email")
     def validate_email(self, col, email):
         if "@" not in email:
