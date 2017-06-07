@@ -115,6 +115,9 @@ class User(db.Model):
         return self.bookmarks_chronologically()[0].time
 
     def active_during_recent(self, days: int = 30):
+        if not self.has_bookmarks():
+            return False
+        
         import dateutil.relativedelta
         now = datetime.datetime.now()
         a_while_ago = now - dateutil.relativedelta.relativedelta(days=days)
