@@ -63,7 +63,7 @@ class Fancinator:
         self.__create_database()
 
         if algorithm is None:
-            algorithm = ArtsRT()
+            algorithm = ArtsRT(D=7)
         self.set_algorithm_wrapper(AlgorithmWrapper(algorithm))
 
     def __create_database(self):
@@ -150,10 +150,62 @@ class Fancinator:
         print('Repetition of incorrect words on average for every {:.4}, in raw: {:}'
               .format(repetition_incorrect_mean, repetition_incorrect))
 
-        return repetition_correct_mean, repetition_incorrect_mean
+        return [repetition_correct_mean, repetition_incorrect_mean]
+
+
+class AlgorithmEvaluator:
+    change_limit = 0.05
+
+    def __init__(self, user_id):
+        self.fancy = Fancinator(user_id)
+        self.result_old = [0, 0]
+
+    def fit_algorithm(self, mean_correct, mean_incorrect):
+
+        tick_tock = 0
+        variables_to_set = [['b', 1, +100], ['w', 1, +100]]
+        result_old = [0, 0]
+        diff_old = [float("inf"), float("inf")]
+        algorithm = ArtsRT()
+
+        change = 1.00
+        while change > self.change_limit and tick_tock != 0:
+            print('New iteration of the algorithm diff={}, tickTock={}, b={}, w={}'
+                  .format(result_old, tick_tock, variables_to_set[0][1], variables_to_set[1][1]))
+            new_variable_value = variables_to_set[tick_tock][1] + variables_to_set[tick_tock][2]
+            setattr(algorithm, variables_to_set[tick_tock][0], new_variable_value)
+            self.__update_algorithm_instance(algorithm)
+            # reset the variable
+            setattr(algorithm, variables_to_set[tick_tock][0], variables_to_set[tick_tock][1])
+
+            result_new = self.fancy.calc_algorithm_stats()
+            diff_new = self.__calc_change(result_old, result_new)
+
+            if sum(diff_new) < sum(diff_old):
+                # We just did better
+                result_old = result_new
+                diff_old = diff_new
+                variables_to_set[tick_tock][1] = new_variable_value
+                print('Improved found')
+            else:
+                # Time to optimize on the other variable
+                tick_tock += 1
+                tick_tock = divmod(tick_tock, len(variables_to_set))
+                print('No further improvement. Moving to next variable')
+
+    def __update_algorithm_instance(self, algorithm_instance):
+        self.fancy.set_algorithm_wrapper(AlgorithmWrapper(algorithm_instance))
+
+    @staticmethod
+    def __calc_change(result_old, result_new):
+        diff = []
+        for i in range(0, len(result_new)):
+            diff[i] = math.fabs(result_old[i] - result_new[i])
+
+        return diff
 
 
 if __name__ == "__main__":
     user_id = 1
     fancy = Fancinator(user_id)
-    mean_correct, mean_incorrect = fancy.calc_algorithm_stats()
+    fancy.calc_algorithm_stats()
