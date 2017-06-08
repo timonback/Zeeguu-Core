@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import zeeguu
-
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
 from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
@@ -46,8 +45,8 @@ class WordsToStudyTest(ModelTestMixIn):
         AlgoService.update_bookmark_priority(zeeguu.db, self.user)
 
         # THEN
-        bookmark = self.__get_bookmark_with_lowest_priority()
-        assert first_bookmark_to_study == bookmark
+        bookmark = self.__get_bookmark_with_highest_priority()
+        assert first_bookmark_to_study != bookmark
 
     def __get_bookmark_with_highest_priority(self):
         bookmarks_to_study = self.user.bookmarks_to_study()
