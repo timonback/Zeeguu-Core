@@ -27,10 +27,6 @@ class TestRetrieveAndCompute(ModelTestMixIn):
 
         assert difficulty_for_easiest['average'] < difficulty_for_easy['average']
 
-        # a problem... the median is the same for the two texts... or is it
-        # a problem?
-        assert difficulty_for_easiest['normalized'] == difficulty_for_easy['normalized']
-
         # on the other hand, they're all EASY
         # assert difficulty_for_easiest['discrete'] == difficulty_for_very_easy['discrete']
 
