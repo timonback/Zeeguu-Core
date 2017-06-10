@@ -29,6 +29,7 @@ bookmark_exercise_mapping = Table('bookmark_exercise_mapping',
 
 WordAlias = db.aliased(UserWord, name="translated_word")
 
+
 class Bookmark(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
@@ -80,20 +81,68 @@ class Bookmark(db.Model):
         events_for_self = WatchInteractionEvent.events_for_bookmark(self)
         return any([x.prevents_further_study() for x in events_for_self])
 
+    def origin_same_as_translation(self):
+        return self.origin.word.lower() == self.translation.word.lower()
+
+    def is_subset_of_larger_bookmark(self):
+        """
+            if the user translates a superset of this sentence
+        """
+        all_bookmarks_in_text = Bookmark.find_all_for_text(self.text)
+        for each in all_bookmarks_in_text:
+            if each != self:
+                if self.origin.word in each.origin.word:
+                    return True
+        return False
+
     def multiword_origin(self):
         return len(self.origin.word.split(" ")) > 1
 
+    def origin_word_count(self):
+        return len(self.origin.word.split(" "))
+
+    def quality_bookmark(self):
+
+        # If it's starred by the user, then it's good quality!
+        if self.user.has_starred(self.origin):
+            return True
+
+        # Else it just should not be bad quality!
+        return not self.bad_quality_bookmark()
+
+    def bad_quality_bookmark(self):
+        # following are reasons that disqualify a bookmark from
+        return (
+
+            # translation is same as origin
+            self.origin_same_as_translation() or
+
+            # origin which is subset of a larger origin
+            (self.is_subset_of_larger_bookmark()) or
+
+            # too long for our exercises
+            (self.origin_word_count() > 4)
+        )
+
     def good_for_study(self):
-        # ML TODO: Must replace call to check_is_latest_outcome... with has_been_learned!
-        return not self.check_is_latest_outcome_too_easy() and not self.events_prevent_further_study()
+
+        last_outcome = self.latest_exercise_outcome()
+
+        if not last_outcome:
+            return self.quality_bookmark() and not self.events_prevent_further_study()
+
+        return (self.quality_bookmark and
+                not last_outcome.too_easy() and
+                not last_outcome.unknown_feedback() and
+                not self.events_prevent_further_study())
 
     def add_new_exercise_result(self, exercise_source, exercise_outcome,
                                 exercise_solving_speed):
         new_source = ExerciseSource.query.filter_by(
-                source=exercise_source.source
+            source=exercise_source.source
         ).first()
         new_outcome = ExerciseOutcome.query.filter_by(
-                outcome=exercise_outcome.outcome
+            outcome=exercise_outcome.outcome
         ).first()
         exercise = Exercise(new_outcome, new_source, exercise_solving_speed,
                             datetime.now())
@@ -115,18 +164,18 @@ class Bookmark(db.Model):
             translation_word = self.translation.word
         except AttributeError as e:
             translation_word = ''
-            zeeguu.log (f"Exception caught: for some reason there was no translation for {self.id}")
-            print (str(e))
+            zeeguu.log(f"Exception caught: for some reason there was no translation for {self.id}")
+            print(str(e))
 
         result = dict(
-                id=self.id,
-                to=translation_word,
-                from_lang=self.origin.language_id,
-                to_lang=self.translation.language.id,
-                title=self.text.url.title,
-                url=self.text.url.as_string(),
-                origin_importance=Word.stats(self.origin.word,
-                                             self.origin.language_id).importance
+            id=self.id,
+            to=translation_word,
+            from_lang=self.origin.language_id,
+            to_lang=self.translation.language.id,
+            title=self.text.url.title,
+            url=self.text.url.as_string(),
+            origin_importance=Word.stats(self.origin.word,
+                                         self.origin.language_id).importance
         )
         result["from"] = self.origin.word
         if with_context:
@@ -141,12 +190,12 @@ class Bookmark(db.Model):
                        _context: str, _url: str, _url_title: str):
         """
             if the bookmark does not exist, it creates it and returns it
-            if it exists, it ** updates the translation** and returns the bookmark object 
-            
-        :param _origin: 
-        :param _context: 
-        :param _url: 
-        :return: 
+            if it exists, it ** updates the translation** and returns the bookmark object
+
+        :param _origin:
+        :param _context:
+        :param _url:
+        :return:
         """
 
         origin_lang = Language.find(_origin_lang)
@@ -183,7 +232,7 @@ class Bookmark(db.Model):
     @classmethod
     def find_by_specific_user(cls, user):
         return cls.query.filter_by(
-                user=user
+            user=user
         ).all()
 
     @classmethod
@@ -197,66 +246,43 @@ class Bookmark(db.Model):
     @classmethod
     def find(cls, b_id):
         return cls.query.filter_by(
-                id=b_id
+            id=b_id
         ).one()
 
     @classmethod
     def find_all_by_user_and_word(cls, user, word):
         return cls.query.filter_by(
-                user=user,
-                origin=word
+            user=user,
+            origin=word
         ).all()
 
     @classmethod
     def find_by_user_word_and_text(cls, user, word, text):
         return cls.query.filter_by(
-                user=user,
-                origin=word,
-                text=text
+            user=user,
+            origin=word,
+            text=text
         ).one()
 
     @classmethod
     def exists(cls, bookmark):
         try:
             cls.query.filter_by(
-                    origin_id=bookmark.origin.id,
-                    id=bookmark.id
+                origin_id=bookmark.origin.id,
+                id=bookmark.id
             ).one()
             return True
         except NoResultFound:
             return False
 
-    def check_is_latest_outcome_too_easy(self, add_to_result_time=False):
+    def latest_exercise_outcome(self):
         sorted_exercise_log_by_latest = sorted(self.exercise_log,
                                                key=lambda x: x.time,
                                                reverse=True)
-        for exercise in sorted_exercise_log_by_latest:
-            if exercise.outcome.outcome == ExerciseOutcome.TOO_EASY:
-                if add_to_result_time:
-                    return True, exercise.time
-                return True
-            elif exercise.outcome.outcome == ExerciseOutcome.SHOW_SOLUTION or exercise.outcome.outcome == ExerciseOutcome.WRONG:
-                if add_to_result_time:
-                    return False, None
-                return False
-        if add_to_result_time:
-            return False, None
-        return False
-
-    def already_seen_today(self, add_to_result_time=False):
-        sorted_exercise_log_by_latest = sorted(self.exercise_log,
-                                               key=lambda x: x.time,
-                                               reverse=True)
-
-        if not sorted_exercise_log_by_latest:
-            # no exercise log => clearly not seen today
-            return False
-
-        last_seen = sorted_exercise_log_by_latest[0]
-        if last_seen.time.date() == datetime.now().date():
-            return True
-
-        return False
+        if sorted_exercise_log_by_latest:
+            return sorted_exercise_log_by_latest[0].outcome
+        else:
+            return None
 
     def check_if_learned_based_on_exercise_outcomes(self,
                                                     add_to_result_time=False):

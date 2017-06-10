@@ -9,11 +9,10 @@ def bookmarks_to_study(user, desired_bookmarks_count=-1):
         join(BookmarkPriorityARTS). \
         filter(BookmarkPriorityARTS.bookmark_id == Bookmark.id). \
         order_by(BookmarkPriorityARTS.priority.desc()). \
-        limit(desired_bookmarks_count)\
-        .all()
+        all()
 
-    bookmarks = [each for each in bookmarks if not each.multiword_origin() ]
+    bookmarks = [each for each in bookmarks if each.good_for_study()]
 
-    return bookmarks
+    return bookmarks[:desired_bookmarks_count]
 
 

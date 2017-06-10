@@ -26,13 +26,14 @@ class SimpleKnowledgeEstimator(object):
         bookmarks = self.user.all_bookmarks()
         known_bookmarks = []
         for bookmark in bookmarks:
-            if bookmark.check_is_latest_outcome_too_easy() and self.language == bookmark.origin.language:
-                known_bookmark_dict = {
-                    'id': bookmark.id,
-                    'origin': bookmark.origin.word,
-                    'text': bookmark.text.content,
-                    'time': bookmark.time.strftime('%m/%d/%Y')}
-                known_bookmarks.append(known_bookmark_dict)
+            if bookmark.latest_exercise_outcome():
+                if bookmark.latest_exercise_outcome().too_easy() and self.language == bookmark.origin.language:
+                    known_bookmark_dict = {
+                        'id': bookmark.id,
+                        'origin': bookmark.origin.word,
+                        'text': bookmark.text.content,
+                        'time': bookmark.time.strftime('%m/%d/%Y')}
+                    known_bookmarks.append(known_bookmark_dict)
         return known_bookmarks
 
     def get_known_words(self):
@@ -66,7 +67,7 @@ class SimpleKnowledgeEstimator(object):
         words_learning = []
         bookmarks = Bookmark.find_by_specific_user(self.user)
         for bookmark in bookmarks:
-            learning = not bookmark.check_is_latest_outcome_too_easy()
+            learning = not bookmark.latest_exercise_outcome().too_easy()
             user_word = bookmark.origin
             if learning and user_word.language == self.language:
                 words_learning.append(user_word.word)

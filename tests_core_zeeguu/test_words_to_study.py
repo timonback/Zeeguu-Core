@@ -28,7 +28,10 @@ class WordsToStudyTest(ModelTestMixIn):
 
         # THEN
         bookmark = self.__get_bookmark_with_highest_priority()
+
         assert new_bookmark == bookmark, "The newly added bookmark does not have the highest priority. Based on non existing exercise"
+
+
 
     def test_just_finished_bookmark_has_not_the_highest_priority(self):
         # GIVEN
