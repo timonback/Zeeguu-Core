@@ -1,3 +1,4 @@
+import sqlalchemy
 import zeeguu
 
 db = zeeguu.db
@@ -34,5 +35,20 @@ class ExerciseOutcome(db.Model):
         return self.outcome in self.correct_outcomes
 
     @classmethod
-    def find(cls, outcome):
+    def find(cls, outcome: str):
         return cls.query.filter_by(outcome=outcome).one()
+
+    @classmethod
+    def find_or_create(cls, session, _outcome: str):
+        try:
+            outcome = cls.find(_outcome)
+
+        except sqlalchemy.orm.exc.NoResultFound as e:
+            outcome = cls(_outcome)
+        except Exception as e:
+            raise e
+
+        session.add(outcome)
+        session.commit()
+
+        return outcome
