@@ -121,7 +121,10 @@ class Bookmark(db.Model):
             (self.is_subset_of_larger_bookmark()) or
 
             # too long for our exercises
-            (self.origin_word_count() > 4)
+            (self.origin_word_count() > 4) or
+
+            # very short words are also not great quality
+            (len(self.origin.word) < 3)
         )
 
     def good_for_study(self):
