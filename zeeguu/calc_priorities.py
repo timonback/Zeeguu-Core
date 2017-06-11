@@ -23,8 +23,6 @@ class AverageExercise:
         self.past_exercises = []
         self.past_exercises_iteration = []
 
-        random.seed(0)
-
         self.avg_solving_speed, self.prob_correct = self._get_avg_exercise(exercise_log)
 
     @classmethod
@@ -63,8 +61,10 @@ class Fancinator:
         self.__create_database()
 
         if algorithm is None:
-            algorithm = ArtsRT(D=7)
-        self.set_algorithm_wrapper(AlgorithmWrapper(algorithm))
+            algorithm = ArtsRT()
+        self.algo_wrapper = AlgorithmWrapper(algorithm)
+
+        self.bookmarks = self.__get_bookmarks_for_user(self.user_id)
 
     def __create_database(self):
         zeeguu.app = Flask("Zeeguu-Core-Test")
@@ -83,9 +83,10 @@ class Fancinator:
     def set_algorithm_wrapper(self, new_algorithm_wrapper):
         self.algo_wrapper = new_algorithm_wrapper
 
-    def calc_algorithm_stats(self):
-        bookmarks = self.__get_bookmarks_for_user(self.user_id)
-        calculation_helpers = self.__run_algorithm_on_bookmarks(bookmarks)
+    def calc_algorithm_stats(self, verbose=True):
+        random.seed(0)
+
+        calculation_helpers = self.__run_algorithm_on_bookmarks(self.bookmarks, verbose)
         return self.__calc_algorithm_result_stats(calculation_helpers)
 
     def __get_bookmarks_for_user(self, user_id):
@@ -93,16 +94,17 @@ class Fancinator:
         print('Using user ' + user.name + ' with id ' + str(user.id))
         return user.all_bookmarks()
 
-    def __run_algorithm_on_bookmarks(self, bookmarks):
-
-        print('Found ' + str(len(bookmarks)) + ' bookmarks')
+    def __run_algorithm_on_bookmarks(self, bookmarks, verbose=True):
+        if verbose:
+            print('Found ' + str(len(bookmarks)) + ' bookmarks')
 
         calculation_helpers = [CalculationHelper(x) for x in bookmarks]
         next_bookmark = calculation_helpers[0]  # to know which exercise to generate next
 
         for i in range(0, 200):
             new_exercise = next_bookmark.average_exercise.append_new_exercise(i)
-            print("{:4} - {:} - {:1}".format(i, next_bookmark.bookmark.id, new_exercise.outcome.correct), end=', ')
+            if verbose:
+                print("{:4} - {:} - {:1}".format(i, next_bookmark.bookmark.id, new_exercise.outcome.correct), end=', ')
 
             max_priority = 0
             for calculation_helper in calculation_helpers:
@@ -115,22 +117,22 @@ class Fancinator:
                         new_priority = self.algo_wrapper.calculate(last_exercises[-1:][0], i)
 
                     calculation_helper.priority = new_priority
-                    if new_priority != self.removed_bookmark_priority:
-                        print('{:+8.2f}'.format(new_priority), end=', ')
-                    else:
-                        print('{:8}'.format(''), end=', ')
+                    if verbose:
+                        if new_priority != self.removed_bookmark_priority:
+                            print('{:+8.2f}'.format(new_priority), end=', ')
+                        else:
+                            print('{:8}'.format(''), end=', ')
 
                 if calculation_helper.priority > max_priority:
                     next_bookmark = calculation_helper
                     max_priority = calculation_helper.priority
-
-            print('')
+            if verbose:
+                print('')
         return calculation_helpers
 
     def __calc_algorithm_result_stats(self, calculation_helpers):
         repetition_correct = []  # bookmark, iterations
         repetition_incorrect = []
-        print('Starting Evaluation')
         for calculation_helper in calculation_helpers:
             average_exercise = calculation_helper.average_exercise
             for i in range(0, len(average_exercise.past_exercises_iteration) - 1):
@@ -154,58 +156,72 @@ class Fancinator:
 
 
 class AlgorithmEvaluator:
-    change_limit = 0.05
+    change_limit = 1.0
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, algorithm):
         self.fancy = Fancinator(user_id)
-        self.result_old = [0, 0]
+        self.algorithm = algorithm
 
-    def fit_algorithm(self, mean_correct, mean_incorrect):
-
+    def fit_algorithm(self, variables_to_set, diff_goal):
         tick_tock = 0
-        variables_to_set = [['b', 1, +100], ['w', 1, +100]]
-        result_old = [0, 0]
-        diff_old = [float("inf"), float("inf")]
-        algorithm = ArtsRT()
 
-        change = 1.00
-        while change > self.change_limit and tick_tock != 0:
-            print('New iteration of the algorithm diff={}, tickTock={}, b={}, w={}'
-                  .format(result_old, tick_tock, variables_to_set[0][1], variables_to_set[1][1]))
+        change = self.__run_algorithm_iteration(diff_goal)
+        while change > self.change_limit or tick_tock != 0:
+            print('------------------------------------------------------------------------')
+            print('New iteration of the algorithm tickTock={}, variables={}'
+                  .format(tick_tock, variables_to_set))
+
             new_variable_value = variables_to_set[tick_tock][1] + variables_to_set[tick_tock][2]
-            setattr(algorithm, variables_to_set[tick_tock][0], new_variable_value)
-            self.__update_algorithm_instance(algorithm)
+            setattr(self.algorithm, variables_to_set[tick_tock][0], new_variable_value)
+            print('Trying now with b={}, w={}'.format(self.algorithm.b, self.algorithm.w))
+            self.__update_algorithm_instance(self.algorithm)
+            diff_to_goal = self.__run_algorithm_iteration(diff_goal)
             # reset the variable
-            setattr(algorithm, variables_to_set[tick_tock][0], variables_to_set[tick_tock][1])
+            setattr(self.algorithm, variables_to_set[tick_tock][0], variables_to_set[tick_tock][1])
 
-            result_new = self.fancy.calc_algorithm_stats()
-            diff_new = self.__calc_change(result_old, result_new)
-
-            if sum(diff_new) < sum(diff_old):
+            if diff_to_goal < change:
+                print('Improvement found')
                 # We just did better
-                result_old = result_new
-                diff_old = diff_new
                 variables_to_set[tick_tock][1] = new_variable_value
-                print('Improved found')
+                change = diff_to_goal
             else:
+                print('No further improvement')
                 # Time to optimize on the other variable
-                tick_tock += 1
-                tick_tock = divmod(tick_tock, len(variables_to_set))
-                print('No further improvement. Moving to next variable')
+                variables_to_set[tick_tock][2] *= -0.5
+
+            tick_tock += 1
+            tick_tock = divmod(tick_tock, len(variables_to_set))[1]
+        return variables_to_set
+
+    def __run_algorithm_iteration(self, diff_goal):
+        result_new = self.fancy.calc_algorithm_stats(verbose=False)
+        diff_new = self.__calc_diff(diff_goal, result_new)
+        diff_to_goal = sum(diff_new)
+        print('New diff to goal {} ({})'.format(diff_to_goal, diff_new))
+        return diff_to_goal
 
     def __update_algorithm_instance(self, algorithm_instance):
         self.fancy.set_algorithm_wrapper(AlgorithmWrapper(algorithm_instance))
 
     @staticmethod
-    def __calc_change(result_old, result_new):
-        diff = []
-        for i in range(0, len(result_new)):
-            diff[i] = math.fabs(result_old[i] - result_new[i])
+    def __calc_diff(a, b):
+        if len(a) != len(b):
+            raise ValueError('size of parameters is different: len(a): {} vs len(b): {}'.format(len(a), len(b)))
 
+        diff = []
+        for i in range(0, len(a)):
+            diff.append(math.fabs(a[i] - b[i]))
         return diff
 
 
 if __name__ == "__main__":
     user_id = 1
-    fancy = Fancinator(user_id)
-    fancy.calc_algorithm_stats()
+    # fancy = Fancinator(user_id)
+    # fancy.calc_algorithm_stats()
+
+    algorithm = ArtsRT()
+    variables_to_set = [['b', getattr(algorithm, 'b'), +10], ['w', getattr(algorithm, 'w'), +10]]
+    diff_goal = [15, 5]
+
+    evaluator = AlgorithmEvaluator(user_id, algorithm)
+    print(evaluator.fit_algorithm(variables_to_set, diff_goal))
