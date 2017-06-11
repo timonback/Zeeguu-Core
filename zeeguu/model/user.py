@@ -217,7 +217,7 @@ class User(db.Model):
         if len(bookmarks) == 0 and self.bookmark_count() ==0:
             # we have zero bookmarks in our account... better to generate some
             # bookmarks to study than just whistle...
-            
+
             # we might be in a situation where we're on the watch for example...
             # in this case, we add some new ones to the user's account
             from zeeguu.temporary.default_words import create_default_bookmarks
