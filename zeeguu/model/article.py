@@ -26,6 +26,7 @@ class Article(zeeguu.db.Model):
 
     # Useful for ordering past read articles
     last_accessed = Column(DateTime)
+    discovered_date = Column(DateTime)
 
     # User Interactions
     opened = Column(Boolean)

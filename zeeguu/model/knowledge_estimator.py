@@ -67,7 +67,9 @@ class SimpleKnowledgeEstimator(object):
         words_learning = []
         bookmarks = Bookmark.find_by_specific_user(self.user)
         for bookmark in bookmarks:
-            learning = not bookmark.latest_exercise_outcome().too_easy()
+            learning = False
+            if bookmark.latest_exercise_outcome():
+                learning = not bookmark.latest_exercise_outcome().too_easy()
             user_word = bookmark.origin
             if learning and user_word.language == self.language:
                 words_learning.append(user_word.word)

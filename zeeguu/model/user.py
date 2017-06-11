@@ -25,6 +25,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     name = db.Column(db.String(255))
+    invitation_code = db.Column(db.String(255))
     password = db.Column(db.LargeBinary(255))
     password_salt = db.Column(db.LargeBinary(255))
     learned_language_id = db.Column(
@@ -39,12 +40,13 @@ class User(db.Model):
     )
     native_language = relationship(Language, foreign_keys=[native_language_id])
 
-    def __init__(self, email, name, password, learned_language=None, native_language=None):
+    def __init__(self, email, name, password, learned_language=None, native_language=None, invitation_code=None):
         self.email = email
         self.name = name
         self.update_password(password)
         self.learned_language = learned_language or Language.default_learned()
         self.native_language = native_language or Language.default_native_language()
+        self.invitation_code = invitation_code
 
     @classmethod
     def create_anonymous(cls, uuid, password, learned_language_code=None, native_language_code=None):
