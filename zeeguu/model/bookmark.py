@@ -53,6 +53,8 @@ class Bookmark(db.Model):
                                 secondary="bookmark_exercise_mapping",
                                 order_by="Exercise.id")
 
+    starred = db.Column(db.Boolean)
+
     def __init__(self, origin: UserWord, translation: UserWord, user: 'User',
                  text: str, time: datetime):
         self.origin = origin
@@ -60,6 +62,7 @@ class Bookmark(db.Model):
         self.user = user
         self.time = time
         self.text = text
+        self.stared = False
 
     def __repr__(self):
         return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n". \

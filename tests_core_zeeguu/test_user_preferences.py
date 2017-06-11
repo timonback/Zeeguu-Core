@@ -16,17 +16,5 @@ class UserPreferenceTest(ModelTestMixIn):
         self.random_origin_language = LanguageRule().random
         self.user_word_rule = UserWordRule(self.random_origin_word, self.random_origin_language)
 
-    def test_user_word_count(self):
-        assert len(self.user.starred_words) == 0
-
-    def test_preferred_word(self):
-        # GIVEN
-
-        # WHEN
-        self.user.starred_words.append(self.user_word_rule.user_word)
-
-        # THEN
-        assert len(self.user.starred_words) == 1
-
     def test_find_word(self):
         assert UserWord.find(self.random_origin_word, self.random_origin_language)

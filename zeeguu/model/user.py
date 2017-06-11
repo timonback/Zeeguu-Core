@@ -18,6 +18,7 @@ from zeeguu.model.user_word import UserWord
 
 ANONYMOUS_EMAIL_DOMAIN = '@anon.zeeguu'
 
+
 class User(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
@@ -31,15 +32,14 @@ class User(db.Model):
         db.ForeignKey(Language.id)
     )
     learned_language = relationship(Language, foreign_keys=[learned_language_id])
-    starred_words = relationship(UserWord, secondary="starred_words_association")
 
     native_language_id = db.Column(
-        db.String (2),
+        db.String(2),
         db.ForeignKey(Language.id)
     )
     native_language = relationship(Language, foreign_keys=[native_language_id])
 
-    def __init__(self, email, name, password, learned_language=None, native_language = None):
+    def __init__(self, email, name, password, learned_language=None, native_language=None):
         self.email = email
         self.name = name
         self.update_password(password)
@@ -47,7 +47,7 @@ class User(db.Model):
         self.native_language = native_language or Language.default_native_language()
 
     @classmethod
-    def create_anonymous(cls, uuid, password, learned_language_code = None, native_language_code = None):
+    def create_anonymous(cls, uuid, password, learned_language_code=None, native_language_code=None):
         """
 
         :param uuid:
@@ -58,7 +58,7 @@ class User(db.Model):
         """
 
         # since the DB must have an email we generate a fake one
-        fake_email = uuid+ANONYMOUS_EMAIL_DOMAIN
+        fake_email = uuid + ANONYMOUS_EMAIL_DOMAIN
 
         try:
             learned_language = Language.find(learned_language_code)
@@ -80,12 +80,6 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % (self.email)
-
-    def has_starred(self, word):
-        return word in self.starred_words
-
-    def star(self, word):
-        self.starred_words.append(word)
 
     def details_as_dictionary(self):
         return dict(
@@ -117,7 +111,7 @@ class User(db.Model):
     def active_during_recent(self, days: int = 30):
         if not self.has_bookmarks():
             return False
-        
+
         import dateutil.relativedelta
         now = datetime.datetime.now()
         a_while_ago = now - dateutil.relativedelta.relativedelta(days=days)
@@ -321,12 +315,3 @@ class User(db.Model):
                 return user
         except sqlalchemy.orm.exc.NoResultFound:
             return None
-
-
-starred_words_association_table = Table('starred_words_association',
-                                        db.Model.metadata,
-                                        Column('user_id', Integer,
-                                               ForeignKey(User.id)),
-                                        Column('starred_word_id', Integer,
-                                               ForeignKey(UserWord.id))
-                                        )
