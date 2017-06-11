@@ -158,11 +158,13 @@ class Fancinator:
 class AlgorithmEvaluator:
     change_limit = 1.0
 
-    def __init__(self, user_id, algorithm):
+    def __init__(self, user_id, algorithm, max_iterations=20):
         self.fancy = Fancinator(user_id)
         self.algorithm = algorithm
+        self.max_iterations = max_iterations
 
     def fit_algorithm(self, variables_to_set, diff_goal):
+        iteration_counter = 0
         tick_tock = 0
 
         change = self.__run_algorithm_iteration(diff_goal)
@@ -171,26 +173,35 @@ class AlgorithmEvaluator:
             print('New iteration of the algorithm tickTock={}, variables={}'
                   .format(tick_tock, variables_to_set))
 
-            new_variable_value = variables_to_set[tick_tock][1] + variables_to_set[tick_tock][2]
+            new_variable_value = math.fabs(variables_to_set[tick_tock][1] + variables_to_set[tick_tock][2])
             setattr(self.algorithm, variables_to_set[tick_tock][0], new_variable_value)
-            print('Trying now with b={}, w={}'.format(self.algorithm.b, self.algorithm.w))
+            print('Trying now with D={}, b={}, w={}'.format(self.algorithm.D, self.algorithm.b, self.algorithm.w))
             self.__update_algorithm_instance(self.algorithm)
+            # run the algorithm
             diff_to_goal = self.__run_algorithm_iteration(diff_goal)
-            # reset the variable
-            setattr(self.algorithm, variables_to_set[tick_tock][0], variables_to_set[tick_tock][1])
 
             if diff_to_goal < change:
                 print('Improvement found')
+
                 # We just did better
                 variables_to_set[tick_tock][1] = new_variable_value
                 change = diff_to_goal
             else:
                 print('No further improvement')
+
+                # reset the variable
+                setattr(self.algorithm, variables_to_set[tick_tock][0], variables_to_set[tick_tock][1])
+
                 # Time to optimize on the other variable
                 variables_to_set[tick_tock][2] *= -0.5
 
             tick_tock += 1
             tick_tock = divmod(tick_tock, len(variables_to_set))[1]
+
+            iteration_counter = iteration_counter + 1
+            if iteration_counter > self.max_iterations:
+                print('Stopped due to max_iterations parameter')
+                break
         return variables_to_set
 
     def __run_algorithm_iteration(self, diff_goal):
@@ -220,7 +231,8 @@ if __name__ == "__main__":
     # fancy.calc_algorithm_stats()
 
     algorithm = ArtsRT()
-    variables_to_set = [['b', getattr(algorithm, 'b'), +10], ['w', getattr(algorithm, 'w'), +10]]
+    variables_to_set = [['D', getattr(algorithm, 'D'), +5], ['b', getattr(algorithm, 'b'), +10],
+                        ['w', getattr(algorithm, 'w'), +10]]
     diff_goal = [15, 5]
 
     evaluator = AlgorithmEvaluator(user_id, algorithm)
