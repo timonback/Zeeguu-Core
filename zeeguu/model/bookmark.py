@@ -107,7 +107,7 @@ class Bookmark(db.Model):
     def quality_bookmark(self):
 
         # If it's starred by the user, then it's good quality!
-        if self.user.has_starred(self.origin):
+        if self.stared:
             return True
 
         # Else it just should not be bad quality!
