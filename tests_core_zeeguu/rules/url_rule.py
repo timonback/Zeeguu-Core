@@ -16,7 +16,7 @@ class UrlRule(BaseRule):
         random_url = self.faker.uri()
         random_title = self.faker.sentence()
 
-        url = Url(random_url, random_title)
+        url = Url.find_or_create(self.db.session, random_url, random_title)
 
         if self._exists_in_db(url):
             return self._create_model_object()

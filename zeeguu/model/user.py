@@ -18,12 +18,14 @@ from zeeguu.model.user_word import UserWord
 
 ANONYMOUS_EMAIL_DOMAIN = '@anon.zeeguu'
 
+
 class User(db.Model):
     __table_args__ = {'mysql_collate': 'utf8_bin'}
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True)
     name = db.Column(db.String(255))
+    invitation_code = db.Column(db.String(255))
     password = db.Column(db.LargeBinary(255))
     password_salt = db.Column(db.LargeBinary(255))
     learned_language_id = db.Column(
@@ -31,23 +33,23 @@ class User(db.Model):
         db.ForeignKey(Language.id)
     )
     learned_language = relationship(Language, foreign_keys=[learned_language_id])
-    starred_words = relationship(UserWord, secondary="starred_words_association")
 
     native_language_id = db.Column(
-        db.String (2),
+        db.String(2),
         db.ForeignKey(Language.id)
     )
     native_language = relationship(Language, foreign_keys=[native_language_id])
 
-    def __init__(self, email, name, password, learned_language=None, native_language = None):
+    def __init__(self, email, name, password, learned_language=None, native_language=None, invitation_code=None):
         self.email = email
         self.name = name
         self.update_password(password)
         self.learned_language = learned_language or Language.default_learned()
         self.native_language = native_language or Language.default_native_language()
+        self.invitation_code = invitation_code
 
     @classmethod
-    def create_anonymous(cls, uuid, password, learned_language_code = None, native_language_code = None):
+    def create_anonymous(cls, uuid, password, learned_language_code=None, native_language_code=None):
         """
 
         :param uuid:
@@ -58,7 +60,7 @@ class User(db.Model):
         """
 
         # since the DB must have an email we generate a fake one
-        fake_email = uuid+ANONYMOUS_EMAIL_DOMAIN
+        fake_email = uuid + ANONYMOUS_EMAIL_DOMAIN
 
         try:
             learned_language = Language.find(learned_language_code)
@@ -81,12 +83,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % (self.email)
 
-    def has_starred(self, word):
-        return word in self.starred_words
-
-    def star(self, word):
-        self.starred_words.append(word)
-
     def details_as_dictionary(self):
         return dict(
             email=self.email,
@@ -104,6 +100,24 @@ class User(db.Model):
 
     def set_native_language(self, code):
         self.native_language = Language.find(code)
+
+    def has_bookmarks(self):
+        return self.bookmark_count() > 0
+
+    def date_of_last_bookmark(self):
+        """
+            assumes that there are bookmarks
+        """
+        return self.bookmarks_chronologically()[0].time
+
+    def active_during_recent(self, days: int = 30):
+        if not self.has_bookmarks():
+            return False
+
+        import dateutil.relativedelta
+        now = datetime.datetime.now()
+        a_while_ago = now - dateutil.relativedelta.relativedelta(days=days)
+        return self.date_of_last_bookmark() > a_while_ago
 
     @sqlalchemy.orm.validates("email")
     def validate_email(self, col, email):
@@ -196,11 +210,17 @@ class User(db.Model):
         :return: 
         """
         from zeeguu.algos import words_to_study
+        from zeeguu.algos.algo_service import AlgoService
+
+        AlgoService.update_bookmark_priority(zeeguu.db, self)
 
         bookmarks = words_to_study.bookmarks_to_study(self, bookmark_count)
 
-        if len(bookmarks) < bookmark_count:
-            # we still don't have enough bookmarks.
+        if len(bookmarks) == 0 and self.bookmark_count() ==0:
+            # we have zero bookmarks in our account... better to generate some
+            # bookmarks to study than just whistle...
+
+            # we might be in a situation where we're on the watch for example...
             # in this case, we add some new ones to the user's account
             from zeeguu.temporary.default_words import create_default_bookmarks
             new_bookmarks = create_default_bookmarks(zeeguu.db.session, self, self.learned_language_id)
@@ -299,12 +319,3 @@ class User(db.Model):
                 return user
         except sqlalchemy.orm.exc.NoResultFound:
             return None
-
-
-starred_words_association_table = Table('starred_words_association',
-                                        db.Model.metadata,
-                                        Column('user_id', Integer,
-                                               ForeignKey(User.id)),
-                                        Column('starred_word_id', Integer,
-                                               ForeignKey(UserWord.id))
-                                        )

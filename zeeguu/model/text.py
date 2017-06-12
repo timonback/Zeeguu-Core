@@ -1,9 +1,10 @@
 import re
 
 import sqlalchemy.orm
+import time
 import zeeguu
 
-from zeeguu import util
+from zeeguu.util import text_hash
 from zeeguu.model.language import Language
 from zeeguu.model.url import Url
 from zeeguu.model.user_word import UserWord
@@ -17,7 +18,8 @@ class Text(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(10000))
 
-    content_hash = db.Column(db.LargeBinary(32))
+    content_hash = db.Column(db.String(255))
+
     language_id = db.Column(db.String(2), db.ForeignKey(Language.id))
     language = db.relationship(Language)
 
@@ -28,7 +30,7 @@ class Text(db.Model):
         self.content = content
         self.language = language
         self.url = url
-        self.content_hash = util.text_hash(content)
+        self.content_hash = text_hash(content)
 
     def __repr__(self):
         return '<Text %r>' % (self.content)
@@ -65,8 +67,12 @@ class Text(db.Model):
 
         return shorter_text
 
+    def all_bookmarks(self):
+        from zeeguu.model import Bookmark
+        return Bookmark.find_all_for_text(self)
+
     @classmethod
-    def find_or_create(cls, text, language, url):
+    def find_or_create(cls, session, text, language, url):
         """
         :param text: string
         :param language: Language (object)
@@ -75,17 +81,23 @@ class Text(db.Model):
         """
 
         try:
-            query = (
-                cls.query.filter(cls.content_hash == util.text_hash(text))
-                # For some reason, here we can't filter by the url...
-            )
-            if query.count() > 0:
-                query = query.filter(cls.content == text)
-                try:
-                    return query.one()
-                except sqlalchemy.orm.exc.NoResultFound:
-                    pass
-            return cls(text, language, url)
-        except:
-            import traceback
-            traceback.print_exc()
+            return cls.query.filter(cls.content_hash == text_hash(text)).one()
+        except sqlalchemy.orm.exc.NoResultFound or sqlalchemy.exc.InterfaceError:
+            try:
+                new = cls(text, language, url)
+                session.add(new)
+                session.commit()
+                return new
+            except sqlalchemy.exc.IntegrityError or sqlalchemy.exc.DatabaseError:
+                for i in range(10):
+                    try:
+                        session.rollback()
+                        t = cls.query.filter(cls.content_hash == text_hash(text)).one()
+                        print("found text after recovering from race")
+                        return t
+                    except:
+                        print("exception of second degree in find text..." + str(i))
+                        time.sleep(0.3)
+                        continue
+                    break
+

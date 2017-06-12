@@ -1,3 +1,5 @@
+from datetime import time
+
 import sqlalchemy.orm
 from sqlalchemy.orm.exc import NoResultFound
 from wordstats import Word
@@ -48,13 +50,38 @@ class UserWord(db.Model, util.JSONSerializable):
         return b * self.importance_level()
 
     @classmethod
-    def find(cls, word, language):
-        try:
-            return (cls.query.filter(cls.word == word)
+    def find(cls, _word: str, language: Language):
+            return (cls.query.filter(cls.word == _word)
                     .filter(cls.language == language)
                     .one())
-        except sqlalchemy.orm.exc.NoResultFound as e:
-            return cls(word, language)
+
+    @classmethod
+    def find_or_create(cls, session, _word: str, language: Language):
+
+        try:
+            return cls.find(_word, language)
+
+        except sqlalchemy.orm.exc.NoResultFound:
+
+            try:
+                new = cls(_word, language)
+                session.add(new)
+                session.commit()
+                return new
+
+            except:
+
+                for _ in range(10):
+                    try:
+                        session.rollback()
+                        w = cls.find(_word, language)
+                        print ("successfully avoided race condition. nice! ")
+                        return w
+                    except sqlalchemy.orm.exc.NoResultFound:
+                        time.sleep(0.3)
+                        continue
+                    break
+
 
     @classmethod
     def find_all(cls):

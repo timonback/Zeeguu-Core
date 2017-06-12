@@ -85,7 +85,7 @@ def text_difficulty(text, language, known_probabilities, difficulty_computer = '
     center = int(round(len(word_difficulties) / 2, 0))
     difficulty_median = word_difficulties[center]
 
-    normalized_estimate = difficulty_median
+    normalized_estimate = difficulty_average
 
     difficulty_scores = dict(
         score_median=difficulty_median,

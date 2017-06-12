@@ -2,7 +2,6 @@ import random
 
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
-from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
 from tests_core_zeeguu.rules.text_rule import TextRule
 from tests_core_zeeguu.rules.user_rule import UserRule
 
@@ -30,29 +29,7 @@ class BookmarkTest(ModelTestMixIn):
         
     def test_translation(self):
         random_bookmark = BookmarkRule(self.user).bookmark
-        assert random_bookmark.translation() is not None
-
-    def test_remove_translation(self):
-        random_bookmark = BookmarkRule(self.user).bookmark
-        random_translation = UserWordRule().user_word
-
-        random_bookmark.add_new_translation(random_translation)
-        length_before = len(random_bookmark.translations_list)
-
-        random_bookmark.remove_translation(random_translation)
-        length_after = len(random_bookmark.translations_list)
-
-        assert length_before > length_after
-
-    def test_translation_words_list(self):
-        random_bookmark = BookmarkRule(self.user).bookmark
-        len_before = len(random_bookmark.translations_list)
-
-        random_translation = UserWordRule().user_word
-        random_bookmark.add_new_translation(random_translation)
-        len_after = len(random_bookmark.translations_list)
-
-        assert len_before < len_after
+        assert random_bookmark.translation is not None
 
     def test_text_is_not_too_long(self):
         random_bookmark = BookmarkRule(self.user).bookmark

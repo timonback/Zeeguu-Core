@@ -1,3 +1,4 @@
+import zeeguu
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.language_rule import LanguageRule
 from tests_core_zeeguu.rules.user_rule import UserRule
@@ -25,10 +26,6 @@ class TestRetrieveAndCompute(ModelTestMixIn):
         difficulty_for_easy = difficulties[EASY_STORY_URL]['difficulty']
 
         assert difficulty_for_easiest['average'] < difficulty_for_easy['average']
-
-        # a problem... the median is the same for the two texts... or is it
-        # a problem?
-        assert difficulty_for_easiest['normalized'] == difficulty_for_easy['normalized']
 
         # on the other hand, they're all EASY
         # assert difficulty_for_easiest['discrete'] == difficulty_for_very_easy['discrete']

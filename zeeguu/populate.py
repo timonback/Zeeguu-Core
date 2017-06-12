@@ -60,20 +60,16 @@ def drop_current_tables(db):
 def add_bookmark(db, user, original_language, original_word, translation_language, translation_word,  date, the_context, the_url, the_url_title):
     session = db.session
 
-    url = Url.find_or_create(the_url, the_url_title)
-    session.add(url)
+    url = Url.find_or_create(session, the_url, the_url_title)
 
-    text = Text.find_or_create(the_context, translation_language, url)
-    session.add(text)
+    text = Text.find_or_create(session, the_context, translation_language, url)
 
-    origin = UserWord.find(original_word, original_language)
-    session.add(origin)
+    origin = UserWord.find_or_create(session, original_word, original_language)
 
-    translation = UserWord.find(translation_word, translation_language)
-    session.add(translation)
+    translation = UserWord.find_or_create(session, translation_word, translation_language)
 
     b1 = Bookmark(origin, translation, user, text, date)
-    db.session.add_all([url, text, origin, translation, b1])
+    db.session.add(b1)
     db.session.commit()
 
     return b1
@@ -88,8 +84,9 @@ def create_minimal_test_db(db):
     en = Language("en", "English")
     nl = Language("nl", "Dutch")
     es = Language("es", "Spanish")
+    fr = Language("fr", "French")
 
-    db.session.add_all([en, de, nl, es]);
+    db.session.add_all([en, de, nl, es, fr]);
 
     mir = User(TEST_EMAIL, "Mircea", TEST_PASS, de, en)
 
