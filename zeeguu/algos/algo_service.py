@@ -2,15 +2,11 @@ import itertools
 import traceback
 
 import zeeguu
-
-from zeeguu.model.bookmark import Bookmark
+from zeeguu.algos.ab_testing import ABTesting
+from zeeguu.algos.analysis.normal_distribution import NormalDistribution
 from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 from zeeguu.model.exercise import Exercise
 from zeeguu.model.exercise_source import ExerciseSource
-
-from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
-from zeeguu.algos.analysis.normal_distribution import NormalDistribution
-from zeeguu.algos.arts.arts_rt import ArtsRT
 from zeeguu.model.learner_stats.exercise_stats import ExerciseStats
 
 db = zeeguu.db
@@ -27,21 +23,22 @@ class PriorityInfo:
 
 
 class AlgoService:
+    """Service calls the wrapper that calls the algorithm
     """
-        
-        service calls the wrapper that calls the algorithm 
-        
-    """
-    algorithm_wrapper = AlgorithmWrapper(ArtsRT)
 
     @classmethod
     def update_exercise_source_stats(cls):
+        """Retrieves all exercises by all users per ExerciseSource and
+        calculates the mean and standard deviation for said exercises.
+
+        The new values for mean and SD are then saved to the ExerciseStats
+        database table
+        """
         exercise_sources = list(ExerciseSource.query.all())
         for source in exercise_sources:
             exercises = Exercise.query.filter_by(source_id=source.id)
             reaction_times = map(lambda x: x.solving_speed, exercises)
-            mean, sd = NormalDistribution.calc_normal_distribution(
-                reaction_times)
+            mean, sd = NormalDistribution.calc_normal_distribution(reaction_times)
             exercise_stats = ExerciseStats(source, mean, sd)
             db.session.merge(exercise_stats)
 
@@ -49,6 +46,13 @@ class AlgoService:
 
     @classmethod
     def update_bookmark_priority(cls, db, user):
+        """Updates the priorities for all bookmarks for a given user based
+        on the latest exercise of a bookmark.
+
+        :param db: A database connection, holding the data about bookmarks,
+        exercises and user info
+        :param user: An User object, for which the bookmarks need updating
+        """
         try:
             bookmarks_for_user = user.all_bookmarks()
             if len(bookmarks_for_user) == 0:
@@ -75,22 +79,22 @@ class AlgoService:
             print(traceback.format_exc())
 
     @classmethod
-    def _calculate_bookmark_priority(cls, x, max_iterations):
-        if x.exercise is not None:
-
-            if x.exercise.solving_speed > 0:
-                x.priority = cls.algorithm_wrapper.calculate(x.exercise, max_iterations)
-
+    def _calculate_bookmark_priority(cls, priority_info, max_iterations):
+        if priority_info.exercise is not None:
+            if priority_info.exercise.solving_speed > 0:
+                chosen_algorithm = ABTesting.get_algorithm_based_on_user(priority_info.bookmark.user)
+                priority_info.priority = chosen_algorithm.calculate(priority_info.exercise, max_iterations)
             else:
                 # solving speed is -1 for the cases where there was some feedback
                 # from the user (either that it's too easy, or that there's something
                 # wrong with it. we shouldn't schedule the bookmark in this case.
                 # moreover, even if we wanted we can't since there's a log of reaction
                 # time somewhere and it won't work with -1!
-                x.priority = PriorityInfo.NO_PRIORITY
+                priority_info.priority = PriorityInfo.NO_PRIORITY
         else:
-            x.priority = PriorityInfo.MAX_PRIORITY
-        return x
+            priority_info.priority = PriorityInfo.MAX_PRIORITY
+
+        return priority_info
 
     @staticmethod
     def _get_exercise_of_bookmark(bookmark):
