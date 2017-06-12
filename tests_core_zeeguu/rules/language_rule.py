@@ -15,16 +15,16 @@ class LanguageRule(BaseRule):
     """
 
     languages = {
-        "da": "Danish",
+        # "da": "Danish",
         "de": "German",
         "en": "English",
         "es": "Spanish",
         "fr": "French",
-        "it": "Italian",
+        # "it": "Italian",
         "nl": "Dutch",
-        "no": "Norwegian",
-        "pt": "Portuguese",
-        "ro": "Romanian"
+        # "no": "Norwegian",
+        # "pt": "Portuguese",
+        # "ro": "Romanian"
     }
 
     @classmethod

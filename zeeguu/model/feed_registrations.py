@@ -2,6 +2,7 @@ from sqlalchemy.orm import relationship
 
 from zeeguu.model.feed import db, RSSFeed
 from zeeguu.model.user import User
+import sqlalchemy
 
 
 class RSSFeedRegistration(db.Model):
@@ -21,13 +22,17 @@ class RSSFeedRegistration(db.Model):
         self.rss_feed = feed
 
     @classmethod
-    def find_or_create(cls, user, feed):
+    def find_or_create(cls, session, user, feed):
         try:
             return (cls.query.filter(cls.user == user)
                     .filter(cls.rss_feed == feed)
                     .one())
         except sqlalchemy.orm.exc.NoResultFound:
-            return cls(user, feed)
+                new = cls(user, feed)
+                session.add(new)
+                session.commit()
+                return new
+
 
     @classmethod
     def feeds_for_user(cls, user):

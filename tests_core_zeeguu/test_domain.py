@@ -28,7 +28,7 @@ class DomainTest(ModelTestMixIn, TestCase):
         e.g. 'https://google.com' should be retrieved from
         e.g. 'https://google.com/search'
         """
-        url_random = UrlRule().url.url
+        url_random = UrlRule().url.as_string()
 
         url_parts = url_random.split('//', 1)
         domain_should_be = url_parts[0] + '//' + url_parts[1].split('/', 1)[0]
@@ -57,7 +57,7 @@ class DomainTest(ModelTestMixIn, TestCase):
         # Create a random number of URLs, each with the same DomainName
         random_num = random.randint(0, 10)
         for _ in range(0, random_num):
-            url_random_extended = url_random_obj_origin.url + self.faker.word()
+            url_random_extended = url_random_obj_origin.as_string() + self.faker.word()
             _ = Url(url_random_extended, self.faker.word())
 
         domain_for_query = url_random_obj_origin.domain_name()

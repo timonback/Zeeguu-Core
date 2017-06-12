@@ -107,7 +107,8 @@ class RSSFeed(db.Model):
         return filtered_feed_items
 
     @classmethod
-    def find_or_create(cls, url, title, description, image_url, language):
+    def find_or_create(cls, session, url, title, description, image_url: Url, language: Language):
+
         try:
             result = (cls.query.filter(cls.url == url)
                       .filter(cls.title == title)
@@ -116,7 +117,10 @@ class RSSFeed(db.Model):
                       .one())
             return result
         except sqlalchemy.orm.exc.NoResultFound:
-            return cls(url, title, description, image_url, language)
+            new = cls(url, title, description, image_url, language)
+            session.add(new)
+            session.commit()
+            return new
 
     @classmethod
     def find_for_language_id(cls, language_id):
