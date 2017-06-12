@@ -11,11 +11,11 @@ class ABTesting:
         algorithms = []
         for s in config.sections():
             new_algorithm = ArtsRT(
-                    a=int(config[s]['a']),
-                    D=int(config[s]['D']),
-                    b=int(config[s]['b']),
-                    r=int(config[s]['r']),
-                    w=int(config[s]['w'])
+                    a=float(config[s]['a']),
+                    D=float(config[s]['D']),
+                    b=float(config[s]['b']),
+                    r=float(config[s]['r']),
+                    w=float(config[s]['w'])
             )
             algorithms.append(new_algorithm)
 
