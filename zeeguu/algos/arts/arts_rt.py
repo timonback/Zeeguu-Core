@@ -20,6 +20,13 @@ class ArtsRT:
         self.r = r
         self.w = w
 
+    def __eq__(self, other):
+        return self.a == other.a \
+               and self.D == other.D \
+               and self.b == other.b \
+               and self.r == other.r \
+               and self.w == other.w
+
     def calculate(self, args):
         """ Calculate the ARTS priority
         Parameters:

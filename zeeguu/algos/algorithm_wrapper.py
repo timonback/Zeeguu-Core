@@ -6,6 +6,9 @@ class AlgorithmWrapper:
     def __init__(self, algorithm):
         self.algorithm = algorithm
 
+    def __eq__(self, other):
+        return self.algorithm == other.algorithm
+
     def calculate(self, exercise, max_iterations):
         if exercise is None:
             raise ValueError("Exercise must not be None")

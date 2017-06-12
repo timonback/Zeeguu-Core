@@ -6,6 +6,9 @@ import os
 if "ZEEGUU_CORE_CONFIG" not in os.environ:
     os.environ["ZEEGUU_CORE_CONFIG"] = os.path.expanduser('~/.config/zeeguu/core_test.cfg')
 
+if "ALGORITHM_CONFIG_FILE" not in os.environ:
+    os.environ["ALGORITHM_CONFIG_FILE"] = os.path.expanduser('~/.config/zeeguu/algorithms.ini')
+
 import zeeguu.model
 
 from faker import Faker

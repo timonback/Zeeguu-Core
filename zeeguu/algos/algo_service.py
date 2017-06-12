@@ -82,7 +82,7 @@ class AlgoService:
     def _calculate_bookmark_priority(cls, priority_info, max_iterations):
         if priority_info.exercise is not None:
             if priority_info.exercise.solving_speed > 0:
-                chosen_algorithm = ABTesting.get_algorithm_based_on_user(priority_info.bookmark.user)
+                chosen_algorithm = ABTesting.get_algorithm_wrapper_for_id(priority_info.bookmark.id)
                 priority_info.priority = chosen_algorithm.calculate(priority_info.exercise, max_iterations)
             else:
                 # solving speed is -1 for the cases where there was some feedback
