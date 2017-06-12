@@ -8,6 +8,7 @@ import flask_sqlalchemy
 from flask import Flask
 
 import zeeguu
+from zeeguu.algos.algo_service import PriorityInfo
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
 from zeeguu.algos.arts.arts_rt import ArtsRT
 from zeeguu.model import User, ExerciseOutcome, Exercise, ExerciseSource
@@ -22,6 +23,7 @@ class AverageExercise:
         self.exercise_log = exercise_log
         self.past_exercises = []
         self.past_exercises_iteration = []
+        self.priorities = []
 
         self.avg_solving_speed, self.prob_correct = self._get_avg_exercise(exercise_log)
 
@@ -48,7 +50,6 @@ class CalculationHelper:
     def __init__(self, bookmark):
         self.bookmark = bookmark
         self.average_exercise = AverageExercise(bookmark.exercise_log)
-        self.priority = 10
 
 
 class Fancinator:
@@ -108,6 +109,8 @@ class Fancinator:
 
             max_priority = 0
             for calculation_helper in calculation_helpers:
+                new_priority = PriorityInfo.MAX_PRIORITY
+
                 last_exercises = calculation_helper.average_exercise.past_exercises[-self.correct_count_limit:]
                 if len(last_exercises) != 0:
                     count_correct = math.fsum([x.outcome.correct for x in last_exercises])
@@ -115,26 +118,31 @@ class Fancinator:
                         new_priority = self.removed_bookmark_priority
                     else:
                         new_priority = self.algo_wrapper.calculate(last_exercises[-1:][0], i)
+                    calculation_helper.average_exercise.priorities.append([i, new_priority])
 
-                    calculation_helper.priority = new_priority
                     if verbose:
                         if new_priority != self.removed_bookmark_priority:
                             print('{:+8.2f}'.format(new_priority), end=', ')
                         else:
                             print('{:8}'.format(''), end=', ')
 
-                if calculation_helper.priority > max_priority:
+                if new_priority > max_priority:
                     next_bookmark = calculation_helper
-                    max_priority = calculation_helper.priority
+                    max_priority = new_priority
             if verbose:
                 print('')
         return calculation_helpers
 
     def __calc_algorithm_result_stats(self, calculation_helpers):
+        words_in_parallel = [0 for _ in calculation_helpers]
         repetition_correct = []  # bookmark, iterations
         repetition_incorrect = []
         for calculation_helper in calculation_helpers:
             average_exercise = calculation_helper.average_exercise
+            for priority_iteration in average_exercise.priorities:
+                if priority_iteration[1] != self.removed_bookmark_priority:
+                    words_in_parallel[priority_iteration[0]] += 1
+
             for i in range(0, len(average_exercise.past_exercises_iteration) - 1):
                 repetition_after = average_exercise.past_exercises_iteration[i + 1] - \
                                    average_exercise.past_exercises_iteration[i]
@@ -143,8 +151,15 @@ class Fancinator:
                 else:
                     repetition_incorrect.append(repetition_after)
 
+        # remove all words that have not been covered at all
+        words_in_parallel = list(filter((0).__ne__, words_in_parallel))
+
+        words_in_parallel_mean = mean(words_in_parallel)
         repetition_correct_mean = mean(repetition_correct)
         repetition_incorrect_mean = mean(repetition_incorrect)
+
+        print('Concurrent words on average                        {:.4}, in raw: {:}'
+              .format(words_in_parallel_mean, words_in_parallel))
 
         print('Repetition of correct words on average for every   {:.4}, in raw: {:}'
               .format(repetition_correct_mean, repetition_correct))
@@ -152,22 +167,45 @@ class Fancinator:
         print('Repetition of incorrect words on average for every {:.4}, in raw: {:}'
               .format(repetition_incorrect_mean, repetition_incorrect))
 
-        return [repetition_correct_mean, repetition_incorrect_mean]
+        return [words_in_parallel_mean, repetition_correct_mean, repetition_incorrect_mean]
 
+
+class OptimizationGoals:
+    def __init__(self,
+                 words_in_parallel=10, words_in_parallel_factor=1.0,
+                 repetition_correct=15, repetition_correct_factor=1.0,
+                 repetition_incorrect=5, repetition_incorrect_factor=1.0):
+        '''
+        Used to specifiy on which goals to focus during the algorithm evalulation
+        :param words_in_parallel: Amount of words to study in parallel
+        :param words_in_parallel_factor: Weighting factor (higher=more important [relative to the others])
+        :param repetition_correct: After x words, correct words should reappear
+        :param repetition_correct_factor: Weighting factor (higher=more important [relative to the others])
+        :param repetition_incorrect: After x words, incorrect words should reappear
+        :param repetition_incorrect_factor: Weighting factor (higher=more important [relative to the others])
+        '''
+        self.words_in_parallel = words_in_parallel
+        self.words_in_parallel_factor = words_in_parallel_factor
+        self.repetition_correct = repetition_correct
+        self.repetition_correct_factor = repetition_correct_factor
+        self.repetition_incorrect = repetition_incorrect
+        self.repetition_incorrect_factor = repetition_incorrect_factor
 
 class AlgorithmEvaluator:
-    change_limit = 1.0
-
-    def __init__(self, user_id, algorithm, max_iterations=20):
+    def __init__(self, user_id, algorithm, max_iterations=20, change_limit=1.0):
         self.fancy = Fancinator(user_id)
         self.algorithm = algorithm
         self.max_iterations = max_iterations
+        self.change_limit = change_limit
 
-    def fit_algorithm(self, variables_to_set, diff_goal):
+    def fit_parameters(self, variables_to_set, optimization_goals):
         iteration_counter = 0
         tick_tock = 0
 
-        change = self.__run_algorithm_iteration(diff_goal)
+        # Init run
+        result_new = self.fancy.calc_algorithm_stats(verbose=False)
+        change = self.__diff_to_goal(optimization_goals, result_new)
+
         while change > self.change_limit or tick_tock != 0:
             print('------------------------------------------------------------------------')
             print('New iteration of the algorithm tickTock={}, variables={}'
@@ -177,8 +215,10 @@ class AlgorithmEvaluator:
             setattr(self.algorithm, variables_to_set[tick_tock][0], new_variable_value)
             print('Trying now with D={}, b={}, w={}'.format(self.algorithm.D, self.algorithm.b, self.algorithm.w))
             self.__update_algorithm_instance(self.algorithm)
+
             # run the algorithm
-            diff_to_goal = self.__run_algorithm_iteration(diff_goal)
+            result_new = self.fancy.calc_algorithm_stats(verbose=False)
+            diff_to_goal = self.__diff_to_goal(optimization_goals, result_new)
 
             if diff_to_goal < change:
                 print('Improvement found')
@@ -202,27 +242,50 @@ class AlgorithmEvaluator:
             if iteration_counter > self.max_iterations:
                 print('Stopped due to max_iterations parameter')
                 break
-        return variables_to_set
 
-    def __run_algorithm_iteration(self, diff_goal):
-        result_new = self.fancy.calc_algorithm_stats(verbose=False)
-        diff_new = self.__calc_diff(diff_goal, result_new)
-        diff_to_goal = sum(diff_new)
-        print('New diff to goal {} ({})'.format(diff_to_goal, diff_new))
-        return diff_to_goal
+        print('')
+        print('The variables should be set the following way:')
+        for variable_to_set in variables_to_set:
+            print('{}={}'.format(variable_to_set[0], variable_to_set[1]))
+
+        return variables_to_set
 
     def __update_algorithm_instance(self, algorithm_instance):
         self.fancy.set_algorithm_wrapper(AlgorithmWrapper(algorithm_instance))
 
+    def __diff_to_goal(self, optimization_goals, result_new):
+        # corresponds to the output from __calc_algorithm_result_stats()
+        optimization_list = [
+            optimization_goals.words_in_parallel,
+            optimization_goals.repetition_correct,
+            optimization_goals.repetition_incorrect
+        ]
+        optimization_list_factors = [
+            optimization_goals.words_in_parallel_factor,
+            optimization_goals.repetition_correct_factor,
+            optimization_goals.repetition_incorrect_factor
+        ]
+
+        diffs = self.__calc_diff(result_new, optimization_list, optimization_list_factors)
+        result = math.fsum(diffs)
+        print('              concurrent words: {:6.4f}, correct words: {:6.4f}, incorrect words: {:6.4f}'.
+              format(result_new[0], result_new[1], result_new[2]))
+        print('Diff: {:6.4f}, concurrent words: {:6.4f}, correct words: {:6.4f}, incorrect words: {:6.4f}'.
+              format(result, diffs[0], diffs[1], diffs[2]))
+        return result
+
     @staticmethod
-    def __calc_diff(a, b):
+    def __calc_diff(a, b, factor=None):
         if len(a) != len(b):
             raise ValueError('size of parameters is different: len(a): {} vs len(b): {}'.format(len(a), len(b)))
+        if factor is None:
+            factor = [1 for _ in range(0, (len(a)))]
 
-        diff = []
+        diffs = []
         for i in range(0, len(a)):
-            diff.append(math.fabs(a[i] - b[i]))
-        return diff
+            diff = math.fabs(a[i] - b[i])
+            diffs.append(diff * factor[i])
+        return diffs
 
 
 if __name__ == "__main__":
@@ -233,7 +296,11 @@ if __name__ == "__main__":
     algorithm = ArtsRT()
     variables_to_set = [['D', getattr(algorithm, 'D'), +5], ['b', getattr(algorithm, 'b'), +10],
                         ['w', getattr(algorithm, 'w'), +10]]
-    diff_goal = [15, 5]
+    optimization_goals = OptimizationGoals(
+        words_in_parallel=30, words_in_parallel_factor=3,
+        repetition_correct_factor=0,
+        repetition_incorrect_factor=0
+    )
 
-    evaluator = AlgorithmEvaluator(user_id, algorithm)
-    print(evaluator.fit_algorithm(variables_to_set, diff_goal))
+    evaluator = AlgorithmEvaluator(user_id, algorithm, change_limit=1.0)
+    print(evaluator.fit_parameters(variables_to_set, optimization_goals))

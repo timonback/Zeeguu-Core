@@ -14,7 +14,7 @@ db = zeeguu.db
 
 
 class PriorityInfo:
-    MAX_PRIORITY = 1000
+    MAX_PRIORITY = 10
 
     def __init__(self, bookmark, exercise, priority = MAX_PRIORITY):
         self.bookmark = bookmark
