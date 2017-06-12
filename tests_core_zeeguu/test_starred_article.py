@@ -5,7 +5,7 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.language_rule import LanguageRule
 from tests_core_zeeguu.rules.url_rule import UrlRule
 from tests_core_zeeguu.rules.user_rule import UserRule
-from zeeguu.model.article import StarredArticle
+from zeeguu.model.starred_article import StarredArticle
 
 
 class StarredArticleTest(ModelTestMixIn):

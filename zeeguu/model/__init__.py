@@ -40,6 +40,7 @@ from .user_activitiy_data import UserActivityData
 from .user_word import UserWord
 from .smartwatch.watch_event_type import WatchEventType
 from .smartwatch.watch_interaction_event import WatchInteractionEvent
+from .starred_article import StarredArticle
 
 # Creating the DB tables if needed
 # Note that this must be called after all the model classes are loaded

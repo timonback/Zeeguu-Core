@@ -12,10 +12,7 @@ from zeeguu.model.language import Language
 class StarredArticle(zeeguu.db.Model):
     """
 
-        This keeps track of information regarding a user's past read
-         articles.
-
-        What do we do when multiple
+        This keeps track of information regarding a user's starred articles.
 
     """
     __table_args__ = {'mysql_collate': 'utf8_bin'}
