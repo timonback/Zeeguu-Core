@@ -108,7 +108,7 @@ class Url(db.Model):
 
     @classmethod
     def find(cls, url, title=""):
-        d = DomainName.find_or_create(Url.get_domain(url))
+        d = DomainName.find(Url.get_domain(url))
         return (cls.query.filter(cls.path == Url.get_path(url))
                 .filter(cls.domain == d)
                 .one())
