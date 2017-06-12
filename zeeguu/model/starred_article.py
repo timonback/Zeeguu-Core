@@ -56,7 +56,7 @@ class StarredArticle(zeeguu.db.Model):
         )
 
     @classmethod
-    def find_or_create(cls, session, _url, user: User, _title: str, _language):
+    def find_or_create(cls, session, user: User, _url, _title: str, _language):
         """
 
             create a new object and add it to the db if it's not already there
@@ -91,7 +91,7 @@ class StarredArticle(zeeguu.db.Model):
 
 
     @classmethod
-    def delete(cls, session, _url, user):
+    def delete(cls, session, user, _url):
 
         try:
             url = Url.find(_url)

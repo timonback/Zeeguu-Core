@@ -26,27 +26,27 @@ class StarredArticleTest(ModelTestMixIn):
 
     def test_new_starring_two_articles(self):
         # GIVEN:
-        StarredArticle.find_or_create(zeeguu.db.session, self.url.as_string(), self.user, self.url.title,
+        StarredArticle.find_or_create(zeeguu.db.session, self.user, self.url.as_string(),  self.url.title,
                                       self.language.id)
         # WHEN:
-        StarredArticle.find_or_create(zeeguu.db.session, self.url2.as_string(), self.user, self.url2.title,
+        StarredArticle.find_or_create(zeeguu.db.session, self.user, self.url2.as_string(),  self.url2.title,
                                       self.language.id)
         # THEN:
         self.assertEqual(2, len(StarredArticle.all_for_user(self.user)))
 
     def test_delete_starred_article(self):
         # GIVEN:
-        StarredArticle.find_or_create(zeeguu.db.session, self.url.as_string(), self.user, self.url.title,
+        StarredArticle.find_or_create(zeeguu.db.session, self.user, self.url.as_string(),  self.url.title,
                                       self.language.id)
         # WHEN:
-        StarredArticle.delete(zeeguu.db.session, self.url.as_string(), self.user)
+        StarredArticle.delete(zeeguu.db.session, self.user, self.url.as_string())
 
         # THEN:
         self.assertEqual(0, len(StarredArticle.all_for_user(self.user)))
 
     def test_converts_to_dict(self):
         # GIVEN:
-        x = StarredArticle.find_or_create(zeeguu.db.session, self.url.as_string(), self.user, self.url.title,
+        x = StarredArticle.find_or_create(zeeguu.db.session, self.user, self.url.as_string(), self.url.title,
                                           self.language.id)
         # WHEN:
         jsonified = json.dumps(x.as_dict())
