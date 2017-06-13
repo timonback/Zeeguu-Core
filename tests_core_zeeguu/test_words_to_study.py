@@ -25,6 +25,9 @@ class WordsToStudyTest(ModelTestMixIn):
         self.user_rule.add_bookmarks(BOOKMARK_COUNT, exercises_count=1)
         self.user = self.user_rule.user
 
+        self.config, self.algorithms = self.__get_config_with_random_algorithm_parameters(algorithm_count=random.randint(2, 5))
+        ABTesting._algorithms = ABTesting.load_algorithms(self.config)
+
     def test_new_bookmark_has_the_highest_priority(self):
         # GIVEN
         new_bookmark = self.user_rule.add_bookmarks(1)[0].bookmark
@@ -57,33 +60,28 @@ class WordsToStudyTest(ModelTestMixIn):
         assert first_bookmark_to_study != bookmark
 
     def test_load_algorithms(self):
-        config, algorithms = self.__get_config_with_random_algorithm_parameters()
-        algorithm_should_be = algorithms[0]
+        algorithm_should_be = self.algorithms[0]
 
-        algorithms_loaded = ABTesting.load_algorithms(config)
+        algorithms_loaded = ABTesting.load_algorithms(self.config)
         algorithm_to_check = algorithms_loaded[0]
 
         assert algorithm_to_check == algorithm_should_be
 
     def test_get_algorithm_for_id(self):
-        config, algorithms = self.__get_config_with_random_algorithm_parameters(algorithm_count=random.randint(2, 5))
-        ABTesting._algorithms = ABTesting.load_algorithms(config)
         new_bookmark = BookmarkRule(self.user).bookmark
 
-        idx_should_be = divmod(new_bookmark.id, len(algorithms))[1]
-        algorithm_should_be = algorithms[idx_should_be]
+        idx_should_be = divmod(new_bookmark.id, len(self.algorithms))[1]
+        algorithm_should_be = self.algorithms[idx_should_be]
 
         algorithm_to_check = ABTesting.get_algorithm_for_id(new_bookmark.id)
 
         assert algorithm_should_be == algorithm_to_check
 
     def test_get_algorithm_wrapper_by_id(self):
-        config, algorithms = self.__get_config_with_random_algorithm_parameters(algorithm_count=random.randint(2, 5))
-        ABTesting._algorithms = ABTesting.load_algorithms(config)
         new_bookmark = BookmarkRule(self.user).bookmark
 
-        idx_should_be = divmod(new_bookmark.id, len(algorithms))[1]
-        algorithm_should_be = algorithms[idx_should_be]
+        idx_should_be = divmod(new_bookmark.id, len(self.algorithms))[1]
+        algorithm_should_be = self.algorithms[idx_should_be]
         wrapper_should_be = AlgorithmWrapper(algorithm_should_be)
 
         algorithm_to_check = ABTesting.get_algorithm_for_id(new_bookmark.id)
