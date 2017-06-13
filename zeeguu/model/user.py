@@ -40,6 +40,11 @@ class User(db.Model):
     )
     native_language = relationship(Language, foreign_keys=[native_language_id])
 
+    from zeeguu.model.cohort import Cohort
+    cohort_id = Column(Integer, ForeignKey(Cohort.id))
+    cohort = relationship(Cohort)
+
+
     def __init__(self, email, name, password, learned_language=None, native_language=None, invitation_code=None):
         self.email = email
         self.name = name
@@ -204,6 +209,20 @@ class User(db.Model):
             dates.append(date_entry)
         return dates
 
+    def bookmarks_by_url_by_date(self, n_days=365):
+        bookmarks_list, dates = self.bookmarks_by_date()
+
+        most_recent_n_days = dates[0:n_days]
+
+        urls_by_date = {}
+        texts_by_url = {}
+        for date in most_recent_n_days:
+            for bookmark in bookmarks_list[date]:
+                urls_by_date.setdefault(date, set()).add(bookmark.text.url)
+                texts_by_url.setdefault(bookmark.text.url, set()).add(bookmark.text)
+        return most_recent_n_days, urls_by_date, texts_by_url
+
+
     def bookmarks_to_study(self, bookmark_count=10):
         """
         :param bookmark_count: by default we recommend 10 words 
@@ -216,7 +235,7 @@ class User(db.Model):
 
         bookmarks = words_to_study.bookmarks_to_study(self, bookmark_count)
 
-        if len(bookmarks) == 0 and self.bookmark_count() ==0:
+        if len(bookmarks) == 0 and self.bookmark_count() == 0:
             # we have zero bookmarks in our account... better to generate some
             # bookmarks to study than just whistle...
 
