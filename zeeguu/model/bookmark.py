@@ -91,7 +91,7 @@ class Bookmark(db.Model):
         """
             if the user translates a superset of this sentence
         """
-        all_bookmarks_in_text = Bookmark.find_all_for_text(self.text)
+        all_bookmarks_in_text = Bookmark.find_all_for_user_and_text(self.user, self.text)
         for each in all_bookmarks_in_text:
             if each != self:
                 if self.origin.word in each.origin.word:
@@ -246,8 +246,8 @@ class Bookmark(db.Model):
         return cls.query.filter().all()
 
     @classmethod
-    def find_all_for_text(cls, text):
-        return cls.query.filter(cls.text == text).all()
+    def find_all_for_user_and_text(cls, text, user):
+        return cls.query.filter_by(text=text, user=user).all()
 
     @classmethod
     def find(cls, b_id):

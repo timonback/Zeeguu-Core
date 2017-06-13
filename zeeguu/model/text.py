@@ -67,9 +67,9 @@ class Text(db.Model):
 
         return shorter_text
 
-    def all_bookmarks(self):
+    def all_bookmarks(self, user):
         from zeeguu.model import Bookmark
-        return Bookmark.find_all_for_text(self)
+        return Bookmark.find_all_for_user_and_text(self, user)
 
     @classmethod
     def find_or_create(cls, session, text, language, url):
