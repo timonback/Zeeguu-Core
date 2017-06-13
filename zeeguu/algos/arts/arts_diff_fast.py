@@ -6,35 +6,20 @@ class ArtsDiffFast:
     ARTS algorithm with default values as described in:
     Adaptive response-time-based category sequencing in perceptual learning
     by Everett Mettler and Philip J. Kellman
+
+    a: Constant - general weight
+    D: Constant - enforced delay (trials)
+    b: Constant - weight for the response time
+    d: Constant - weight for the standard deviation (inside log)
+    w: Constant - priority increment for an error. Higher values let incorrect items appear quicker again
     """
 
-    """ Constant: maximal possible priority """
-    MAX_PRIORITY = 1000
-
-    """ Constant: enforced delay (trials) """
-    D = 2
-
-    """ Constant: general weight """
-    a = 0.1
-
-    """ Constant: weight for the response time """
-    b = 1.1
-
-    """ Constant: weight for the standard deviation (inside log) """
-    d = 1.7
-
-    """ Constant: priority increment for an error 
-    Higher values let incorrect items appear quicker again
-    """
-    w = 20
-
-    """ Calculate the ARTS priority
-    
-    Parameters:
-     N: number of trials since item was presented
-     alpha: 0, if item was last answered correct; 1 otherwise
-     RT: response time on most recent presentation
-    """
+    def __init__(self, a=0.1, D=2, b=1.1, d=1.7, w=20):
+        self.a = a
+        self.D = D
+        self.b = b
+        self.d = d
+        self.w = w
 
     def calculate(self, N, alpha, sd):
         return self.a \

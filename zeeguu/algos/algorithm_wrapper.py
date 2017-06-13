@@ -18,7 +18,7 @@ class AlgorithmWrapper:
 
     def _args_prepare(self, exercise, max_iterations):
         N = max_iterations - exercise.id
-        alpha = exercise.outcome.correct
+        alpha = not exercise.outcome.correct
         RT = exercise.solving_speed
         return N, alpha, RT
 
