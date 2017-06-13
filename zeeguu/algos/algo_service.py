@@ -2,22 +2,19 @@ import itertools
 import traceback
 
 import zeeguu
-
-from zeeguu.model.bookmark import Bookmark
-from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
-from zeeguu.model.exercise import Exercise
-from zeeguu.model.exercise_source import ExerciseSource
-
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
 from zeeguu.algos.analysis.normal_distribution import NormalDistribution
 from zeeguu.algos.arts.arts_rt import ArtsRT
+from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
+from zeeguu.model.exercise import Exercise
+from zeeguu.model.exercise_source import ExerciseSource
 from zeeguu.model.learner_stats.exercise_stats import ExerciseStats
 
 db = zeeguu.db
 
 
 class PriorityInfo:
-    MAX_PRIORITY = 1000
+    MAX_PRIORITY = 10
     NO_PRIORITY = -1000
 
     def __init__(self, bookmark, exercise, priority=MAX_PRIORITY):
@@ -32,7 +29,7 @@ class AlgoService:
         service calls the wrapper that calls the algorithm 
         
     """
-    algorithm_wrapper = AlgorithmWrapper(ArtsRT)
+    algorithm_wrapper = AlgorithmWrapper(ArtsRT())
 
     @classmethod
     def update_exercise_source_stats(cls):

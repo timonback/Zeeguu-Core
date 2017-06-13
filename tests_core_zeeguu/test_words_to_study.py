@@ -12,15 +12,16 @@ class WordsToStudyTest(ModelTestMixIn):
     def setUp(self):
         super().setUp()
 
-        BOOKMARK_COUNT = 10
+        self.BOOKMARK_COUNT = 10
 
         self.user_rule = UserRule()
-        self.user_rule.add_bookmarks(BOOKMARK_COUNT, exercises_count=1)
+        self.user_rule.add_bookmarks(self.BOOKMARK_COUNT, exercises_count=1)
         self.user = self.user_rule.user
 
     def test_new_bookmark_has_the_highest_priority(self):
         # GIVEN
         new_bookmark = self.user_rule.add_bookmarks(1)[0].bookmark
+        AlgoService.algorithm_wrapper.algorithm.D = self.BOOKMARK_COUNT
 
         # WHEN
         AlgoService.update_bookmark_priority(zeeguu.db, self.user)
@@ -29,8 +30,6 @@ class WordsToStudyTest(ModelTestMixIn):
         bookmark = self.__get_bookmark_with_highest_priority()
 
         assert new_bookmark == bookmark, "The newly added bookmark does not have the highest priority. Based on non existing exercise"
-
-
 
     def test_just_finished_bookmark_has_not_the_highest_priority(self):
         # GIVEN
