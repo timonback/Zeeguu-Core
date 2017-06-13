@@ -19,7 +19,6 @@ def bookmarks_to_study(user, desired_bookmarks_count=-1):
         else:
             zeeguu.log("rejected bookmark since it is not good for study: " + str(each.origin.word))
 
-
     return bookmarks[:desired_bookmarks_count]
 
 
