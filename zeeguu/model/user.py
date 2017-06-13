@@ -210,9 +210,6 @@ class User(db.Model):
         :return: 
         """
         from zeeguu.algos import words_to_study
-        from zeeguu.algos.algo_service import AlgoService
-
-        AlgoService.update_bookmark_priority(zeeguu.db, self)
 
         bookmarks = words_to_study.bookmarks_to_study(self, bookmark_count)
 
