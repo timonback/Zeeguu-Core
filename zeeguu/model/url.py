@@ -49,9 +49,13 @@ class Url(db.Model):
     def as_string(self):
         return self.domain.domain_name + self.path
 
-    def render_link(self, link_text):
+    def render_link(self, link_text = None):
+        if not link_text:
+            _title = self.title
+        else:
+            _title = link_text
         if self.as_string() != "":
-            return '<a href="' + self.as_string() + '">' + link_text + '</a>'
+            return '<a href="' + self.as_string() + '">' + _title + '</a>'
         else:
             return ""
 
