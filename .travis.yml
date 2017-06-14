@@ -16,6 +16,7 @@ cache:
 
 env:
   - ZEEGUU_CORE_CONFIG=$HOME/.config/zeeguu/core_test.cfg
+  - ALGORITHM_CONFIG_FILE=$HOME/.config/zeeguu/algorithms.ini
 
 install: "python3 setup.py install"
 

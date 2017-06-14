@@ -55,6 +55,8 @@ class Bookmark(db.Model):
 
     starred = db.Column(db.Boolean)
 
+    learned = db.Column(db.Boolean)
+
     def __init__(self, origin: UserWord, translation: UserWord, user: 'User',
                  text: str, time: datetime):
         self.origin = origin
@@ -63,6 +65,7 @@ class Bookmark(db.Model):
         self.time = time
         self.text = text
         self.stared = False
+        self.learned = False
 
     def __repr__(self):
         return "Bookmark[{3} of {4}: {0}->{1} in '{2}...']\n". \
@@ -134,21 +137,21 @@ class Bookmark(db.Model):
 
         last_outcome = self.latest_exercise_outcome()
 
-        if not last_outcome:
+        if last_outcome is not None:
             return self.quality_bookmark() and not self.events_prevent_further_study()
 
-        return (self.quality_bookmark and
-                not last_outcome.too_easy() and
-                not last_outcome.unknown_feedback() and
-                not self.events_prevent_further_study())
+        return self.quality_bookmark \
+               and not last_outcome.too_easy() \
+               and not last_outcome.unknown_feedback() \
+               and not self.events_prevent_further_study()
 
     def add_new_exercise_result(self, exercise_source, exercise_outcome,
                                 exercise_solving_speed):
         new_source = ExerciseSource.query.filter_by(
-            source=exercise_source.source
+                source=exercise_source.source
         ).first()
         new_outcome = ExerciseOutcome.query.filter_by(
-            outcome=exercise_outcome.outcome
+                outcome=exercise_outcome.outcome
         ).first()
         exercise = Exercise(new_outcome, new_source, exercise_solving_speed,
                             datetime.now())
@@ -174,14 +177,14 @@ class Bookmark(db.Model):
             print(str(e))
 
         result = dict(
-            id=self.id,
-            to=translation_word,
-            from_lang=self.origin.language_id,
-            to_lang=self.translation.language.id,
-            title=self.text.url.title,
-            url=self.text.url.as_string(),
-            origin_importance=Word.stats(self.origin.word,
-                                         self.origin.language_id).importance
+                id=self.id,
+                to=translation_word,
+                from_lang=self.origin.language_id,
+                to_lang=self.translation.language.id,
+                title=self.text.url.title,
+                url=self.text.url.as_string(),
+                origin_importance=Word.stats(self.origin.word,
+                                             self.origin.language_id).importance
         )
         result["from"] = self.origin.word
         if with_context:
@@ -238,7 +241,7 @@ class Bookmark(db.Model):
     @classmethod
     def find_by_specific_user(cls, user):
         return cls.query.filter_by(
-            user=user
+                user=user
         ).all()
 
     @classmethod
@@ -252,30 +255,30 @@ class Bookmark(db.Model):
     @classmethod
     def find(cls, b_id):
         return cls.query.filter_by(
-            id=b_id
+                id=b_id
         ).one()
 
     @classmethod
     def find_all_by_user_and_word(cls, user, word):
         return cls.query.filter_by(
-            user=user,
-            origin=word
+                user=user,
+                origin=word
         ).all()
 
     @classmethod
     def find_by_user_word_and_text(cls, user, word, text):
         return cls.query.filter_by(
-            user=user,
-            origin=word,
-            text=text
+                user=user,
+                origin=word,
+                text=text
         ).one()
 
     @classmethod
     def exists(cls, bookmark):
         try:
             cls.query.filter_by(
-                origin_id=bookmark.origin.id,
-                id=bookmark.id
+                    origin_id=bookmark.origin.id,
+                    id=bookmark.id
             ).one()
             return True
         except NoResultFound:
