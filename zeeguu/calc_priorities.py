@@ -1,8 +1,12 @@
 # -*- coding: utf8 -*-
+import csv
 import datetime
 import math
 import os
 import random
+
+from statistics import median
+from timeit import default_timer as timer
 
 import flask_sqlalchemy
 from flask import Flask
@@ -85,24 +89,27 @@ class Fancinator:
         self.algo_wrapper = new_algorithm_wrapper
 
     def calc_algorithm_stats(self, verbose=True):
+        if len(self.bookmarks) == 0:
+            return None
+
         random.seed(0)
 
-        calculation_helpers = self.__run_algorithm_on_bookmarks(self.bookmarks, verbose)
-        return self.__calc_algorithm_result_stats(calculation_helpers)
+        calculation_helpers = self.__run_algorithm_on_bookmarks(self.bookmarks, verbose=verbose)
+        return self.__calc_algorithm_result_stats(calculation_helpers, verbose=verbose)
 
     def __get_bookmarks_for_user(self, user_id):
         user = User.find_by_id(user_id)
         print('Using user ' + user.name + ' with id ' + str(user.id))
         return user.all_bookmarks()
 
-    def __run_algorithm_on_bookmarks(self, bookmarks, verbose=True):
+    def __run_algorithm_on_bookmarks(self, bookmarks, iterations=200, verbose=True):
         if verbose:
             print('Found ' + str(len(bookmarks)) + ' bookmarks')
 
         calculation_helpers = [CalculationHelper(x) for x in bookmarks]
         next_bookmark = calculation_helpers[0]  # to know which exercise to generate next
 
-        for i in range(0, 200):
+        for i in range(0, iterations):
             new_exercise = next_bookmark.average_exercise.append_new_exercise(i)
             if verbose:
                 print("{:4} - {:} - {:1}".format(i, next_bookmark.bookmark.id, new_exercise.outcome.correct), end=', ')
@@ -133,8 +140,16 @@ class Fancinator:
                 print('')
         return calculation_helpers
 
-    def __calc_algorithm_result_stats(self, calculation_helpers):
-        words_in_parallel = [0 for _ in calculation_helpers]
+    def __calc_algorithm_result_stats(self, calculation_helpers, verbose=False):
+        # get the amount of iterations run
+        iterations = max(
+            [max(
+                map(lambda x: x[0], c.average_exercise.priorities)
+                , default=0)
+                for c in calculation_helpers]
+        ) + 1
+
+        words_in_parallel = [0 for _ in range(0, iterations)]
         repetition_correct = []  # bookmark, iterations
         repetition_incorrect = []
         for calculation_helper in calculation_helpers:
@@ -158,14 +173,15 @@ class Fancinator:
         repetition_correct_mean = mean(repetition_correct)
         repetition_incorrect_mean = mean(repetition_incorrect)
 
-        print('Concurrent words on average                        {:.4}, in raw: {:}'
-              .format(words_in_parallel_mean, words_in_parallel))
+        if verbose:
+            print('Concurrent words on average                        {:.4}, in raw: {:}'
+                  .format(words_in_parallel_mean, words_in_parallel))
 
-        print('Repetition of correct words on average for every   {:.4}, in raw: {:}'
-              .format(repetition_correct_mean, repetition_correct))
+            print('Repetition of correct words on average for every   {:.4}, in raw: {:}'
+                  .format(repetition_correct_mean, repetition_correct))
 
-        print('Repetition of incorrect words on average for every {:.4}, in raw: {:}'
-              .format(repetition_incorrect_mean, repetition_incorrect))
+            print('Repetition of incorrect words on average for every {:.4}, in raw: {:}'
+                  .format(repetition_incorrect_mean, repetition_incorrect))
 
         return [words_in_parallel_mean, repetition_correct_mean, repetition_incorrect_mean]
 
@@ -199,6 +215,9 @@ class AlgorithmEvaluator:
         self.change_limit = change_limit
 
     def fit_parameters(self, variables_to_set, optimization_goals):
+        if len(self.fancy.bookmarks) == 0:
+            return None
+
         iteration_counter = 0
         tick_tock = 0
 
@@ -208,8 +227,8 @@ class AlgorithmEvaluator:
 
         while change > self.change_limit or tick_tock != 0:
             print('------------------------------------------------------------------------')
-            print('New iteration of the algorithm tickTock={}, variables={}'
-                  .format(tick_tock, variables_to_set))
+            print('Iteration {:3d} of the algorithm tickTock={}, variables={}'
+                  .format(iteration_counter, tick_tock, variables_to_set))
 
             new_variable_value = math.fabs(variables_to_set[tick_tock][1] + variables_to_set[tick_tock][2])
             setattr(self.algorithm, variables_to_set[tick_tock][0], new_variable_value)
@@ -289,18 +308,47 @@ class AlgorithmEvaluator:
 
 
 if __name__ == "__main__":
-    user_id = 1
-    # fancy = Fancinator(user_id)
-    # fancy.calc_algorithm_stats()
-
-    algorithm = ArtsRT()
-    variables_to_set = [['D', getattr(algorithm, 'D'), +5], ['b', getattr(algorithm, 'b'), +10],
-                        ['w', getattr(algorithm, 'w'), +10]]
     optimization_goals = OptimizationGoals(
-        words_in_parallel=30, words_in_parallel_factor=3,
+        words_in_parallel=20, words_in_parallel_factor=3,
         repetition_correct_factor=0,
         repetition_incorrect_factor=0
     )
 
-    evaluator = AlgorithmEvaluator(user_id, algorithm, change_limit=1.0)
-    print(evaluator.fit_parameters(variables_to_set, optimization_goals))
+    users = User.find_all()
+
+    start = timer()
+
+    user_ids = [user.id for user in users]
+    results = []
+    for user_id in user_ids:
+        algorithm = ArtsRT()
+        evaluator = AlgorithmEvaluator(user_id, algorithm, change_limit=1.0)
+        variables_to_set = [
+            ['D', getattr(algorithm, 'D'), +5],
+            ['b', getattr(algorithm, 'b'), +10],
+            ['w', getattr(algorithm, 'w'), +10]
+        ]
+        result = evaluator.fit_parameters(variables_to_set, optimization_goals)
+        if result is not None:
+            result = [user_id, list(map(lambda x: [x[0], x[1]], result))]
+            results.append(result)
+        else:
+            print('This user has no bookmarks. Skipping.')
+    end = timer()
+
+    print(results)
+
+    parameters_d = list(map(lambda x: x[1][0][1], results))
+    parameters_b = list(map(lambda x: x[1][1][1], results))
+    parameters_w = list(map(lambda x: x[1][2][1], results))
+    print('Complete calculation took {:10.2f}s'.format((end-start)))
+    print('Printing results based on {} users ({} users have no bookmark and are skipped)'.format(len(results), len(user_ids)-len(results)))
+    print('D: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_d), median(parameters_d), min(parameters_d), max(parameters_d)))
+    print('b: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_b), median(parameters_b), min(parameters_b), max(parameters_b)))
+    print('w: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_w), median(parameters_w), min(parameters_w), max(parameters_w)))
+
+    with open('calc_priority.csv', 'w') as myfile:
+        wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+        wr.writerow(parameters_d)
+        wr.writerow(parameters_b)
+        wr.writerow(parameters_w)
