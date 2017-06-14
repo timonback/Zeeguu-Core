@@ -11,6 +11,7 @@ from tests_core_zeeguu.rules.user_rule import UserRule
 from zeeguu.algos.ab_testing import ABTesting
 from zeeguu.algos.algo_service import AlgoService
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
+from zeeguu.algos.arts import ArtsRandom
 from zeeguu.algos.arts.arts_rt import ArtsRT
 
 
@@ -99,18 +100,22 @@ class WordsToStudyTest(ModelTestMixIn):
         config = configparser.ConfigParser()
 
         for i in range(0, algorithm_count):
-            new_algorithm = ArtsRT(
-                    a=random.randint(1, 100),
-                    d=random.randint(1, 5),
-                    b=random.randint(1, 100),
-                    r=random.randint(1, 100),
-                    w=random.randint(1, 100)
-            )
+            kwargs = {
+                'a': random.randint(1, 100),
+                'd': random.randint(1, 5),
+                'b': random.randint(1, 100),
+                'r': random.randint(1, 100),
+                'w': random.randint(1, 100)
+            }
+            if random.randint(0, 1):
+                new_algorithm = ArtsRT(**kwargs)
+            else:
+                new_algorithm = ArtsRandom(**kwargs)
 
             algorithms.append(new_algorithm)
 
             config[self.faker.word() + str(i)] = {
-                'type': 'ArtsRT',
+                'type': type(new_algorithm).__name__,
                 'a': str(new_algorithm.a),
                 'd': str(new_algorithm.d),
                 'b': str(new_algorithm.b),
