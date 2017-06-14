@@ -13,16 +13,16 @@ class ArtsRT:
     w: Constant - priority increment for an error. Higher values let incorrect items appear quicker again
     """
 
-    def __init__(self, a=0.1, D=2, b=1.1, r=1.7, w=20):
+    def __init__(self, a=0.1, d=2, b=1.1, r=1.7, w=20):
         self.a = a
-        self.D = D
+        self.d = d
         self.b = b
         self.r = r
         self.w = w
 
     def __eq__(self, other):
         return self.a == other.a \
-               and self.D == other.D \
+               and self.d == other.d \
                and self.b == other.b \
                and self.r == other.r \
                and self.w == other.w
@@ -37,7 +37,7 @@ class ArtsRT:
         """
         N, alpha, RT = args
         return self.a \
-               * (N - self.D) \
+               * (N - self.d) \
                * (
                    (1 - alpha) * self.b * math.log(RT / self.r)
                    + (alpha * self.w)

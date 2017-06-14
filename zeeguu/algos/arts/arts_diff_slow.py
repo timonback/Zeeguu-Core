@@ -8,23 +8,23 @@ class ArtsDiffSlow:
     by Everett Mettler and Philip J. Kellman
 
     a: Constant - general weight
-    D: Constant - enforced delay (trials)
+    d: Constant - enforced delay (trials)
     b: Constant - weight for the response time
-    d: Constant - weight for the standard deviation (inside log)
+    r: Constant - weight for the standard deviation (inside log)
     w: Constant - priority increment for an error. Higher values let incorrect items appear quicker again
     """
 
-    def __init__(self, a=0.1, D=2, b=1.1, d=1.7, w=20):
+    def __init__(self, a=0.1, d=2, b=1.1, r=1.7, w=20):
         self.a = a
-        self.D = D
-        self.b = b
         self.d = d
+        self.b = b
+        self.r = r
         self.w = w
 
     def calculate(self, N, alpha, sd):
         return self.a \
-               * (N - self.D) \
+               * (N - self.d) \
                * (
-                   (1 - alpha) * self.b / (math.e ** (self.d * sd))
+                   (1 - alpha) * self.b / (math.e ** (self.r * sd))
                    + (alpha * self.w)
                )

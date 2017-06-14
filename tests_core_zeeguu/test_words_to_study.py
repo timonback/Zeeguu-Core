@@ -101,7 +101,7 @@ class WordsToStudyTest(ModelTestMixIn):
         for i in range(0, algorithm_count):
             new_algorithm = ArtsRT(
                     a=random.randint(1, 100),
-                    D=random.randint(1, 5),
+                    d=random.randint(1, 5),
                     b=random.randint(1, 100),
                     r=random.randint(1, 100),
                     w=random.randint(1, 100)
@@ -110,8 +110,9 @@ class WordsToStudyTest(ModelTestMixIn):
             algorithms.append(new_algorithm)
 
             config[self.faker.word() + str(i)] = {
+                'type': 'ArtsRT',
                 'a': str(new_algorithm.a),
-                'D': str(new_algorithm.D),
+                'd': str(new_algorithm.d),
                 'b': str(new_algorithm.b),
                 'r': str(new_algorithm.r),
                 'w': str(new_algorithm.w)

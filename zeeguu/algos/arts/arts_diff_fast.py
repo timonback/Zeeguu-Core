@@ -14,17 +14,17 @@ class ArtsDiffFast:
     w: Constant - priority increment for an error. Higher values let incorrect items appear quicker again
     """
 
-    def __init__(self, a=0.1, D=2, b=1.1, d=1.7, w=20):
+    def __init__(self, a=0.1, d=2, b=1.1, r=1.7, w=20):
         self.a = a
-        self.D = D
-        self.b = b
         self.d = d
+        self.b = b
+        self.r = r
         self.w = w
 
     def calculate(self, N, alpha, sd):
         return self.a \
-               * (N - self.D) \
+               * (N - self.d) \
                * (
-                   (1 - alpha) * self.b * (math.e ** (self.d * sd))
+                   (1 - alpha) * self.b * (math.e ** (self.r * sd))
                    + (alpha * self.w)
                )

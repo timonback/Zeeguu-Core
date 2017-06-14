@@ -1,22 +1,40 @@
 import configparser
+import importlib
 
+import zeeguu
 import zeeguu.util.configuration as utils
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
-from zeeguu.algos.arts.arts_rt import ArtsRT
 
 
 class ABTesting:
     @staticmethod
+    def create_algorithm(parameters):
+        try:
+            algorithm_name = parameters['type']
+            del parameters['type']
+
+            parameters_converted = {key: int(val) for (key, val) in parameters.items()}
+
+            algorithm_class = getattr(importlib.import_module('zeeguu.algos.arts'), algorithm_name)
+            return algorithm_class(**parameters_converted)
+
+        except AttributeError as e:
+            zeeguu.log('The specified algorithm class could not be found.')
+            zeeguu.log(str(e))
+            exit(-1)
+
+    @staticmethod
+    def get_dict_from_config(section):
+        keys = [key for key in section]
+        vals = [val for val in section.values()]
+        return dict(zip(keys, vals))
+
+    @staticmethod
     def load_algorithms(config):
         algorithms = []
         for s in config.sections():
-            new_algorithm = ArtsRT(
-                    a=float(config[s]['a']),
-                    D=float(config[s]['D']),
-                    b=float(config[s]['b']),
-                    r=float(config[s]['r']),
-                    w=float(config[s]['w'])
-            )
+            parameters = ABTesting.get_dict_from_config(config[s])
+            new_algorithm = ABTesting.create_algorithm(parameters)
             algorithms.append(new_algorithm)
 
         return algorithms
