@@ -95,6 +95,8 @@ class AlgoService:
         else:
             priority_info.priority = PriorityInfo.MAX_PRIORITY
 
+        priority_info.bookmark.learned = priority_info.bookmark.good_for_study()
+
         return priority_info
 
     @staticmethod

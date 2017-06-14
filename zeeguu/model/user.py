@@ -213,7 +213,7 @@ class User(db.Model):
 
         bookmarks = words_to_study.bookmarks_to_study(self, bookmark_count)
 
-        if len(bookmarks) == 0 and self.bookmark_count() ==0:
+        if len(bookmarks) == 0 and self.bookmark_count() == 0:
             # we have zero bookmarks in our account... better to generate some
             # bookmarks to study than just whistle...
 

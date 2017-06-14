@@ -28,6 +28,8 @@ class WordsToStudyTest(ModelTestMixIn):
             algorithm_count=random.randint(2, 5))
         ABTesting._algorithms = ABTesting.load_algorithms(self.config)
 
+        AlgoService.update_bookmark_priority(self.db, self.user)
+
     def test_just_finished_bookmark_has_not_the_highest_priority(self):
         # GIVEN
         ABTesting._algorithms = [self.algorithms[random.randint(0, len(self.algorithms) - 1)]]
@@ -69,7 +71,7 @@ class WordsToStudyTest(ModelTestMixIn):
     def test_get_algorithm_wrapper_by_id(self):
         new_bookmark = BookmarkRule(self.user).bookmark
 
-        idx_should_be = divmod(new_bookmark.id, len(self.algorithms))[1]
+        idx_should_be = new_bookmark.id % len(self.algorithms)
         algorithm_should_be = self.algorithms[idx_should_be]
         wrapper_should_be = AlgorithmWrapper(algorithm_should_be)
 
@@ -80,10 +82,16 @@ class WordsToStudyTest(ModelTestMixIn):
 
     def __get_bookmark_with_highest_priority(self):
         bookmarks_to_study = self.user.bookmarks_to_study()
+        if len(bookmarks_to_study) == 0:
+            return None
+
         return bookmarks_to_study[0]
 
     def __get_bookmark_with_lowest_priority(self):
         bookmarks_to_study = self.user.bookmarks_to_study()
+        if len(bookmarks_to_study) == 0:
+            return None
+
         return bookmarks_to_study[-1]
 
     def __get_config_with_random_algorithm_parameters(self, algorithm_count=1):

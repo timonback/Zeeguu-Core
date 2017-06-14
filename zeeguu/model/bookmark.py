@@ -137,10 +137,10 @@ class Bookmark(db.Model):
 
         last_outcome = self.latest_exercise_outcome()
 
-        if last_outcome is not None:
+        if last_outcome is None:
             return self.quality_bookmark() and not self.events_prevent_further_study()
 
-        return self.quality_bookmark \
+        return self.quality_bookmark() \
                and not last_outcome.too_easy() \
                and not last_outcome.unknown_feedback() \
                and not self.events_prevent_further_study()
@@ -285,13 +285,10 @@ class Bookmark(db.Model):
             return False
 
     def latest_exercise_outcome(self):
-        sorted_exercise_log_by_latest = sorted(self.exercise_log,
-                                               key=lambda x: x.time,
-                                               reverse=True)
-        if sorted_exercise_log_by_latest:
-            return sorted_exercise_log_by_latest[0].outcome
-        else:
+        if len(self.exercise_log) == 0:
             return None
+
+        return self.exercise_log[-1].outcome
 
     def check_if_learned_based_on_exercise_outcomes(self,
                                                     add_to_result_time=False):
