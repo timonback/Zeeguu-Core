@@ -53,9 +53,9 @@ class Bookmark(db.Model):
                                 secondary="bookmark_exercise_mapping",
                                 order_by="Exercise.id")
 
-    starred = db.Column(db.Boolean)
+    starred = db.Column(db.Boolean, default=False)
 
-    learned = db.Column(db.Boolean)
+    learned = db.Column(db.Boolean, default=False)
 
     def __init__(self, origin: UserWord, translation: UserWord, user: 'User',
                  text: str, time: datetime):

@@ -58,9 +58,10 @@ class AlgoService:
             if len(bookmarks_for_user) == 0:
                 return
 
+            bookmarks_not_learned = [x for x in bookmarks_for_user if not x.learned]
             # tuple(0=bookmark, 1=exercise)
-            bookmark_exercise_of_user = map(cls._get_exercise_of_bookmark, bookmarks_for_user)
-            b1, b2 = itertools.tee(bookmark_exercise_of_user, 2)
+            bookmark_exercise_pair = map(cls._get_exercise_of_bookmark, bookmarks_not_learned)
+            b1, b2 = itertools.tee(bookmark_exercise_pair, 2)
 
             max_iterations = max(pair.exercise.id if pair.exercise is not None else 0 for pair in b1)
             exercises_and_priorities = [cls._calculate_bookmark_priority(x, max_iterations) for x in b2]

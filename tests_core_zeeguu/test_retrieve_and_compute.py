@@ -12,6 +12,7 @@ from zeeguu.model.url import Url
 class TestRetrieveAndCompute(ModelTestMixIn):
     def setUp(self):
         super().setUp()
+
         self.user = UserRule().user
         self.lan = LanguageRule().de
 

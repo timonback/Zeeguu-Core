@@ -4,9 +4,9 @@ from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 
 
 def bookmarks_to_study(user, desired_bookmarks_count=-1):
-
     _bookmarks = Bookmark.query. \
         filter_by(user_id=user.id). \
+        filter_by(learned=False). \
         join(BookmarkPriorityARTS). \
         filter(BookmarkPriorityARTS.bookmark_id == Bookmark.id). \
         order_by(BookmarkPriorityARTS.priority.desc()). \
@@ -20,5 +20,3 @@ def bookmarks_to_study(user, desired_bookmarks_count=-1):
             zeeguu.log("rejected bookmark since it is not good for study: " + str(each.origin.word))
 
     return bookmarks[:desired_bookmarks_count]
-
-
