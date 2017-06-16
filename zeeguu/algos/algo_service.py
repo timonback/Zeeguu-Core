@@ -31,15 +31,20 @@ class AlgoService:
     """
     algorithm_wrapper = AlgorithmWrapper(ArtsRT())
 
+    # AlgorithmSDCaller requires that update_exercise_source_stats is being called at some point before
+    # algorithm_wrapper = AlgorithmSDCaller(ArtsDiffFast())
+
     @classmethod
     def update_exercise_source_stats(cls):
         exercise_sources = list(ExerciseSource.query.all())
         for source in exercise_sources:
-            exercises = Exercise.query.filter_by(source_id=source.id)
-            reaction_times = map(lambda x: x.solving_speed, exercises)
+            exercises = Exercise.query.filter_by(source_id=source.id).filter(Exercise.solving_speed <= 30000).all()
+            reaction_times = list(map(lambda x: x.solving_speed, exercises))
             mean, sd = NormalDistribution.calc_normal_distribution(
                 reaction_times)
-            exercise_stats = ExerciseStats(source, mean, sd)
+            if sd is None:
+                sd = 1000
+            exercise_stats = ExerciseStats.find_or_create(db.session, ExerciseStats(source, mean, sd))
             db.session.merge(exercise_stats)
 
         db.session.commit()
