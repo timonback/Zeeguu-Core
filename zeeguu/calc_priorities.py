@@ -4,7 +4,6 @@ import datetime
 import math
 import os
 import random
-
 from statistics import median
 from timeit import default_timer as timer
 
@@ -12,7 +11,7 @@ import flask_sqlalchemy
 from flask import Flask
 
 import zeeguu
-from zeeguu.algos.algo_service import PriorityInfo
+from zeeguu.algos.algo_service import PriorityInfo, AlgoService
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
 from zeeguu.algos.arts.arts_rt import ArtsRT
 from zeeguu.model import User, ExerciseOutcome, Exercise, ExerciseSource
@@ -103,8 +102,7 @@ class Fancinator:
         return user.all_bookmarks()
 
     def __run_algorithm_on_bookmarks(self, bookmarks, iterations=200, verbose=True):
-        if verbose:
-            print('Found ' + str(len(bookmarks)) + ' bookmarks')
+        print('Found ' + str(len(bookmarks)) + ' bookmarks')
 
         calculation_helpers = [CalculationHelper(x) for x in bookmarks]
         next_bookmark = calculation_helpers[0]  # to know which exercise to generate next
@@ -314,6 +312,8 @@ if __name__ == "__main__":
         repetition_incorrect_factor=0
     )
 
+    AlgoService.update_exercise_source_stats()
+
     users = User.find_all()
 
     start = timer()
@@ -330,7 +330,8 @@ if __name__ == "__main__":
         ]
         result = evaluator.fit_parameters(variables_to_set, optimization_goals)
         if result is not None:
-            result = [user_id, list(map(lambda x: [x[0], x[1]], result))]
+            count_bookmarks = len(evaluator.fancy.bookmarks)
+            result = [user_id, list(map(lambda x: [x[0], x[1]], result)), count_bookmarks]
             results.append(result)
         else:
             print('This user has no bookmarks. Skipping.')
@@ -338,17 +339,26 @@ if __name__ == "__main__":
 
     print(results)
 
+    users = list(map(lambda x: x[0], results))
     parameters_d = list(map(lambda x: x[1][0][1], results))
     parameters_b = list(map(lambda x: x[1][1][1], results))
     parameters_w = list(map(lambda x: x[1][2][1], results))
+    bookmarks = list(map(lambda x: x[2], results))
     print('Complete calculation took {:10.2f}s'.format((end-start)))
     print('Printing results based on {} users ({} users have no bookmark and are skipped)'.format(len(results), len(user_ids)-len(results)))
+    print('Average user has {:6.2f} bookmarks'.format(mean(bookmarks)))
     print('D: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_d), median(parameters_d), min(parameters_d), max(parameters_d)))
     print('b: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_b), median(parameters_b), min(parameters_b), max(parameters_b)))
     print('w: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_w), median(parameters_w), min(parameters_w), max(parameters_w)))
 
     with open('calc_priority.csv', 'w') as myfile:
-        wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-        wr.writerow(parameters_d)
-        wr.writerow(parameters_b)
-        wr.writerow(parameters_w)
+        wr = csv.writer(myfile)
+        wr.writerow(['user_id', 'd', 'b', 'w', 'bookmarks'])
+        rows = [users,
+                parameters_d,
+                parameters_b,
+                parameters_w,
+                bookmarks]
+
+        rows_zip = zip(*rows)
+        wr.writerows(rows_zip)
