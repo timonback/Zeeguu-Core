@@ -7,18 +7,16 @@ class NormalDistribution:
     def calc_normal_distribution(values):
         mean = NormalDistribution.mean(values)
         sd = NormalDistribution.calc_standard_deviation(values, mean)
-        return [mean, sd]
+        return mean, sd
 
     @staticmethod
     def calc_standard_deviation(values, mean):
         if len(values) == 0:
-            return -1
+            return None
 
-        sum = 0
-        for val in values:
-            sum += (val - mean) ** 2
+        s = sum([(val - mean) ** 2 for val in values])
 
-        avg = sum / len(values)
+        avg = s / len(values)
         sd = math.sqrt(avg)
         return sd
 

@@ -1,5 +1,6 @@
-import zeeguu
+import sqlalchemy
 
+import zeeguu
 from zeeguu.model.exercise_source import ExerciseSource
 
 db = zeeguu.db
@@ -24,3 +25,22 @@ class ExerciseStats(db.Model):
         self.exercise_source = exercise_source
         self.mean = mean
         self.sd = sd
+
+    @classmethod
+    def find(cls, exercise_stats):
+        return cls.query.filter_by(exercise_source_id=exercise_stats.exercise_source.id).one()
+
+    @classmethod
+    def find_or_create(cls, session, exercise_stats):
+        try:
+            entry = cls.find(exercise_stats)
+
+        except sqlalchemy.orm.exc.NoResultFound as e:
+            entry = cls(exercise_stats.exercise_source, exercise_stats.mean, exercise_stats.sd)
+        except Exception as e:
+            raise e
+
+        session.add(entry)
+        session.commit()
+
+        return entry
