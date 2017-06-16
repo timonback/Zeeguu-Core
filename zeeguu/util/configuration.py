@@ -36,10 +36,7 @@ def load_configuration_or_abort(app, environ_variable, mandatory_config_keys=[])
 
 def load_config_file(environ_variable):
     try:
-        config_file = os.environ[environ_variable]
-        return config_file
+        return os.environ[environ_variable]
     except Exception as e:
         print(str(e))
-        print((
-            "You must define a {0} environment var to be able to load the configuration. ".format(environ_variable)))
-        exit(-1)
+        print(("You must define a {0} environment var to be able to load the configuration. ".format(environ_variable)))
