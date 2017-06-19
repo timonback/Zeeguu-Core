@@ -10,7 +10,7 @@ class AlgorithmLoader:
             algorithm_name = parameters['type']
             del parameters['type']
 
-            parameters_converted = {key: int(val) for (key, val) in parameters.items()}
+            parameters_converted = {key: float(val) for (key, val) in parameters.items()}
 
             algorithm_class = getattr(importlib.import_module('zeeguu.algos.arts'), algorithm_name)
             return algorithm_class(**parameters_converted)

@@ -120,11 +120,11 @@ class WordsToStudyTest(ModelTestMixIn):
 
         for i in range(0, algorithm_count):
             kwargs = {
-                'a': random.randint(1, 100),
+                'a': random.uniform(1, 100),
                 'd': random.randint(1, 5),
-                'b': random.randint(1, 100),
-                'r': random.randint(1, 100),
-                'w': random.randint(1, 100)
+                'b': random.uniform(1, 100),
+                'r': random.uniform(1, 100),
+                'w': random.uniform(1, 100)
             }
             if random.randint(0, 1):
                 new_algorithm = ArtsRT(**kwargs)
