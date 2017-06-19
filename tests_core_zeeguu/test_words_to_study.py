@@ -10,6 +10,7 @@ from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
 from tests_core_zeeguu.rules.user_rule import UserRule
 from zeeguu.algos.ab_testing import ABTesting
 from zeeguu.algos.algo_service import AlgoService
+from zeeguu.algos.algorithm_loader import AlgorithmLoader
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
 from zeeguu.algos.arts import ArtsRandom
 from zeeguu.algos.arts.arts_rt import ArtsRT
@@ -27,7 +28,7 @@ class WordsToStudyTest(ModelTestMixIn):
 
         self.config, self.algorithms = self.__get_config_with_random_algorithm_parameters(
             algorithm_count=random.randint(2, 5))
-        ABTesting._algorithms = ABTesting.load_algorithms(self.config)
+        ABTesting._algorithms = AlgorithmLoader.load_algorithms(self.config)
 
         AlgoService.update_bookmark_priority(self.db, self.user)
 
@@ -54,7 +55,7 @@ class WordsToStudyTest(ModelTestMixIn):
     def test_load_algorithms(self):
         algorithm_should_be = self.algorithms[0]
 
-        algorithms_loaded = ABTesting.load_algorithms(self.config)
+        algorithms_loaded = AlgorithmLoader.load_algorithms(self.config)
         algorithm_to_check = algorithms_loaded[0]
 
         assert algorithm_to_check == algorithm_should_be
