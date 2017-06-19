@@ -81,6 +81,24 @@ class WordsToStudyTest(ModelTestMixIn):
 
         assert wrapper_should_be == wrapper_to_check
 
+    def test_load_algorithms_from_file(self):
+        assert len(ABTesting._algorithms) >= 1
+
+    def test_group_bookmarks_per_algorithm(self):
+        bookmarks = self.user.all_bookmarks()
+        count_bookmarks_to_group = len(bookmarks) - (len(bookmarks) % len(ABTesting._algorithms))
+        bookmarks_to_group = bookmarks[:count_bookmarks_to_group]
+
+        group_count_should_be = len(ABTesting._algorithms)
+        bookmark_count_per_group_should_be = int(count_bookmarks_to_group // len(ABTesting._algorithms))
+
+        groups_created_by_ABTesting = ABTesting.split_bookmarks_based_on_algorithm(bookmarks_to_group)
+        group_count_to_check = len(groups_created_by_ABTesting)
+        bookmark_count_per_group_to_check = max([len(g) for g in groups_created_by_ABTesting])
+
+        assert group_count_to_check == group_count_should_be \
+               and bookmark_count_per_group_to_check == bookmark_count_per_group_should_be
+
     def __get_bookmark_with_highest_priority(self):
         bookmarks_to_study = self.user.bookmarks_to_study()
         if len(bookmarks_to_study) == 0:

@@ -24,10 +24,10 @@ class BookmarkRule(BaseRule):
 
         random_text = TextRule().text
 
-        random_origin_word = self.faker.word()
+        random_origin_word = self.faker.word() + str(random.random())
         random_origin_language = LanguageRule().random
 
-        random_translation_word = self.faker.word()
+        random_translation_word = self.faker.word() + str(random.random())
         random_translation_language = LanguageRule().random
 
         if UserWord.exists(random_origin_word, random_origin_language) \

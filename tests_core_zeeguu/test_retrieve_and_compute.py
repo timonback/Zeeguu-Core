@@ -1,4 +1,3 @@
-import zeeguu
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.language_rule import LanguageRule
 from tests_core_zeeguu.rules.user_rule import UserRule

@@ -4,8 +4,8 @@ import time
 
 import feedparser
 import sqlalchemy.orm.exc
-import zeeguu
 
+import zeeguu
 from zeeguu.model.language import Language
 from zeeguu.model.url import Url
 
@@ -43,23 +43,23 @@ class RSSFeed(db.Model):
             image_url = self.image_url.as_string()
 
         return dict(
-            id=self.id,
-            title=self.title,
-            url=self.url.as_string(),
-            description=self.description,
-            language=self.language.id,
-            image_url=image_url
+                id=self.id,
+                title=self.title,
+                url=self.url.as_string(),
+                description=self.description,
+                language=self.language.id,
+                image_url=image_url
         )
 
     def feed_items(self):
         feed_data = feedparser.parse(self.url.as_string())
         feed_items = [
             dict(
-                title=item.get("title", ""),
-                url=item.get("link", ""),
-                content=item.get("content", ""),
-                summary=item.get("summary", ""),
-                published=time.strftime("%Y-%m-%dT%H:%M:%S%z", item.published_parsed)
+                    title=item.get("title", ""),
+                    url=item.get("link", ""),
+                    content=item.get("content", ""),
+                    summary=item.get("summary", ""),
+                    published=time.strftime("%Y-%m-%dT%H:%M:%S%z", item.published_parsed)
             )
             for item in feed_data.entries]
 
@@ -73,7 +73,6 @@ class RSSFeed(db.Model):
         except Exception as e:
             print(e)
             return None
-
 
     @classmethod
     def find_by_url(cls, url):
@@ -96,11 +95,8 @@ class RSSFeed(db.Model):
 
         feed_items = self.feed_items()
         urls = [each['url'] for each in feed_items]
-        urls_and_metrics = retrieve_urls_and_compute_metrics(urls,
-                                                             self.language,
-                                                             user,
-                                                             timeout)
-        filtered_feed_items = [dict(list(each.items()) + list({"metrics":urls_and_metrics.get(each['url'])}.items()))
+        urls_and_metrics = retrieve_urls_and_compute_metrics(urls, self.language, user, timeout)
+        filtered_feed_items = [dict(list(each.items()) + list({"metrics": urls_and_metrics.get(each['url'])}.items()))
                                for each in feed_items
                                if each["url"] in list(urls_and_metrics.keys())]
 

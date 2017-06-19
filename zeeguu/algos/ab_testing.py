@@ -1,8 +1,6 @@
 import configparser
 import importlib
 
-import itertools
-
 import zeeguu
 import zeeguu.util.configuration as utils
 from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
@@ -67,8 +65,6 @@ class ABTesting:
 
     @classmethod
     def split_bookmarks_based_on_algorithm(cls, bookmarks):
-        # groups = [bookmarks[i] for i in range(0, len(bookmarks), len(cls._algorithms))]
-        # groups = [list(v) for k, v in itertools.groupby(bookmarks, key=lambda x: (x.id % len(cls._algorithms)))]
         groups = []
         for i in range(0, len(cls._algorithms)):
             groups.append([bookmarks[v] for v in range(i, len(bookmarks), len(cls._algorithms))])
