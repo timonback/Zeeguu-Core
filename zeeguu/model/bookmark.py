@@ -192,8 +192,7 @@ class Bookmark(db.Model):
         return result
 
     @classmethod
-    def find_or_create(cls, session,
-                       user,
+    def find_or_create(cls, session, user,
                        _origin: str, _origin_lang: str,
                        _translation: str, _translation_lang: str,
                        _context: str, _url: str, _url_title: str):
@@ -298,30 +297,31 @@ class Bookmark(db.Model):
         :param add_to_result_time:
         :return:
         """
-        sorted_exercise_log_by_latest = sorted(self.exercise_log,
-                                               key=lambda x: x.time,
-                                               reverse=True)
+        if len(self.exercise_log) == 0:
+            if add_to_result_time:
+                return False, None
 
-        if sorted_exercise_log_by_latest:
-            last_exercise = sorted_exercise_log_by_latest[0]
+            return False
 
-            # If last outcome is TOO EASY we know it
-            if last_exercise.outcome.outcome == ExerciseOutcome.TOO_EASY:
-                if add_to_result_time:
-                    return True, last_exercise.time
-                return True
+        last_exercise = self.exercise_log[-1]
 
-            CORRECTS_IN_A_ROW = 5
-            if len(sorted_exercise_log_by_latest) > CORRECTS_IN_A_ROW:
+        # If last outcome is TOO EASY we know it
+        if last_exercise.outcome.outcome == ExerciseOutcome.TOO_EASY:
+            if add_to_result_time:
+                return True, last_exercise.time
 
-                # If we got it right for the last CORRECTS_IN_A_ROW times, we know it
-                if all(exercise.outcome.outcome == ExerciseOutcome.CORRECT for
-                       exercise in
-                       sorted_exercise_log_by_latest[0:CORRECTS_IN_A_ROW - 1]):
-                    return True, last_exercise.time
+            return True
+
+        CORRECTS_IN_A_ROW = 5
+        if len(self.exercise_log) >= CORRECTS_IN_A_ROW:
+
+            # If we got it right for the last CORRECTS_IN_A_ROW times, we know it
+            if all(exercise.outcome.correct for exercise in self.exercise_log[-CORRECTS_IN_A_ROW:]):
+                return True, last_exercise.time
 
         if add_to_result_time:
             return False, None
+
         return False
 
     def events_indicate_its_learned(self):
@@ -337,7 +337,7 @@ class Bookmark(db.Model):
 
     def has_been_learned(self, also_return_time=False):
         # TODO: This must be stored in the DB together with the
-        # bookmark... once a bookmark has been learned, we shoud
+        # bookmark... once a bookmark has been learned, we should
         # not ever doubt it ...
 
         """
@@ -353,8 +353,8 @@ class Bookmark(db.Model):
         if learned:
             if also_return_time:
                 return True, time
-            else:
-                return True
+
+            return True
 
         # The second case is when we have an event in the smartwatch event log
         # that indicates that the word has been learned
