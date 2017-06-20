@@ -206,8 +206,8 @@ class Bookmark(db.Model):
         :return:
         """
 
-        origin_lang = Language.find(_origin_lang)
-        translation_lang = Language.find(_translation_lang)
+        origin_lang = Language.find_or_create(_origin_lang)
+        translation_lang = Language.find_or_create(_translation_lang)
 
         origin = UserWord.find_or_create(session, _origin, origin_lang)
 

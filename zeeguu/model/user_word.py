@@ -33,15 +33,19 @@ class UserWord(db.Model, util.JSONSerializable):
     def __repr__(self):
         return '<UserWord %r>' % (self.word)
 
+    def __eq__(self, other):
+        return self.word == other.word and self.language == other.language
+
     def serialize(self):
         return self.word
 
     # returns a number between 0 and 10
     def importance_level(self):
-        stats = Word.stats(self.word, self.language.id)
-        if stats:
+        try:
+            stats = Word.stats(self.word, self.language.id)
             return int(min(stats.importance, 10))
-        else:
+        except ValueError:
+            zeeguu.log('Word "{0}" not in language {1} stats.'.format(self.word, self.language.id))
             return 0
 
     # we use this in the bookmarks.html to show the importance of a word
@@ -51,37 +55,31 @@ class UserWord(db.Model, util.JSONSerializable):
 
     @classmethod
     def find(cls, _word: str, language: Language):
-            return (cls.query.filter(cls.word == _word)
-                    .filter(cls.language == language)
-                    .one())
+        return (cls.query.filter(cls.word == _word)
+                .filter(cls.language == language)
+                .one())
 
     @classmethod
     def find_or_create(cls, session, _word: str, language: Language):
-
         try:
             return cls.find(_word, language)
-
         except sqlalchemy.orm.exc.NoResultFound:
-
             try:
                 new = cls(_word, language)
                 session.add(new)
                 session.commit()
                 return new
-
             except:
-
                 for _ in range(10):
                     try:
                         session.rollback()
                         w = cls.find(_word, language)
-                        print ("successfully avoided race condition. nice! ")
+                        print("successfully avoided race condition. nice! ")
                         return w
                     except sqlalchemy.orm.exc.NoResultFound:
                         time.sleep(0.3)
                         continue
                     break
-
 
     @classmethod
     def find_all(cls):
@@ -96,8 +94,8 @@ class UserWord(db.Model, util.JSONSerializable):
     def exists(cls, word, language):
         try:
             cls.query.filter_by(
-                language=language,
-                word=word
+                    language=language,
+                    word=word
             ).one()
             return True
         except NoResultFound:

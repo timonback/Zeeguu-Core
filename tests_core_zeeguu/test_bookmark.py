@@ -69,7 +69,7 @@ class BookmarkTest(ModelTestMixIn):
         random_bookmarks = [BookmarkRule(self.user).bookmark for _ in range(0, 3)]
 
         random_bookmarks[0].origin = random_bookmarks[0].translation
-        random_bookmarks[1].origin.word = self.faker.sentence(nb_words=6)
+        random_bookmarks[1].origin.word = self.faker.sentence(nb_words=10)
         random_bookmarks[2].origin.word = self.faker.word()[:2]
 
         for b in random_bookmarks:
