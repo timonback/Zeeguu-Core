@@ -97,19 +97,6 @@ class BookmarkTest(ModelTestMixIn):
 
         assert exercise_count_after > exercise_count_before
 
-    def test_split_words_from_context(self):
-        random_bookmark = BookmarkRule(self.user).bookmark
-        random_text_list = random_bookmark.text.content.split()
-        random_idx = random.randint(0, len(random_text_list) - 1)
-        random_word = random_text_list[random_idx]
-        random_bookmark.origin.word = random_word
-
-        list_should_be = [''.join(c for c in w if c not in string.punctuation) for w in random_text_list if w != random_word]
-
-        list_to_check = random_bookmark.split_words_from_context()
-
-        assert list_to_check == list_should_be
-
     def test_find_or_create(self):
         bookmark_should_be = BookmarkRule(self.user).bookmark
         bookmark_to_check = Bookmark.find_or_create(self.db.session, self.user,
