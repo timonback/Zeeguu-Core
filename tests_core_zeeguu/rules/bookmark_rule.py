@@ -1,5 +1,6 @@
 import random
 import re
+from datetime import timedelta
 
 from tests_core_zeeguu.rules.base_rule import BaseRule
 from tests_core_zeeguu.rules.language_rule import LanguageRule
@@ -38,7 +39,7 @@ class BookmarkRule(BaseRule):
                                      random_origin_language).user_word
         random_translation = UserWordRule(random_translation_word,
                                           random_translation_language).user_word
-        random_date = self.faker.date_time_this_month()
+        random_date = self.faker.date_time_this_month() - timedelta(days=1)
 
         bookmark = Bookmark(random_origin, random_translation, user,
                             random_text, random_date)

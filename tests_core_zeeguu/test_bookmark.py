@@ -133,9 +133,9 @@ class BookmarkTest(ModelTestMixIn):
         for b in list_should_be:
             assert b in list_to_check
 
-    def test_find_all_for_text(self):
+    def find_all_for_user_and_text(self):
         bookmark_should_be = self.user.all_bookmarks()[0]
-        bookmark_to_check = Bookmark.find_all_for_text(bookmark_should_be.text)
+        bookmark_to_check = Bookmark.find_all_for_user_and_text(bookmark_should_be.text, self.user)
 
         assert bookmark_should_be in bookmark_to_check
 

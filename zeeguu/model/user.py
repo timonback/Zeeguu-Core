@@ -5,6 +5,7 @@ import random
 import re
 
 import sqlalchemy.orm
+from sqlalchemy import Column, Table, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -38,6 +39,10 @@ class User(db.Model):
             db.ForeignKey(Language.id)
     )
     native_language = relationship(Language, foreign_keys=[native_language_id])
+
+    from zeeguu.model.cohort import Cohort
+    cohort_id = Column(Integer, ForeignKey(Cohort.id))
+    cohort = relationship(Cohort)
 
     def __init__(self, email, name, password, learned_language=None, native_language=None, invitation_code=None):
         self.email = email

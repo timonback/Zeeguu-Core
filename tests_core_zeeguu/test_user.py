@@ -38,7 +38,8 @@ class UserTest(ModelTestMixIn):
 
         last_bookmark_time = self.user.date_of_last_bookmark()
 
-        assert last_bookmark_time == random_bookmarks[-1].time
+        assert last_bookmark_time == random_bookmarks[-1].time, \
+            "{0} should be {1}".format(last_bookmark_time, random_bookmarks[-1].time)
 
     def test_active_during_recent(self):
         # User has no bookmarks, so he/she was not active recently
