@@ -4,6 +4,11 @@ from zeeguu.model.user_word import UserWord
 
 
 class UserWordRule(BaseRule):
+    """A Rule testing class for the zeeguu.model.UserWord model class.
+
+    Creates a UserWord object with random data and saves it to the database.
+    """
+
     def __init__(self, word=None, language=None):
         super().__init__()
 

@@ -2,6 +2,13 @@ from zeeguu.model.learner_stats.exercise_stats import ExerciseStats
 
 
 class AlgorithmWrapper:
+    """A Wrapper class for the ARTS algorithm implementations.
+
+    Needed to prepare the data received from the AlgoService for execution of the ARTS algorithm.
+    This preparation is needed in order to use the ARTS algorithms without copy and pasting all
+    preparation code (i.e. getting the N, alpha, and RT values) everywhere where the ARTS algorithm
+    is to be used.
+    """
 
     def __init__(self, algorithm):
         self.algorithm = algorithm
@@ -24,6 +31,13 @@ class AlgorithmWrapper:
 
 
 class AlgorithmSDCaller(AlgorithmWrapper):
+    """A extension of the AlgorithmWrapper which calculates the Standard deviation of a reaction time from the
+    population mean of an Exercise and passes it to the ARTS algorithm.
+
+    This wrapper is needed for implementations of the ARTS algorithm which use the Standard Deviation instead of the
+    Reaction Time (e.g. ArtsDiffSlow, ArtsDiffFast)
+    """
+
     def _args_prepare(self, exercise, max_iterations):
         N = max_iterations - exercise.id
         alpha = exercise.outcome.correct

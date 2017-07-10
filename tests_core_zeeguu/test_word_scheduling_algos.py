@@ -15,7 +15,7 @@ from zeeguu.algos.analysis.normal_distribution import NormalDistribution
 from zeeguu.algos.arts import ArtsDiffFast, ArtsDiffSlow, ArtsRT, ArtsRandom
 
 
-class AlgosTest(ModelTestMixIn):
+class WordSchedulingAlgosTest(ModelTestMixIn):
     def setUp(self):
         super().setUp()
 
@@ -77,7 +77,6 @@ class AlgosTest(ModelTestMixIn):
 
     """Tests for class AlgorithmLoader"""
     def test_create_algorithm(self):
-        test_kwargs = self.__get_random_algorithm_parameters()
         algorithm_should_be = self.__create_random_algorithm()
 
         test_parameters = self.__get_kwargs_from_algorithm(algorithm_should_be)

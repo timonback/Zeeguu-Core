@@ -6,7 +6,7 @@ from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
 
 
 class ABTesting:
-    _config_file = utils.load_config_file('ALGORITHM_CONFIG_FILE')
+    _config_file = utils.load_config_file('WORD_SCHEDULING_ALGORITHM_CONFIG')
 
     _config = configparser.ConfigParser()
     _config.read(_config_file)
@@ -14,12 +14,12 @@ class ABTesting:
 
     @classmethod
     def get_algorithm_for_id(cls, id):
-        """Returns an algorithm specified in ALGORITHM_CONFIG_FILE based on the modulo
+        """Returns an algorithm specified in WORD_SCHEDULING_ALGORITHM_CONFIG based on the modulo
         of the ID of the object and the number of algorithms
 
         :param id: An Integer, for which the algorithm should be returned
         :return: An AlgorithmWrapper containing an ArtsRT object with the parameters
-                 specified in ALGORITHM_CONFIG_FILE
+                 specified in WORD_SCHEDULING_ALGORITHM_CONFIG
         """
         count_algorithms = len(cls._algorithms)
         idx = divmod(id, count_algorithms)[1]

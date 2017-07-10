@@ -4,6 +4,10 @@ from zeeguu.model.smartwatch.watch_interaction_event import WatchInteractionEven
 
 
 class WatchInterationEventRule(BaseRule):
+    """
+    TODO: Write docstrings, @mircea ;-)
+    """
+
     def __init__(self, bookmark, watch_event_type=None):
         super().__init__()
 

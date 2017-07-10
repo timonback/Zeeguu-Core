@@ -3,6 +3,10 @@ from zeeguu.model.smartwatch.watch_event_type import WatchEventType
 
 
 class WatchEventTypeRule(BaseRule):
+    """
+    TODO: Write docstrings, @mircea ;-)
+    """
+
     def __init__(self):
         super().__init__()
 

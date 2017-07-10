@@ -1,11 +1,18 @@
 import math
 
+from zeeguu.algos.arts.arts_base import ArtsBase
 
-class ArtsDiffSlow:
+
+class ArtsDiffSlow((ArtsBase)):
     """
     ARTS algorithm with default values as described in:
     Adaptive response-time-based category sequencing in perceptual learning
     by Everett Mettler and Philip J. Kellman
+
+    This class emphasizes the differences between (on average) slow reaction times more than between (on average)
+    fast reaction times. This means that priorities of slightly different slow reaction times (e.g. 2000ms and
+    2050ms) differ more significantly (e.g. 10 and 50) than the priorities of slightly different fast reaction times
+    (e.g. 500ms and 550ms, with priorities of e.g. 10 and 12)
 
     a: Constant - general weight
     d: Constant - enforced delay (trials)

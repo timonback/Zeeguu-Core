@@ -12,6 +12,11 @@ from zeeguu.model.user_word import UserWord
 
 
 class BookmarkRule(BaseRule):
+    """A Rule testing class for the zeeguu.model.Bookmark model class.
+
+    Creates a Bookmark object with random data and saves it to the database.
+    """
+
     props = ['origin', 'translation', 'text', 'date']
 
     def __init__(self, user, **kwargs):
@@ -21,6 +26,18 @@ class BookmarkRule(BaseRule):
         self.save(self.bookmark)
 
     def _create_model_object(self, user, **kwargs):
+        """
+        Creates a Bookmark object with random data.
+
+        Behind the random words, a random number is added since the Faker library does not have too many RANDOM words
+        and random words get repeated whenever many random bookmarks are created. To forcome the problem of bookmarks
+        with duplicate words in the database, a random number is added.
+
+        :param user: User Object, to which the bookmark is assigned.
+        :param kwargs: Holds any of the 'props' as key if a field should not be random
+        :return:
+        """
+        # This line is needed so that the URL is created in the database
         random_url = UrlRule().url
 
         random_text = TextRule().text

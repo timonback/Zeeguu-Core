@@ -6,6 +6,11 @@ from zeeguu.model.user import User
 
 
 class UserRule(BaseRule):
+    """A Rule testing class for the zeeguu.model.User model class.
+
+    Creates a User object with random data and saves it to the database.
+    """
+
     def __init__(self):
         super().__init__()
 

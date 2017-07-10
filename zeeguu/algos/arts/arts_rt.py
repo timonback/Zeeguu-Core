@@ -1,7 +1,9 @@
 import math
 
+from zeeguu.algos.arts.arts_base import ArtsBase
 
-class ArtsRT:
+
+class ArtsRT(ArtsBase):
     """
     ARTS algorithm with default values as described in:
     Adaptive response-time-based category sequencing in perceptual learning
@@ -19,13 +21,6 @@ class ArtsRT:
         self.b = b
         self.r = r
         self.w = w
-
-    def __eq__(self, other):
-        return self.a == other.a \
-               and self.d == other.d \
-               and self.b == other.b \
-               and self.r == other.r \
-               and self.w == other.w
 
     def calculate(self, args):
         """ Calculate the ARTS priority
