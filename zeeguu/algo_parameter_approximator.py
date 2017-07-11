@@ -1,4 +1,14 @@
 # -*- coding: utf8 -*-
+
+"""
+This file provides a meta-analysis to optimize the parameters of the word scheduling algorithms
+ for individual or all users.
+It simulates the algorithm through multiple runs and optimizes the parameter based on a predefined set of
+ optimization goals.
+The file can be run by itself, makes uses of code of Zeeguu and the connect data in the database (read), however
+ the Zeeguu Core does not depend on this. For a later manual analysis a csv file is written.
+"""
+
 import csv
 import datetime
 import math
@@ -21,45 +31,75 @@ def mean(numbers):
     return float(sum(numbers)) / max(len(numbers), 1)
 
 
-class AverageExercise:
-    def __init__(self, exercise_log):
-        self.exercise_log = exercise_log
-        self.past_exercises = []
-        self.past_exercises_iteration = []
+class AverageBookmarkExercise:
+    """Represents the average exercise for one bookmark and
+     keeps track of the history of exercises during the simulation
+    It is based on the ratio of correct/incorrect answer and reaction time of all by the user done exercises
+    It get used to create a model with real data in order to extend it later in the simulation (append_new_exercise)
+    """
+
+    """Default value for the probability that an exercise is correct, if no real data exists"""
+    DEFAULT_PROP_CORRECT = 0.5
+    """Default value for the reaction time for an exercise, if no real data exists"""
+    DEFAULT_REACTION_TIME = 500
+
+    def __init__(self, bookmark):
+        """Create a new AverageBookmarkExercise for a bookmark"""
+
+        """Original exercises"""
+        self.exercise_log = bookmark.exercise_log
+        """Added exercises during the simulation"""
+        self.exercises = []
+        """Corresponds to exercises and keeps the iteration in which the exercise was added"""
+        self.exercises_iteration = []
+        """Current bookmark priority"""
         self.priorities = []
 
-        self.avg_solving_speed, self.prob_correct = self._get_avg_exercise(exercise_log)
+        self.avg_solving_speed, self.prob_correct = self._get_avg_exercise(bookmark.exercise_log)
 
     @classmethod
     def _get_avg_exercise(cls, exercise_log):
+        """
+        Get the average exercise parameters based on the current exercise log of the bookmark
+        """
         if len(exercise_log) == 0:
-            return 500, 0.5
+            return cls.DEFAULT_REACTION_TIME, cls.DEFAULT_PROP_CORRECT
 
         avg_speed = mean([x.solving_speed for x in exercise_log])
         prob_correct = mean([x.outcome.correct for x in exercise_log])
         return avg_speed, prob_correct
 
     def append_new_exercise(self, iteration):
+        """
+        Add a new exercise to the exercise log
+        :param iteration: The current number of iteration / learning session
+        :return: The exercise
+        """
         random_outcome = ExerciseOutcome(
             ExerciseOutcome.CORRECT) if random.random() < self.prob_correct else ExerciseOutcome(ExerciseOutcome.WRONG)
         new_exercise = Exercise(random_outcome, ExerciseSource("Test"), self.avg_solving_speed, datetime.datetime.now())
         new_exercise.id = iteration
-        self.past_exercises.append(new_exercise)
-        self.past_exercises_iteration.append(iteration)
+        self.exercises.append(new_exercise)
+        self.exercises_iteration.append(iteration)
         return new_exercise
 
 
-class CalculationHelper:
-    def __init__(self, bookmark):
-        self.bookmark = bookmark
-        self.average_exercise = AverageExercise(bookmark.exercise_log)
+class AlgorithmSimulator:
+    """
+    Simulates a word scheduling algorithm on a specific user.
+    """
 
-
-class Fancinator:
+    """A word is excluded (learned) after x correct answers"""
     correct_count_limit = 3
+    """Assigned bookmark priority, when a bookmark is removed (learned)"""
     removed_bookmark_priority = -1000
 
     def __init__(self, user_id, algorithm=None):
+        """
+        Create a new algorithm simulation for
+        :param user_id: The user id of a user
+        :param algorithm: The used word scheduling algorithm (not the wrapper)
+        """
         self.user_id = user_id
 
         self.__create_database()
@@ -88,13 +128,24 @@ class Fancinator:
         self.algo_wrapper = new_algorithm_wrapper
 
     def calc_algorithm_stats(self, verbose=True):
+        """
+        Calculate the parameter stats for the algorithm
+        :param verbose: Whether additional information is printed
+        :return: [words_in_parallel_mean, repetition_correct_mean, repetition_incorrect_mean]
+         words_in_parallel_mean = mean of words that where learned in parallel
+         repetition_correct_mean = mean of how many other words are repeated
+          before the correctly answered words is repeated (spacing)
+         repetition_incorrect_mean = mean of how many other words are repeated
+          before incorrectly answered words is repeated (spacing)
+        """
         if len(self.bookmarks) == 0:
             return None
 
+        # reset random seed
         random.seed(0)
 
-        calculation_helpers = self.__run_algorithm_on_bookmarks(self.bookmarks, verbose=verbose)
-        return self.__calc_algorithm_result_stats(calculation_helpers, verbose=verbose)
+        bookmark_exercises = self.__run_algorithm_on_bookmarks(self.bookmarks, verbose=verbose)
+        return self.__calc_algorithm_result_stats(bookmark_exercises, verbose=verbose)
 
     def __get_bookmarks_for_user(self, user_id):
         user = User.find_by_id(user_id)
@@ -102,28 +153,36 @@ class Fancinator:
         return user.all_bookmarks()
 
     def __run_algorithm_on_bookmarks(self, bookmarks, iterations=200, verbose=True):
+        """
+        Run the algorithm for amount x of iteration (learning sessions) on the specified list of bookmarks
+        In each iteration a new exercise is added based on the AverageBookmarkExercise
+        :return: a list of AverageBookmarkExercise
+        """
         print('Found ' + str(len(bookmarks)) + ' bookmarks')
 
-        calculation_helpers = [CalculationHelper(x) for x in bookmarks]
-        next_bookmark = calculation_helpers[0]  # to know which exercise to generate next
+        bookmark_exercises = [AverageBookmarkExercise(x) for x in bookmarks]
+        # next_bookmark is used to know which bookmark has the highest priority in order to add a new exercise for it
+        next_bookmark = bookmark_exercises[0]  # First, we simply choose the first bookmark
 
         for i in range(0, iterations):
-            new_exercise = next_bookmark.average_exercise.append_new_exercise(i)
+            # generate new exercise
+            new_exercise = next_bookmark.append_new_exercise(i)
             if verbose:
                 print("{:4} - {:} - {:1}".format(i, next_bookmark.bookmark.id, new_exercise.outcome.correct), end=', ')
 
+            # update priorities
             max_priority = 0
-            for calculation_helper in calculation_helpers:
+            for bookmark_exercise in bookmark_exercises:
                 new_priority = PriorityInfo.MAX_PRIORITY
 
-                last_exercises = calculation_helper.average_exercise.past_exercises[-self.correct_count_limit:]
+                last_exercises = bookmark_exercise.exercises[-self.correct_count_limit:]
                 if len(last_exercises) != 0:
                     count_correct = math.fsum([x.outcome.correct for x in last_exercises])
                     if count_correct == self.correct_count_limit:
                         new_priority = self.removed_bookmark_priority
                     else:
                         new_priority = self.algo_wrapper.calculate(last_exercises[-1:][0], i)
-                    calculation_helper.average_exercise.priorities.append([i, new_priority])
+                    bookmark_exercise.priorities.append([i, new_priority])
 
                     if verbose:
                         if new_priority != self.removed_bookmark_priority:
@@ -132,34 +191,38 @@ class Fancinator:
                             print('{:8}'.format(''), end=', ')
 
                 if new_priority > max_priority:
-                    next_bookmark = calculation_helper
+                    next_bookmark = bookmark_exercise
                     max_priority = new_priority
             if verbose:
-                print('')
-        return calculation_helpers
+                print('')  # newline
+        return bookmark_exercises
 
-    def __calc_algorithm_result_stats(self, calculation_helpers, verbose=False):
+    def __calc_algorithm_result_stats(self, bookmark_exercises, verbose=False):
+        """
+        Calculate statistics based on the created AverageBookmarkExercise (list)
+        """
         # get the amount of iterations run
         iterations = max(
             [max(
-                map(lambda x: x[0], c.average_exercise.priorities)
+                map(lambda x: x[0], c.priorities)
                 , default=0)
-                for c in calculation_helpers]
+                for c in bookmark_exercises]
         ) + 1
 
         words_in_parallel = [0 for _ in range(0, iterations)]
         repetition_correct = []  # bookmark, iterations
         repetition_incorrect = []
-        for calculation_helper in calculation_helpers:
-            average_exercise = calculation_helper.average_exercise
-            for priority_iteration in average_exercise.priorities:
+        for bookmark_exercise in bookmark_exercises:
+            # for words_in_parallel
+            for priority_iteration in bookmark_exercise.priorities:
                 if priority_iteration[1] != self.removed_bookmark_priority:
                     words_in_parallel[priority_iteration[0]] += 1
 
-            for i in range(0, len(average_exercise.past_exercises_iteration) - 1):
-                repetition_after = average_exercise.past_exercises_iteration[i + 1] - \
-                                   average_exercise.past_exercises_iteration[i]
-                if average_exercise.past_exercises[i].outcome.correct:
+            # for repetition_correct_mean, repetition_incorrect_mean
+            for i in range(0, len(bookmark_exercise.past_exercises_iteration) - 1):
+                repetition_after = bookmark_exercise.past_exercises_iteration[i + 1] - \
+                                   bookmark_exercise.past_exercises_iteration[i]
+                if bookmark_exercise.past_exercises[i].outcome.correct:
                     repetition_correct.append(repetition_after)
                 else:
                     repetition_incorrect.append(repetition_after)
@@ -189,15 +252,15 @@ class OptimizationGoals:
                  words_in_parallel=10, words_in_parallel_factor=1.0,
                  repetition_correct=15, repetition_correct_factor=1.0,
                  repetition_incorrect=5, repetition_incorrect_factor=1.0):
-        '''
-        Used to specifiy on which goals to focus during the algorithm evalulation
+        """
+        Used to specify on which goals to focus during the algorithm evaluation
         :param words_in_parallel: Amount of words to study in parallel
         :param words_in_parallel_factor: Weighting factor (higher=more important [relative to the others])
         :param repetition_correct: After x words, correct words should reappear
         :param repetition_correct_factor: Weighting factor (higher=more important [relative to the others])
         :param repetition_incorrect: After x words, incorrect words should reappear
         :param repetition_incorrect_factor: Weighting factor (higher=more important [relative to the others])
-        '''
+        """
         self.words_in_parallel = words_in_parallel
         self.words_in_parallel_factor = words_in_parallel_factor
         self.repetition_correct = repetition_correct
@@ -205,24 +268,53 @@ class OptimizationGoals:
         self.repetition_incorrect = repetition_incorrect
         self.repetition_incorrect_factor = repetition_incorrect_factor
 
+
 class AlgorithmEvaluator:
+    """
+    Approximates the algorithm parameter for a user according to set of optimization goals
+    """
+
     def __init__(self, user_id, algorithm, max_iterations=20, change_limit=1.0):
-        self.fancy = Fancinator(user_id)
+        """
+        Creates an AlgorithmEvaluator
+        :param user_id: The user id of the user to optimize for
+        :param algorithm: The used algorithm (no wrapper)
+        :param max_iterations: The amount of maximum iterations to run/abort
+        :param change_limit: Abort the approximation if the change between two runs is smaller than change_limit
+        """
+        self.fancy = AlgorithmSimulator(user_id)
         self.algorithm = algorithm
         self.max_iterations = max_iterations
         self.change_limit = change_limit
 
     def fit_parameters(self, variables_to_set, optimization_goals):
+        """
+        Fit the parameters of the algorithm to match optimization goals best
+        :param variables_to_set: a list of algorithm_variables
+         algorithm_variable: ['X', getattr(algorithm, 'X'), approximation_change]
+         where:
+          1. X is the variable/parameter in the algorithm
+          2. The current/starting value for X in the first run
+          3. approximation_change is the added approximation variable in the next run
+        Notes about the approximation_change:
+         The starting value gets increased by approximation_change in every run until no further improvement is made.
+         Then: The new approximation_change is -(approximation_change/2) to run backward again closer to the optimal
+         value until it overshoots and the approximation_change is again updated
+        :param optimization_goals: An instance of OptimizationGoals
+        :return: The variables_to_set where the second parameter is the found optimal value
+        """
         if len(self.fancy.bookmarks) == 0:
             return None
 
         iteration_counter = 0
-        tick_tock = 0
+        tick_tock = 0  # ensure that when optimizing, it´s stopped the earliest after all variables have been considered
 
         # Init run
         result_new = self.fancy.calc_algorithm_stats(verbose=False)
         change = self.__diff_to_goal(optimization_goals, result_new)
 
+        # Only leave optimization when the change limit is too small and
+        #  the optimization was run on all parameters (tick_tock)
         while change > self.change_limit or tick_tock != 0:
             print('------------------------------------------------------------------------')
             print('Iteration {:3d} of the algorithm tickTock={}, variables={}'
@@ -235,6 +327,7 @@ class AlgorithmEvaluator:
 
             # run the algorithm
             result_new = self.fancy.calc_algorithm_stats(verbose=False)
+            # difference to desired goal
             diff_to_goal = self.__diff_to_goal(optimization_goals, result_new)
 
             if diff_to_goal < change:
@@ -305,6 +398,7 @@ class AlgorithmEvaluator:
         return diffs
 
 
+
 if __name__ == "__main__":
     optimization_goals = OptimizationGoals(
         words_in_parallel=20, words_in_parallel_factor=3,
@@ -312,8 +406,10 @@ if __name__ == "__main__":
         repetition_incorrect_factor=0
     )
 
+    # update exercise source stats
     AlgoService.update_exercise_source_stats()
 
+    # optimize for algorithm for these users
     users = User.find_all()
 
     start = timer()
@@ -339,6 +435,7 @@ if __name__ == "__main__":
 
     print(results)
 
+    # print general (mean) results
     users = list(map(lambda x: x[0], results))
     parameters_d = list(map(lambda x: x[1][0][1], results))
     parameters_b = list(map(lambda x: x[1][1][1], results))
@@ -351,8 +448,9 @@ if __name__ == "__main__":
     print('b: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_b), median(parameters_b), min(parameters_b), max(parameters_b)))
     print('w: mean {:6.2f}, median {:6.2f}, range from {:6.2f} to {:6.2f}'.format(mean(parameters_w), median(parameters_w), min(parameters_w), max(parameters_w)))
 
-    with open('calc_priority.csv', 'w') as myfile:
-        wr = csv.writer(myfile)
+    # write data for further analysis to file
+    with open('algo_parameter_approximator.csv', 'w') as file:
+        wr = csv.writer(file)
         wr.writerow(['user_id', 'd', 'b', 'w', 'bookmarks'])
         rows = [users,
                 parameters_d,

@@ -2,7 +2,7 @@ from zeeguu.model.learner_stats.exercise_stats import ExerciseStats
 
 
 class AlgorithmWrapper:
-    """A Wrapper class for the ARTS algorithm implementations.
+    """A Wrapper class for the ARTS algorithm implementations to calculate bookmark priorities.
 
     Needed to prepare the data received from the AlgoService for execution of the ARTS algorithm.
     This preparation is needed in order to use the ARTS algorithms without copy and pasting all
@@ -24,6 +24,13 @@ class AlgorithmWrapper:
         return self.algorithm.calculate(args)
 
     def _args_prepare(self, exercise, max_iterations):
+        """Gathers the parameters to later apply them when the algorithm.calculate method is being called
+        INFO: This needs to be overwritten for other word scheduling algorithms according to their required calculate method
+
+        :param exercise: The exercise (usually latest) to base the new priority on
+        :param max_iterations: Current amount of total iterations/sessions of a user (ArtsRT parameter D)
+        :return: parameters for algorithm.calculate
+        """
         N = max_iterations - exercise.id
         alpha = not exercise.outcome.correct
         RT = exercise.solving_speed
@@ -39,6 +46,11 @@ class AlgorithmSDCaller(AlgorithmWrapper):
     """
 
     def _args_prepare(self, exercise, max_iterations):
+        """ Overwritten original method of AlgorithmWrapper._args_prepare
+
+        The standard deviation algorithms require the standard deviation in order to calculate the new priorities.
+
+        """
         N = max_iterations - exercise.id
         alpha = exercise.outcome.correct
         sd = self.convert_rt_to_sd(exercise)

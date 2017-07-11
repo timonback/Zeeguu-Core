@@ -5,6 +5,7 @@ from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 
 def bookmarks_to_study(user, desired_bookmarks_count=10):
     """Returns a list of bookmarks with the highest priorities
+    An equal amount of bookmarks from each used algorithm (ABTesting) are selected
 
     If there are no bookmarks_groups (i.e. the bookmarks table is empty, or no Algorithms are declared in the
     WORD_SCHEDULING_ALGORITHM_CONFIG file) then an empty list is returned.
@@ -21,6 +22,7 @@ def bookmarks_to_study(user, desired_bookmarks_count=10):
         order_by(BookmarkPriorityARTS.priority.desc()). \
         all()
 
+    # Group the bookmarks by their used priority algorithm in lists
     bookmark_groups = ABTesting.split_bookmarks_based_on_algorithm(bookmarks)
     if len(bookmarks) == 0 or len(bookmark_groups) == 0:
         return []

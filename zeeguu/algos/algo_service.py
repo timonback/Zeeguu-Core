@@ -24,11 +24,10 @@ class PriorityInfo:
 
 
 class AlgoService:
+    """Handles the related tasks for using word scheduling algorithms
+    and also acts as a wrapper that calls the specific algorithm
     """
-        
-        service calls the wrapper that calls the algorithm 
-        
-    """
+
     algorithm_wrapper = AlgorithmWrapper(ArtsRT())
 
     # AlgorithmSDCaller requires that update_exercise_source_stats is being called at some point before
@@ -36,6 +35,8 @@ class AlgoService:
 
     @classmethod
     def update_exercise_source_stats(cls):
+        """Update the ExerciseStats for the ArtsDiffSlow and ArtsDiffFast algorithm to provide
+         normalization information between the different exercise sources"""
         exercise_sources = list(ExerciseSource.query.all())
         for source in exercise_sources:
             exercises = Exercise.query.filter_by(source_id=source.id).filter(Exercise.solving_speed <= 30000).all()
@@ -51,6 +52,11 @@ class AlgoService:
 
     @classmethod
     def update_bookmark_priority(cls, db, user):
+        """ Update all bookmark priorities of one user
+
+        :param db: The connection to the database
+        :param user: The user object
+        """
         try:
             bookmarks_for_user = user.all_bookmarks()
             if len(bookmarks_for_user) == 0:
@@ -78,6 +84,12 @@ class AlgoService:
 
     @classmethod
     def _calculate_bookmark_priority(cls, x, max_iterations):
+        """Calculate the (new) priority of a bookmark-exercise pair
+
+        :param x: An instance of the bookmark-exercise information (PriorityInfo)
+        :param max_iterations: The current amount of iterations/learning sessions (in the ArtsRT algorithm known as D)
+        :return: The bookmark-exercise information (PriorityInfo) with a updated priority
+        """
         if x.exercise is not None:
 
             if x.exercise.solving_speed > 0:
