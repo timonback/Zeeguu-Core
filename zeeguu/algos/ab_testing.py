@@ -21,8 +21,7 @@ class ABTesting:
         :return: An AlgorithmWrapper containing an ArtsRT object with the parameters
                  specified in WORD_SCHEDULING_ALGORITHM_CONFIG
         """
-        count_algorithms = len(cls._algorithms)
-        idx = divmod(id, count_algorithms)[1]
+        idx = cls.__get_algorithm_index_for_id(id)
         return cls._algorithms[idx]
 
     @classmethod
@@ -34,6 +33,15 @@ class ABTesting:
     def split_bookmarks_based_on_algorithm(cls, bookmarks):
         groups = []
         for i in range(0, len(cls._algorithms)):
-            groups.append([bookmarks[v] for v in range(i, len(bookmarks), len(cls._algorithms))])
+            groups.append([])
+
+        for i in range(0, len(bookmarks)):
+            group_idx = cls.__get_algorithm_index_for_id(bookmarks[i].id)
+            groups[group_idx].append(bookmarks[i])
 
         return groups
+
+    @classmethod
+    def __get_algorithm_index_for_id(cls, id):
+        count_algorithms = len(cls._algorithms)
+        return divmod(id, count_algorithms)[1]

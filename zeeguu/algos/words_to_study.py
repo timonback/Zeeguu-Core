@@ -27,11 +27,18 @@ def bookmarks_to_study(user, desired_bookmarks_count=10):
     if len(bookmarks) == 0 or len(bookmark_groups) == 0:
         return []
 
+    # Select bookmarks from the algorithm groups
     bookmarks_to_return = []
     possible_bookmarks_to_return_count = min(desired_bookmarks_count, len(bookmarks))
-
-    for i in range(possible_bookmarks_to_return_count):
+    i = 0  # counter to select from different groups
+    while possible_bookmarks_to_return_count != len(bookmarks_to_return):
         idx = i % len(bookmark_groups)
-        bookmarks_to_return.append(bookmark_groups[idx].pop(0))
+        if 0 < len(bookmark_groups[idx]):
+            bookmarks_to_return.append(bookmark_groups[idx].pop(0))
+
+        if i >= len(bookmarks):
+            # no more bookmarks available...
+            break
+        i = i + 1
 
     return bookmarks_to_return
