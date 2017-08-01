@@ -1,4 +1,5 @@
 import itertools
+
 import traceback
 
 import zeeguu
@@ -41,6 +42,11 @@ class AlgoService:
         for source in exercise_sources:
             exercises = Exercise.query.filter_by(source_id=source.id).filter(Exercise.solving_speed <= 30000).all()
             reaction_times = list(map(lambda x: x.solving_speed, exercises))
+            if len(reaction_times) == 0:
+                # magic values for the reaction, if no data exists
+                reaction_times = [5000, 6000]
+                print('This exercise source has no data yet. ID: ' + str(source.id))
+
             mean, sd = NormalDistribution.calc_normal_distribution(
                 reaction_times)
             if sd is None:
