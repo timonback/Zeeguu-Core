@@ -11,14 +11,13 @@ The file can be run by itself, makes uses of code of Zeeguu and the connect data
 
 import csv
 import datetime
+import flask_sqlalchemy
 import math
 import os
 import random
+from flask import Flask
 from statistics import median
 from timeit import default_timer as timer
-
-import flask_sqlalchemy
-from flask import Flask
 
 import zeeguu
 from zeeguu.algos.algo_service import PriorityInfo, AlgoService
@@ -219,10 +218,10 @@ class AlgorithmSimulator:
                     words_in_parallel[priority_iteration[0]] += 1
 
             # for repetition_correct_mean, repetition_incorrect_mean
-            for i in range(0, len(bookmark_exercise.past_exercises_iteration) - 1):
-                repetition_after = bookmark_exercise.past_exercises_iteration[i + 1] - \
-                                   bookmark_exercise.past_exercises_iteration[i]
-                if bookmark_exercise.past_exercises[i].outcome.correct:
+            for i in range(0, len(bookmark_exercise.exercises_iteration) - 1):
+                repetition_after = bookmark_exercise.exercises_iteration[i + 1] - \
+                                   bookmark_exercise.exercises_iteration[i]
+                if bookmark_exercise.exercises[i].outcome.correct:
                     repetition_correct.append(repetition_after)
                 else:
                     repetition_incorrect.append(repetition_after)
@@ -322,7 +321,7 @@ class AlgorithmEvaluator:
 
             new_variable_value = math.fabs(variables_to_set[tick_tock][1] + variables_to_set[tick_tock][2])
             setattr(self.algorithm, variables_to_set[tick_tock][0], new_variable_value)
-            print('Trying now with D={}, b={}, w={}'.format(self.algorithm.D, self.algorithm.b, self.algorithm.w))
+            print('Trying now with D={}, b={}, w={}'.format(self.algorithm.d, self.algorithm.b, self.algorithm.w))
             self.__update_algorithm_instance(self.algorithm)
 
             # run the algorithm
@@ -420,7 +419,7 @@ if __name__ == "__main__":
         algorithm = ArtsRT()
         evaluator = AlgorithmEvaluator(user_id, algorithm, change_limit=1.0)
         variables_to_set = [
-            ['D', getattr(algorithm, 'D'), +5],
+            ['d', getattr(algorithm, 'd'), +5],
             ['b', getattr(algorithm, 'b'), +10],
             ['w', getattr(algorithm, 'w'), +10]
         ]
