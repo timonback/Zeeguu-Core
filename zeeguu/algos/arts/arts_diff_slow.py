@@ -28,7 +28,8 @@ class ArtsDiffSlow((ArtsBase)):
         self.r = r
         self.w = w
 
-    def calculate(self, N, alpha, sd):
+    def calculate(self, args):
+        N, alpha, sd = args
         return self.a \
                * (N - self.d) \
                * (

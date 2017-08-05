@@ -9,7 +9,7 @@ class ArtsRT(ArtsBase):
     Adaptive response-time-based category sequencing in perceptual learning
     by Everett Mettler and Philip J. Kellman
     a: Constant - general weight
-    D: Constant - enforced delay (trials)
+    d: Constant - enforced delay (trials)
     b: Constant - weight for the response time
     r: Constant - weight for the response time (inside log)
     w: Constant - priority increment for an error. Higher values let incorrect items appear quicker again
