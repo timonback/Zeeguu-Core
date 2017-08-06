@@ -11,13 +11,14 @@ The file can be run by itself, makes uses of code of Zeeguu and the connect data
 
 import csv
 import datetime
-import flask_sqlalchemy
 import math
 import os
 import random
-from flask import Flask
 from statistics import median
 from timeit import default_timer as timer
+
+import flask_sqlalchemy
+from flask import Flask
 
 import zeeguu
 from zeeguu.algos.algo_service import PriorityInfo, AlgoService
@@ -41,6 +42,8 @@ class AverageBookmarkExercise:
     DEFAULT_PROP_CORRECT = 0.5
     """Default value for the reaction time for an exercise, if no real data exists"""
     DEFAULT_REACTION_TIME = 500
+    """Caching of the used exercise source"""
+    exercise_source = ExerciseSource.find("Test")
 
     def __init__(self, bookmark):
         """Create a new AverageBookmarkExercise for a bookmark"""
@@ -76,7 +79,7 @@ class AverageBookmarkExercise:
         """
         random_outcome = ExerciseOutcome(
             ExerciseOutcome.CORRECT) if random.random() < self.prob_correct else ExerciseOutcome(ExerciseOutcome.WRONG)
-        new_exercise = Exercise(random_outcome, ExerciseSource("Test"), self.avg_solving_speed, datetime.datetime.now())
+        new_exercise = Exercise(random_outcome, self.exercise_source, self.avg_solving_speed, datetime.datetime.now())
         new_exercise.id = iteration
         self.exercises.append(new_exercise)
         self.exercises_iteration.append(iteration)
@@ -180,7 +183,12 @@ class AlgorithmSimulator:
                     if count_correct == self.correct_count_limit:
                         new_priority = self.removed_bookmark_priority
                     else:
-                        new_priority = self.algo_wrapper.calculate(last_exercises[-1:][0], i)
+                        last_exercise = last_exercises[-1:][0]
+
+                        try:
+                            new_priority = self.algo_wrapper.calculate(last_exercise, i)
+                        except Exception as e:
+                            print('Exception during priority calculation: ' + str(e), e)
                     bookmark_exercise.priorities.append([i, new_priority])
 
                     if verbose:
@@ -281,7 +289,7 @@ class AlgorithmEvaluator:
         :param max_iterations: The amount of maximum iterations to run/abort
         :param change_limit: Abort the approximation if the change between two runs is smaller than change_limit
         """
-        self.fancy = AlgorithmSimulator(user_id)
+        self.fancy = AlgorithmSimulator(user_id, algorithm=algorithm)
         self.algorithm = algorithm
         self.max_iterations = max_iterations
         self.change_limit = change_limit
@@ -426,7 +434,8 @@ if __name__ == "__main__":
         result = evaluator.fit_parameters(variables_to_set, optimization_goals)
         if result is not None:
             count_bookmarks = len(evaluator.fancy.bookmarks)
-            result = [user_id, list(map(lambda x: [x[0], x[1]], result)), count_bookmarks]
+            count_exercises = sum(map(lambda x: len(x.exercise_log), evaluator.fancy.bookmarks))
+            result = [user_id, list(map(lambda x: [x[0], x[1]], result)), count_bookmarks, count_exercises]
             results.append(result)
         else:
             print('This user has no bookmarks. Skipping.')
@@ -440,6 +449,7 @@ if __name__ == "__main__":
     parameters_b = list(map(lambda x: x[1][1][1], results))
     parameters_w = list(map(lambda x: x[1][2][1], results))
     bookmarks = list(map(lambda x: x[2], results))
+    exercises = list(map(lambda x: x[3], results))
     print('Complete calculation took {:10.2f}s'.format((end-start)))
     print('Printing results based on {} users ({} users have no bookmark and are skipped)'.format(len(results), len(user_ids)-len(results)))
     print('Average user has {:6.2f} bookmarks'.format(mean(bookmarks)))
@@ -450,12 +460,13 @@ if __name__ == "__main__":
     # write data for further analysis to file
     with open('algo_parameter_approximator.csv', 'w') as file:
         wr = csv.writer(file)
-        wr.writerow(['user_id', 'd', 'b', 'w', 'bookmarks'])
+        wr.writerow(['user_id', 'd', 'b', 'w', 'bookmarks', 'exercises'])
         rows = [users,
                 parameters_d,
                 parameters_b,
                 parameters_w,
-                bookmarks]
+                bookmarks,
+                exercises]
 
         rows_zip = zip(*rows)
         wr.writerows(rows_zip)
