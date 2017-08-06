@@ -28,8 +28,7 @@ class ArtsDiffFast(ArtsBase):
         self.r = r
         self.w = w
 
-    def calculate(self, args):
-        N, alpha, sd = args
+    def calculate(self, N, alpha, sd):
         return self.a \
                * (N - self.d) \
                * (
