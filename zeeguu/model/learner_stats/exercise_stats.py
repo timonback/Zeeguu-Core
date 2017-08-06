@@ -14,8 +14,8 @@ class ExerciseStats(db.Model):
     exercise_source_id = db.Column(db.Integer, db.ForeignKey("exercise_source.id"), primary_key=True)
     exercise_source = db.relationship(ExerciseSource)
 
-    mean = db.Column(db.DECIMAL(10, 3), nullable=False)
-    sd = db.Column(db.DECIMAL(10, 3), nullable=False)
+    mean = db.Column(db.DECIMAL(10, 3, asdecimal=False), nullable=False)
+    sd = db.Column(db.DECIMAL(10, 3, asdecimal=False), nullable=False)
 
     updated = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
