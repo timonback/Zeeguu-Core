@@ -220,7 +220,7 @@ class User(db.Model):
         :param bookmark_count: by default we recommend 10 words 
         :return: 
         """
-        from zeeguu.algos import words_to_study
+        from zeeguu.word_scheduling import words_to_study
 
         if self.bookmark_count() == 0:
             bookmarks = self.__create_default_bookmarks(bookmark_count)

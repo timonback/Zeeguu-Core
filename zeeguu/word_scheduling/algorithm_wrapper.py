@@ -4,7 +4,7 @@ from zeeguu.model.learner_stats.exercise_stats import ExerciseStats
 class AlgorithmWrapper:
     """A Wrapper class for the ARTS algorithm implementations to calculate bookmark priorities.
 
-    Needed to prepare the data received from the AlgoService for execution of the ARTS algorithm.
+    Needed to prepare the data received from the AlgorithmService for execution of the ARTS algorithm.
     This preparation is needed in order to use the ARTS algorithms without copy and pasting all
     preparation code (i.e. getting the N, alpha, and RT values) everywhere where the ARTS algorithm
     is to be used.

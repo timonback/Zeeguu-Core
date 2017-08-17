@@ -1,6 +1,6 @@
 import random
 
-from zeeguu.algos.arts.arts_base import ArtsBase
+from zeeguu.word_scheduling.arts.arts_base import ArtsBase
 
 
 class ArtsRandom(ArtsBase):

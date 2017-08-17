@@ -3,9 +3,9 @@ import itertools
 import traceback
 
 import zeeguu
-from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
-from zeeguu.algos.analysis.normal_distribution import NormalDistribution
-from zeeguu.algos.arts.arts_rt import ArtsRT
+from zeeguu.word_scheduling.algorithm_wrapper import AlgorithmWrapper
+from zeeguu.word_scheduling.analysis.normal_distribution import NormalDistribution
+from zeeguu.word_scheduling.arts.arts_rt import ArtsRT
 from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 from zeeguu.model.exercise import Exercise
 from zeeguu.model.exercise_source import ExerciseSource
@@ -24,7 +24,7 @@ class PriorityInfo:
         self.priority = priority
 
 
-class AlgoService:
+class AlgorithmService:
     """Handles the related tasks for using word scheduling algorithms
     and also acts as a wrapper that calls the specific algorithm
     """

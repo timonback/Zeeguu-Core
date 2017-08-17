@@ -1,17 +1,23 @@
 import math
 
-from zeeguu.algos.arts.arts_base import ArtsBase
+from zeeguu.word_scheduling.arts.arts_base import ArtsBase
 
 
-class ArtsRT(ArtsBase):
+class ArtsDiffSlow((ArtsBase)):
     """
     ARTS algorithm with default values as described in:
     Adaptive response-time-based category sequencing in perceptual learning
     by Everett Mettler and Philip J. Kellman
+
+    This class emphasizes the differences between (on average) slow reaction times more than between (on average)
+    fast reaction times. This means that priorities of slightly different slow reaction times (e.g. 2000ms and
+    2050ms) differ more significantly (e.g. 10 and 50) than the priorities of slightly different fast reaction times
+    (e.g. 500ms and 550ms, with priorities of e.g. 10 and 12)
+
     a: Constant - general weight
     d: Constant - enforced delay (trials)
     b: Constant - weight for the response time
-    r: Constant - weight for the response time (inside log)
+    r: Constant - weight for the standard deviation (inside log)
     w: Constant - priority increment for an error. Higher values let incorrect items appear quicker again
     """
 
@@ -22,18 +28,10 @@ class ArtsRT(ArtsBase):
         self.r = r
         self.w = w
 
-    def calculate(self, args):
-        """ Calculate the ARTS priority
-        Parameters:
-            args: Contains the following parameters:
-                N: number of trials since item was presented
-                alpha: 0, if item was last answered correct; 1 otherwise
-                RT: response time on most recent presentation
-        """
-        N, alpha, RT = args
+    def calculate(self, N, alpha, sd):
         return self.a \
                * (N - self.d) \
                * (
-                   (1 - alpha) * self.b * math.log(RT / self.r)
+                   (1 - alpha) * self.b / (math.e ** (self.r * sd))
                    + (alpha * self.w)
                )

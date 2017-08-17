@@ -12,7 +12,7 @@ class AlgorithmLoader:
 
             parameters_converted = {key: float(val) for (key, val) in parameters.items()}
 
-            algorithm_class = getattr(importlib.import_module('zeeguu.algos.arts'), algorithm_name)
+            algorithm_class = getattr(importlib.import_module('zeeguu.word_scheduling.arts'), algorithm_name)
             return algorithm_class(**parameters_converted)
 
         except AttributeError as e:
