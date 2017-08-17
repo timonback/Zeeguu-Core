@@ -24,7 +24,7 @@ class PriorityInfo:
         self.priority = priority
 
 
-class AlgoService:
+class AlgorithmService:
     """Handles the related tasks for using word scheduling algorithms
     and also acts as a wrapper that calls the specific algorithm
     """

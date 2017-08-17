@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, date
 
 from tests_core_zeeguu.rules.language_rule import LanguageRule
 
-from zeeguu.algos.algo_service import AlgoService
+from zeeguu.algos.algorithm_service import AlgorithmService
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
@@ -91,7 +91,7 @@ class UserTest(ModelTestMixIn):
 
     def test_bookmarks_to_study(self):
         self.user.learned_language_id = random.choice(Language.available_languages()).id
-        AlgoService.update_bookmark_priority(self.db, self.user)
+        AlgorithmService.update_bookmark_priority(self.db, self.user)
         default_bookmarks = self.user.bookmarks_to_study()
         assert len(default_bookmarks) != 0
 
