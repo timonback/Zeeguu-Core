@@ -6,8 +6,8 @@ from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.exercise_rule import ExerciseRule
 from tests_core_zeeguu.rules.outcome_rule import OutcomeRule
 from tests_core_zeeguu.rules.user_rule import UserRule
-from zeeguu.algos.ab_testing import ABTesting
-from zeeguu.algos.algorithm_service import AlgorithmService
+from zeeguu.word_scheduling.ab_testing import ABTesting
+from zeeguu.word_scheduling.algorithm_service import AlgorithmService
 
 
 class WordsToStudyTest(ModelTestMixIn):

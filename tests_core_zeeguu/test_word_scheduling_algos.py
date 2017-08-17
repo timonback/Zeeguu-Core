@@ -7,12 +7,12 @@ from tests_core_zeeguu.rules.user_rule import UserRule
 
 from tests_core_zeeguu.model_test_mixin import ModelTestMixIn
 from tests_core_zeeguu.rules.bookmark_rule import BookmarkRule
-from zeeguu.algos.ab_testing import ABTesting
-from zeeguu.algos.algorithm_service import AlgorithmService
-from zeeguu.algos.algorithm_loader import AlgorithmLoader
-from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
-from zeeguu.algos.analysis.normal_distribution import NormalDistribution
-from zeeguu.algos.arts import ArtsDiffFast, ArtsDiffSlow, ArtsRT, ArtsRandom
+from zeeguu.word_scheduling.ab_testing import ABTesting
+from zeeguu.word_scheduling.algorithm_service import AlgorithmService
+from zeeguu.word_scheduling.algorithm_loader import AlgorithmLoader
+from zeeguu.word_scheduling.algorithm_wrapper import AlgorithmWrapper
+from zeeguu.word_scheduling.analysis.normal_distribution import NormalDistribution
+from zeeguu.word_scheduling.arts import ArtsDiffFast, ArtsDiffSlow, ArtsRT, ArtsRandom
 
 
 class WordSchedulingAlgosTest(ModelTestMixIn):

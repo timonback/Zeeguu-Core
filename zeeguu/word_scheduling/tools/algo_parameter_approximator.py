@@ -21,9 +21,9 @@ import flask_sqlalchemy
 from flask import Flask
 
 import zeeguu
-from zeeguu.algos.algorithm_service import PriorityInfo, AlgorithmService
-from zeeguu.algos.algorithm_wrapper import AlgorithmWrapper
-from zeeguu.algos.arts.arts_rt import ArtsRT
+from zeeguu.word_scheduling.algorithm_service import PriorityInfo, AlgorithmService
+from zeeguu.word_scheduling.algorithm_wrapper import AlgorithmWrapper
+from zeeguu.word_scheduling.arts.arts_rt import ArtsRT
 from zeeguu.model import User, ExerciseOutcome, Exercise, ExerciseSource
 
 

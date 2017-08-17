@@ -1,4 +1,4 @@
-from zeeguu.algos.ab_testing import ABTesting
+from zeeguu.word_scheduling.ab_testing import ABTesting
 from zeeguu.model.bookmark import Bookmark
 from zeeguu.model.bookmark_priority_arts import BookmarkPriorityARTS
 

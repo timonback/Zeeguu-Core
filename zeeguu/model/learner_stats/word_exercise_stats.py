@@ -2,7 +2,7 @@ import decimal
 
 import sqlalchemy.orm
 import zeeguu
-from zeeguu.algos.algorithm_service import AlgorithmService
+from zeeguu.word_scheduling.algorithm_service import AlgorithmService
 from zeeguu.model.user import User
 from zeeguu.model.user_word import UserWord
 
